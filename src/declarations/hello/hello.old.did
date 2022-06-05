@@ -1,4 +1,0 @@
-service : {
-  farewell: (text) -> (text);
-  greet: (text) -> (text);
-}
