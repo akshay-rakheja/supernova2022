@@ -2,5 +2,7 @@ type TickResult = variant { "ok": int; "err": text };
 
 service: {
     "hello_world": () -> (text) query;
+    "get_update_address": () -> (text) query;
+    "set_update_address": (text) -> ();
     "tick_result": () -> (TickResult);
 }

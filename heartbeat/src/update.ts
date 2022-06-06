@@ -1,13 +1,12 @@
-import {Update, Query, int, UpdateAsync, CanisterResult} from 'azle';
-
+import { Update, Query, int, UpdateAsync, CanisterResult } from "azle";
 
 let counter: int = BigInt(0);
 export function count(): Query<int> {
-    
-    return counter;
+  return counter;
 }
 
-export function tick(): Update<void> {
-    console.log("Ticked!!!!")
-    counter = counter + BigInt(1);
+export function tick(): Update<int> {
+  console.log("Ticked!!!!");
+  counter = counter + BigInt(1);
+  return counter;
 }
