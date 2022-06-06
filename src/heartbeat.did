@@ -1,3 +1,6 @@
+type TickResult = variant { "ok": int; "err": text };
+
 service: {
     "hello_world": () -> (text) query;
+    "tick_result": () -> (TickResult);
 }
