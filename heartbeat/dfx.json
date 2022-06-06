@@ -15,6 +15,22 @@
       "ts": "src/update.ts",
       "candid": "src/update.did",
       "wasm": "target/wasm32-unknown-unknown/release/update.wasm"
+    },
+    "update2": {
+      "type": "custom",
+      "build": "npx azle update",
+      "root": "src",
+      "ts": "src/update.ts",
+      "candid": "src/update.did",
+      "wasm": "target/wasm32-unknown-unknown/release/update.wasm"
+    },
+    "update3": {
+      "type": "custom",
+      "build": "npx azle update",
+      "root": "src",
+      "ts": "src/update.ts",
+      "candid": "src/update.did",
+      "wasm": "target/wasm32-unknown-unknown/release/update.wasm"
     }
   }
 }
