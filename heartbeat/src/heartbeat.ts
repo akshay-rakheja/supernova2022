@@ -76,8 +76,8 @@ export function* heartbeat(): Heartbeat {
   }
 }
 
-export function* tick_result(): UpdateAsync<TickResult> {
-  let updateCanister =
-    ic.canisters.Update_Canister<Update_Canister>(update_address);
-  return yield updateCanister.tick();
-}
+// export function* tick_result(): UpdateAsync<TickResult> {
+//   let updateCanister =
+//     ic.canisters.Update_Canister<Update_Canister>(update_address);
+//   return yield updateCanister.tick();
+// }
