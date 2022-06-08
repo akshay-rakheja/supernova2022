@@ -19,7 +19,7 @@ type Update_Canister = Canister<{
 }>;
 
 type Registry = { [key: string]: UpdateInfo };
-type UpdateInfo = { period: nat };
+type UpdateInfo = { period: nat; func: string };
 let lastUpdate: { [key: string]: nat } = {};
 let registry: Registry = {};
 let lastTime: nat = BigInt(0);
@@ -28,9 +28,10 @@ let period: nat = BigInt(10_000_000_000);
 
 export function add_update_address(
   newAddress: Principal,
-  period: nat
+  period: nat,
+  func: string
 ): Update<void> {
-  registry[newAddress] = { period };
+  registry[newAddress] = { period, func };
   lastUpdate[newAddress] = ic.time();
 }
 
@@ -60,17 +61,20 @@ function should(period: nat, comparison: nat = lastTime): boolean {
 export function* heartbeat(): Heartbeat {
   if (shouldTick()) {
     for (const address of Object.keys(registry)) {
-      console.log("I am checking", address);
+      // console.log("I am checking", address, lastUpdate[address]);
       const { period: thisPeriod } = registry[address];
       if (should(thisPeriod, lastUpdate[address])) {
         lastUpdate[address] = ic.time();
-        console.log("I will tick", address);
-        console.log("arguments");
+        // console.log("I will tick", address);
+        // console.log("arguments");
         // const argarray:nat8[] = "()".split("").map((s) => s.charCodeAt(0));
-        // const argarray: nat8[] = [68, 73, 68, 76, 0, 0];
-        // const { ok, err }: Variant<{ ok: nat8[]; err: string }> =
-        //   yield ic.call_raw(address, "tick", argarray, 0n); //@TODO RHD Experiment with late-binding
-        // console.log("I have ok and err", ok, err);
+        /* */
+        const nullArguments: nat8[] = [68, 73, 68, 76, 0, 0];
+        const { ok, err }: Variant<{ ok: nat8[]; err: string }> =
+          yield ic.call_raw(address, "tick", nullArguments, 0n); //@TODO RHD Experiment with late-binding
+        if (err) console.log("I have   err", err);
+        /** */
+        /*
         const update = ic.canisters.Update_Canister<Update_Canister>(address);
         // .tick();
         const result: TickResult = yield update.tick();
@@ -80,6 +84,7 @@ export function* heartbeat(): Heartbeat {
         } else {
           console.log("Tick: " + address + ": " + result.err);
         }
+        /** */
       } else {
         // console.log("I will not tick");
       }

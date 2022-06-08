@@ -1,9 +1,10 @@
 type UpdateInfo = record {
     "period": nat;
+    "func": text;
 };
 
 service: {
     "get_update_address": (principal) -> (UpdateInfo) query;
-    "add_update_address": (principal, nat) -> ();
+    "add_update_address": (principal, nat, text) -> ();
     "remove_update_address": (principal) -> ();
 }
