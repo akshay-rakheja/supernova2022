@@ -4,5 +4,6 @@ type UpdateInfo = record {
 
 service: {
     "get_update_address": (principal) -> (UpdateInfo) query;
-    "add_update_address": (text, nat) -> ();
+    "add_update_address": (principal, nat) -> ();
+    "remove_update_address": (principal) -> ();
 }
