@@ -1,4 +1,3 @@
 service: {
-    "get_update_addresses": () -> (vec text) query;
-    "add_update_address": (text) -> ();
+    "add_update_address": (text, nat) -> ();
 }
