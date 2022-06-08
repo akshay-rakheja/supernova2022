@@ -57,24 +57,23 @@ export function* heartbeat(): Heartbeat {
   if (shouldTick()) {
     for (const address of Object.keys(registry)) {
       console.log("I am checking", address);
-        const { period: thisPeriod } = registry[address];
-        if (should(thisPeriod)) {
-          console.log("I will tick", address);
-      
-      //     // yield ic.call_raw(address, "tick", [], BigInt(0)); //@TODO RHD Experiment with late-binding
-      //     const update: Update_Canister =
-      //       ic.canisters.Update_Canister<Update_Canister>(address);
-      //     const result: TickResult = yield update.tick();
-      //     if (result.ok) {
-      //       console.log("Tick: " + address + ": " + result.ok.toString());
-      //     } else {
-      //       console.log("Tick: " + address + ": " + result.err);
-          } else {
-            console.log("I will not tick");
-          }
-        }
+      const { period: thisPeriod } = registry[address];
+      if (should(thisPeriod)) {
+        console.log("I will tick", address);
+
+        //     // yield ic.call_raw(address, "tick", [], BigInt(0)); //@TODO RHD Experiment with late-binding
+        //     const update: Update_Canister =
+        //       ic.canisters.Update_Canister<Update_Canister>(address);
+        //     const result: TickResult = yield update.tick();
+        //     if (result.ok) {
+        //       console.log("Tick: " + address + ": " + result.ok.toString());
+        //     } else {
+        //       console.log("Tick: " + address + ": " + result.err);
+      } else {
+        console.log("I will not tick");
+      }
     }
-    console.log("Incrementing lastTime to ", ic.time());
-    lastTime = ic.time();
   }
+  console.log("Incrementing lastTime to ", ic.time());
+  lastTime = ic.time();
 }
