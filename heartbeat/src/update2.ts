@@ -5,8 +5,8 @@ export function count(): Query<int> {
   return counter;
 }
 
-export function tick2(): Update<int> {
-  console.log("Ticked!!!!");
-  counter = counter + BigInt(1);
-  return counter;
+export function tick2(): Update<void> {
+  console.log("Ticked me!!!!!");
+  counter = counter + BigInt(2);
+  // return counter;
 }
