@@ -1,12 +1,27 @@
 type UpdateInfo = record {
-    "period": nat;
+    "period": opt nat;
     "func": text;
+    "schedule": opt Schedule;
+    "canister": principal;
+};
+
+type Schedule = record {
+    "dow": opt nat8;
+    "hour": nat8;
+    "minute": nat8;
 };
 
 service: {
-    "get_update_address": (principal) -> (UpdateInfo) query;
-    "get_pulses": (principal) -> (nat) query;
-    "get_next_update_time": (principal) -> (nat) query;
-    "add_update_address": (principal, nat, text) -> ();
-    "remove_update_address": (principal) -> ();
+    "get_one": (principal, nat8) -> (UpdateInfo) query;
+    "get_length": (principal) -> (nat8) query;
+    "get_all": (principal) -> (vec UpdateInfo) query;
+    "get_used_pulses": (principal) -> (nat) query;
+    "get_available_pulses": (principal) -> (nat) query;
+    "get_next_update_time": (principal, nat8) -> (nat) query;
+    "getDisplayTime": () -> (text) query;
+    "getNow": () -> (nat) query;
+    "add_period": (principal, nat, text) -> (nat);
+    "add_weekly_schedule": (principal, nat8, nat8, nat8, text) -> (nat);
+    "add_daily_schedule": (principal, nat8, nat8, text) -> (nat);
+    "remove": (principal, nat8) -> ();
 }
