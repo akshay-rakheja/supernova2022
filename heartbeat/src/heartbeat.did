@@ -1,8 +1,18 @@
 type UpdateInfo = record {
+    "owner": principal;
     "period": opt nat;
     "func": text;
     "schedule": opt Schedule;
     "canister": principal;
+    "args": opt vec nat8;
+};
+
+type Message = record {
+    "owner": principal;
+    "time": nat;
+    "canister": principal;
+    "func": text;
+    "args": opt vec nat8;
 };
 
 type Schedule = record {
@@ -12,16 +22,27 @@ type Schedule = record {
 };
 
 service: {
-    "get_one": (principal, nat8) -> (UpdateInfo) query;
-    "get_length": (principal) -> (nat8) query;
+    "get_one": (principal, nat32) -> (UpdateInfo) query;
+    "get_count": (principal) -> (nat32) query;
     "get_all": (principal) -> (vec UpdateInfo) query;
-    "get_used_pulses": (principal) -> (nat) query;
-    "get_available_pulses": (principal) -> (nat) query;
-    "get_next_update_time": (principal, nat8) -> (nat) query;
+    "get_next_update_time": (principal, nat32) -> (nat) query;
+    "get_one_message": (principal, nat32) -> (Message) query;
+    "get_message_count": (principal) -> (nat32) query;
+    "get_messages": (principal) -> (vec Message) query;
+    "get_burned_pulses": () -> (nat) query;
+    "get_pulses": () -> (nat) query;
+    "get_pulses_for": (principal) -> (nat) query;
     "getDisplayTime": () -> (text) query;
     "getNow": () -> (nat) query;
-    "add_period": (principal, nat, text) -> (nat);
-    "add_weekly_schedule": (principal, nat8, nat8, nat8, text) -> (nat);
-    "add_daily_schedule": (principal, nat8, nat8, text) -> (nat);
-    "remove": (principal, nat8) -> ();
+    "getNowSeconds": () -> (nat32) query;
+    "whoami": () -> (principal) query;
+    "add_period": (principal, nat, text) -> (nat32);
+    "add_weekly_schedule": (principal, nat8, nat8, nat8, text) -> (nat32);
+    "add_daily_schedule": (principal, nat8, nat8, text) -> (nat32);
+    "remove": (principal, nat32) -> ();
+    "add_message": (principal, nat, text, opt vec nat8) -> (nat32);
+    "remove_message": (principal, nat32) -> (nat32);
+    "mint_pulses": (nat) -> (nat);
+    "mint_pulses_for": (nat, principal) -> (nat);
+    "transfer_pulses": (nat, principal) -> (nat);
 }

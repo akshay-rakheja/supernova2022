@@ -1,8 +1,18 @@
-import { Query, ic, Heartbeat, Update, nat, Principal, nat8, Opt } from "azle";
+import {
+  Query,
+  ic,
+  Heartbeat,
+  Update,
+  nat,
+  Principal,
+  nat8,
+  Opt,
+  nat32,
+} from "azle";
 
 //#region custom types
 type Registry = { [key: string]: UpdateInfo[] };
-
+type MessageRegistry = { [key: string]: Message[] };
 type Schedule = {
   dow: Opt<nat8>;
   hour: nat8;
@@ -10,10 +20,20 @@ type Schedule = {
 };
 
 type UpdateInfo = {
+  owner: Principal;
   period: Opt<nat>;
   func: string;
   schedule: Opt<Schedule>;
   canister: Principal;
+  args: Opt<nat8[]>;
+};
+
+type Message = {
+  owner: Principal;
+  time: nat;
+  canister: Principal;
+  func: string;
+  args: Opt<nat8[]>;
 };
 
 //#endregion
@@ -103,6 +123,7 @@ let lastUpdate: { [key: string]: nat[] } = {};
 let firedPulses: { [key: string]: nat } = {};
 let allowedPulses: { [key: string]: nat } = {};
 let registry: Registry = {};
+let messageRegistry: MessageRegistry = {};
 let lastTime: nat = BigInt(0);
 let period: nat = BigInt(10);
 
@@ -116,11 +137,10 @@ function should(period: nat, comparison: nat = lastTime): boolean {
   return delta > period;
 }
 
-function* sendPulse(address: Principal, index: number) {
-  const { func } = registry[address][index];
+function* sendPulse(address: Principal, func: string, args: Opt<nat8[]>) {
   firedPulses[address] = firedPulses[address] + BigInt(1);
-  const nullArguments: nat8[] = [68, 73, 68, 76, 0, 0]; // DIDL + 2 nulls
-  yield ic.call_raw(address, func, nullArguments, 0n); //@TODO RHD SUpport passing an argument other than null
+  if (!args) args = [68, 73, 68, 76, 0, 0]; // DIDL + 2 nulls
+  yield ic.call_raw(address, func, args, 0n); //@TODO RHD SUpport passing an argument other than null
 }
 
 function setNextUpdate(schedule: Schedule) {
@@ -140,25 +160,28 @@ function setNextUpdate(schedule: Schedule) {
 
 //#endregion
 
-//#region interface
+//#region Interface for schedules
 export function add_period(
   canister: Principal,
   period_in_seconds: nat,
   func: string
-): Update<nat> {
+): Update<nat32> {
+  const owner = ic.caller();
+  if (allowedPulses[owner] < 1)
+    throw new Error("You must have pulses in the bank");
   if (period_in_seconds < 10) throw new Error("Period must be at least 10s");
   if (!registry[canister]) registry[canister] = [];
   registry[canister].push({
+    owner,
     period: period_in_seconds * second_in_ns,
     func,
     canister,
     schedule: null,
+    args: null,
   });
   if (!lastUpdate[canister]) lastUpdate[canister] = [];
   lastUpdate[canister].push(ic.time());
-  firedPulses[canister] = BigInt(0);
-  if (allowedPulses[canister] === null) allowedPulses[canister] = BigInt(10);
-  return lastUpdate[canister][lastUpdate[canister].length - 1] + period;
+  return lastUpdate[canister].length - 1;
 }
 
 export function add_weekly_schedule(
@@ -167,49 +190,59 @@ export function add_weekly_schedule(
   hour_of_day: nat8,
   minute: nat8,
   func: string
-): Update<nat> {
+): Update<nat32> {
+  const owner = ic.caller();
+  if (allowedPulses[owner] < 1)
+    throw new Error("You must have pulses in the bank");
   const schedule: Schedule = { dow: day_of_week, hour: hour_of_day, minute };
   if (!registry[canister]) registry[canister] = [];
-  registry[canister].push({ func, canister, schedule, period: null });
-  firedPulses[canister] = BigInt(0);
-  if (allowedPulses[canister] === null) allowedPulses[canister] = BigInt(10);
+  registry[canister].push({
+    owner,
+    func,
+    canister,
+    schedule,
+    period: null,
+    args: null,
+  });
   if (!lastUpdate[canister]) lastUpdate[canister] = [];
   lastUpdate[canister].push(setNextUpdate(schedule));
-  return lastUpdate[canister][lastUpdate[canister].length - 1];
+  return lastUpdate[canister].length - 1;
 }
 export function add_daily_schedule(
   canister: Principal,
   hour_of_day: nat8,
   minute: nat8,
   func: string
-): Update<nat> {
-  console.log("A");
+): Update<nat32> {
+  const owner = ic.caller();
+  if (allowedPulses[owner] < 1)
+    throw new Error("You must have pulses in the bank");
   const schedule: Schedule = { dow: null, hour: hour_of_day, minute };
-  console.log("B");
   if (!registry[canister]) registry[canister] = [];
-  console.log("C");
-  registry[canister].push({ func, canister, schedule, period: null });
-  console.log("D");
-  firedPulses[canister] = BigInt(0);
-  console.log("E");
-  if (allowedPulses[canister] === null) allowedPulses[canister] = BigInt(10);
-  console.log("F");
+  registry[canister].push({
+    owner,
+    func,
+    canister,
+    schedule,
+    period: null,
+    args: null,
+  });
   if (!lastUpdate[canister]) lastUpdate[canister] = [];
-  console.log("G");
   lastUpdate[canister].push(setNextUpdate(schedule));
-  console.log("H");
-  return lastUpdate[canister][lastUpdate[canister].length - 1];
+  return lastUpdate[canister].length - 1;
 }
 
-export function remove(address: Principal, index: nat8): Update<void> {
+export function remove(address: Principal, index: nat32): Update<void> {
+  if (ic.caller() !== registry[address][index].owner)
+    throw new Error("Not the owner of this schedule");
   delete registry[address][index];
 }
 
-export function get_one(principal: Principal, index: nat8): Query<UpdateInfo> {
+export function get_one(principal: Principal, index: nat32): Query<UpdateInfo> {
   return registry[principal][index];
 }
 
-export function get_count(principal: Principal): Query<nat8> {
+export function get_count(principal: Principal): Query<nat32> {
   return registry[principal].length;
 }
 
@@ -217,22 +250,114 @@ export function get_all(principal: Principal): Query<UpdateInfo[]> {
   return registry[principal];
 }
 
-export function get_used_pulses(principal: Principal): Query<nat> {
-  return firedPulses[principal];
-}
-
-export function get_available_pulses(principal: Principal): Query<nat> {
-  return allowedPulses[principal] - firedPulses[principal];
-}
 export function get_next_update_time(
   principal: Principal,
-  index: nat8
+  index: nat32
 ): Query<nat> {
   if (registry[principal][index].period !== null) {
     return lastUpdate[principal][index] + registry[principal][index].period!;
   } else {
     return lastUpdate[principal][index];
   }
+}
+//#endregion
+
+//#region Interface for messages (one-time events)
+export function add_message(
+  canister: Principal,
+  unix_time_code_in_seconds: nat,
+  func: string,
+  args: Opt<nat8[]>
+): Update<nat32> {
+  const owner = ic.caller();
+  if (allowedPulses[owner] < 1)
+    throw new Error("You must have pulses in the bank");
+  const time = unix_time_code_in_seconds * second_in_ns;
+  if (time < ic.time()) throw new Error("Time must be in the future");
+  if (!messageRegistry[canister]) messageRegistry[canister] = [];
+  messageRegistry[canister].push({ args, func, canister, time, owner });
+  return messageRegistry[canister].length - 1;
+}
+
+export function remove_message(
+  canister: Principal,
+  index: nat32
+): Update<nat32> {
+  if (ic.caller() !== messageRegistry[canister][index].owner)
+    throw new Error("Not the owner of this schedule");
+  delete messageRegistry[canister][index];
+  return messageRegistry[canister].length;
+}
+
+export function get_one_message(
+  principal: Principal,
+  index: nat32
+): Query<Message> {
+  return messageRegistry[principal][index];
+}
+
+export function get_message_count(principal: Principal): Query<nat32> {
+  return messageRegistry[principal].length;
+}
+
+export function get_messages(principal: Principal): Query<Message[]> {
+  return messageRegistry[principal];
+}
+//#endregion
+
+//#region Interface for pulses
+
+export function mint_pulses(pulseCount: nat): Update<nat> {
+  if (pulseCount < 1) throw new Error("Pulsecount needs ot be at least 1");
+  const principal = ic.caller();
+  if (!allowedPulses[principal]) {
+    allowedPulses[principal] = 0n;
+    firedPulses[principal] = 0n;
+  }
+  allowedPulses[principal] += pulseCount;
+  return allowedPulses[principal];
+}
+
+export function mint_pulses_for(
+  pulseCount: nat,
+  onBehalfOf: Principal
+): Update<nat> {
+  if (pulseCount < 1) throw new Error("Pulsecount needs ot be at least 1");
+  const principal = onBehalfOf;
+  if (!allowedPulses[principal]) {
+    allowedPulses[principal] = 0n;
+    firedPulses[principal] = 0n;
+  }
+  allowedPulses[principal] += pulseCount;
+  return allowedPulses[principal];
+}
+
+export function get_burned_pulses(): Query<nat> {
+  const principal = ic.caller();
+  return firedPulses[principal];
+}
+
+export function get_pulses(): Query<nat> {
+  const principal = ic.caller();
+  return allowedPulses[principal] - firedPulses[principal];
+}
+
+export function get_pulses_for(principal: Principal): Query<nat> {
+  return allowedPulses[principal] - firedPulses[principal];
+}
+
+export function transfer_pulses(pulseCount: nat, to: Principal): Update<nat> {
+  const principal = ic.caller();
+  if (pulseCount > allowedPulses[principal] - firedPulses[principal]) {
+    throw new Error("you don't have that many pulses available");
+  }
+  if (!allowedPulses[to]) {
+    allowedPulses[to] = 0n;
+    firedPulses[to] = 0n;
+  }
+  allowedPulses[principal] -= pulseCount;
+  allowedPulses[to] += pulseCount;
+  return allowedPulses[principal];
 }
 
 export function getDisplayTime(): Query<string> {
@@ -248,29 +373,55 @@ export function getNow(): Query<nat> {
   return ic.time();
 }
 
+export function getNowSeconds(): Query<nat32> {
+  return Number(ic.time() / second_in_ns);
+}
+
 export function* heartbeat(): Heartbeat {
   if (shouldTick()) {
     for (const address in Object.keys(registry)) {
-      for (let index = 0; index < registry[address].length; index++) {
-        const updateInfo = registry[address][index];
-        const { period: thisPeriod, schedule, address } = updateInfo;
-        if (firedPulses[address] < allowedPulses[address]) {
-          lastTime = ic.time();
-          if (thisPeriod !== null) {
-            if (should(thisPeriod, lastUpdate[address][index])) {
-              lastUpdate[address][index] = ic.time();
-              yield* sendPulse(address, index);
+      if (firedPulses[address] < allowedPulses[address]) {
+        for (let index = 0; index < registry[address].length; index++) {
+          if (registry[address][index] === null) continue;
+          const updateInfo = registry[address][index];
+          const { period: thisPeriod, schedule, func, args } = updateInfo;
+          if (firedPulses[address] < allowedPulses[address]) {
+            lastTime = ic.time();
+            if (thisPeriod !== null) {
+              if (should(thisPeriod, lastUpdate[address][index])) {
+                lastUpdate[address][index] = ic.time();
+                yield* sendPulse(address, func, args);
+              }
+            } else if (schedule !== null) {
+              if (lastUpdate[address][index] < ic.time()) {
+                const nextUpdate = setNextUpdate(schedule);
+                lastUpdate[address][index] = nextUpdate;
+                yield* sendPulse(address, func, args);
+              }
             }
-          } else if (schedule !== null) {
-            if (lastUpdate[address][index] < ic.time()) {
-              const nextUpdate = setNextUpdate(schedule);
-              lastUpdate[address][index] = nextUpdate;
-              yield* sendPulse(address, index);
+          }
+        }
+      }
+    }
+    for (const address in Object.keys(messageRegistry)) {
+      if (firedPulses[address] < allowedPulses[address]) {
+        for (let x = messageRegistry[address].length - 1; x > -1; x--) {
+          if (messageRegistry[address][x] === null) continue;
+          if (firedPulses[address] < allowedPulses[address]) {
+            const { time, args, canister, func } = messageRegistry[address][x];
+            if (time < ic.time()) {
+              //Send the message
+              delete messageRegistry[address][x];
+              sendPulse(address, func, args);
             }
           }
         }
       }
     }
   }
+}
+
+export function whoami(): Query<Principal> {
+  return ic.caller();
 }
 //#endregion
