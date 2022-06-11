@@ -1,0 +1,12 @@
+{
+  "canisters": {
+    "tokenTransfer": {
+      "type": "custom",
+      "build": "npx azle tokenTransfer",
+      "root": "src",
+      "ts": "src/tokenTransfer.ts",
+      "candid": "src/tokenTransfer.did",
+      "wasm": "target/wasm32-unknown-unknown/release/tokenTransfer.wasm.gz"
+    }
+  }
+}
