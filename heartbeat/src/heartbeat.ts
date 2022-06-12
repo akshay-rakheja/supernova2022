@@ -8,7 +8,10 @@ import {
   nat8,
   Opt,
   nat32,
+  Init,
+  UpdateAsync,
 } from "azle";
+import { Ledger } from "azle/canisters/ledger";
 
 //#region custom types
 type Registry = { [key: string]: UpdateInfo[] };
@@ -136,9 +139,26 @@ function should(period: nat, comparison: nat = lastTime): boolean {
   let delta = (now - comparison) / BigInt(1_000_000_000);
   return delta > period;
 }
+let pulse_cost_in_pulses = 10_000_000n;
 
-function* sendPulse(address: Principal, func: string, args: Opt<nat8[]>) {
-  firedPulses[address] = firedPulses[address] + BigInt(1);
+function availablePulses(owner: Principal) {
+  return allowedPulses[owner] - firedPulses[owner];
+}
+function canPulse(owner: Principal) {
+  return availablePulses(owner) > pulse_cost_in_pulses;
+}
+
+function burn_pulses(owner: Principal, pulses: bigint) {
+  firedPulses[owner] += pulses;
+}
+
+function* sendPulse(
+  address: Principal,
+  func: string,
+  args: Opt<nat8[]>,
+  owner: Principal
+) {
+  burn_pulses(owner, pulse_cost_in_pulses);
   if (!args) args = [68, 73, 68, 76, 0, 0]; // DIDL + 2 nulls
   yield ic.call_raw(address, func, args, 0n); //@TODO RHD SUpport passing an argument other than null
 }
@@ -305,17 +325,76 @@ export function get_messages(principal: Principal): Query<Message[]> {
 }
 //#endregion
 
+//#region owner management
+let owner: Principal;
+export function init(): Init {
+  owner = ic.caller();
+}
+export function set_owner(newOwner: Principal): Update<Principal> {
+  owner = newOwner;
+  return owner;
+}
+
+export function is_owner(): Query<boolean> {
+  return ic.caller() === owner;
+}
+//#endregion
+
 //#region Interface for pulses
 
-export function mint_pulses(pulseCount: nat): Update<nat> {
-  if (pulseCount < 1) throw new Error("Pulsecount needs ot be at least 1");
+let pulse_price = 10_000n; // 1e7 e8s, or 0.1 ICP
+let accountId: string;
+export function set_pulse_price(newPrice: nat): Update<nat> {
+  const caller = ic.caller();
+  if (caller !== owner)
+    throw new Error("This is not the owner of the container");
+  pulse_price = newPrice;
+  return pulse_price;
+}
+
+export function get_pulse_price(): Query<nat> {
+  return pulse_price;
+}
+export function set_account_id(newAccountId: string): Update<string> {
+  const accountId = newAccountId;
+  return accountId;
+}
+export function get_account_id(): Query<string> {
+  return accountId;
+}
+const ICPCanister = ic.canisters.Ledger<Ledger>("r7inp-6aaaa-aaaaa-aaabq-cai");
+
+export function* mint_pulses(
+  blockNumber: nat
+): UpdateAsync<{ ok: Opt<nat>; err: Opt<string> }> {
+  //let's check the ledger
+  const result = yield ICPCanister.query_blocks({
+    start: blockNumber,
+    length: 1n,
+  });
+  if (result.ok === null) throw new Error("Could not query for this block");
+  const transfer = result.ok?.blocks[0].transaction?.operation?.Transfer;
+  if (!transfer) throw new Error("No transfer on the block");
+  const { amount, from, to } = transfer;
+  // const toPrincipal = ICPCanister.
+  // if(to. === ic.id()
+  if (Buffer.from(to).toString("hex") !== accountId) {
+    console.log(
+      "That did not work for me",
+      Buffer.from(to).toString("hex"),
+      accountId
+    );
+    throw new Error("Oh noes");
+  }
+  const pulseCount = amount.e8s / pulse_price;
   const principal = ic.caller();
+  if (pulseCount < 1) throw new Error("Pulsecount needs ot be at least 1");
   if (!allowedPulses[principal]) {
     allowedPulses[principal] = 0n;
     firedPulses[principal] = 0n;
   }
   allowedPulses[principal] += pulseCount;
-  return allowedPulses[principal];
+  return { ok: allowedPulses[principal], err: null };
 }
 
 export function mint_pulses_for(
@@ -360,6 +439,8 @@ export function transfer_pulses(pulseCount: nat, to: Principal): Update<nat> {
   return allowedPulses[principal];
 }
 
+//#region Interface for current time utility functions
+
 export function getDisplayTime(): Query<string> {
   const dow = currentDow();
   const hour = currentHour();
@@ -376,45 +457,44 @@ export function getNow(): Query<nat> {
 export function getNowSeconds(): Query<nat32> {
   return Number(ic.time() / second_in_ns);
 }
+//#endregion
+
+//#region Heartbeat
 
 export function* heartbeat(): Heartbeat {
   if (shouldTick()) {
     for (const address in Object.keys(registry)) {
-      if (firedPulses[address] < allowedPulses[address]) {
-        for (let index = 0; index < registry[address].length; index++) {
-          if (registry[address][index] === null) continue;
-          const updateInfo = registry[address][index];
-          const { period: thisPeriod, schedule, func, args } = updateInfo;
-          if (firedPulses[address] < allowedPulses[address]) {
-            lastTime = ic.time();
-            if (thisPeriod !== null) {
-              if (should(thisPeriod, lastUpdate[address][index])) {
-                lastUpdate[address][index] = ic.time();
-                yield* sendPulse(address, func, args);
-              }
-            } else if (schedule !== null) {
-              if (lastUpdate[address][index] < ic.time()) {
-                const nextUpdate = setNextUpdate(schedule);
-                lastUpdate[address][index] = nextUpdate;
-                yield* sendPulse(address, func, args);
-              }
+      for (let index = 0; index < registry[address].length; index++) {
+        if (registry[address][index] === null) continue;
+        const updateInfo = registry[address][index];
+        const { period: thisPeriod, schedule, func, args, owner } = updateInfo;
+        if (canPulse(owner)) {
+          lastTime = ic.time();
+          if (thisPeriod !== null) {
+            if (should(thisPeriod, lastUpdate[address][index])) {
+              lastUpdate[address][index] = ic.time();
+              yield* sendPulse(address, func, args, owner);
+            }
+          } else if (schedule !== null) {
+            if (lastUpdate[address][index] < ic.time()) {
+              const nextUpdate = setNextUpdate(schedule);
+              lastUpdate[address][index] = nextUpdate;
+              yield* sendPulse(address, func, args, owner);
             }
           }
         }
       }
     }
-    for (const address in Object.keys(messageRegistry)) {
-      if (firedPulses[address] < allowedPulses[address]) {
-        for (let x = messageRegistry[address].length - 1; x > -1; x--) {
-          if (messageRegistry[address][x] === null) continue;
-          if (firedPulses[address] < allowedPulses[address]) {
-            const { time, args, canister, func } = messageRegistry[address][x];
-            if (time < ic.time()) {
-              //Send the message
-              delete messageRegistry[address][x];
-              sendPulse(address, func, args);
-            }
-          }
+  }
+  for (const address in Object.keys(messageRegistry)) {
+    for (let x = messageRegistry[address].length - 1; x > -1; x--) {
+      if (messageRegistry[address][x] === null) continue;
+      const { time, args, canister, func, owner } = messageRegistry[address][x];
+      if (canPulse(owner)) {
+        if (time < ic.time()) {
+          //Send the message
+          delete messageRegistry[address][x];
+          sendPulse(address, func, args, owner);
         }
       }
     }
