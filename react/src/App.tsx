@@ -19,44 +19,67 @@ function App() {
     })();
   }, []);
 
+  // function get_registry() {
+  //   return authClient?.registry;
+  // }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <h1 className="text-3xl font-bold underline">Hello world!</h1>
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-        <button
-          id="signinBtn"
-          className="bg-red-500 border-red-900 hover:bg-red-900 rounded-md p-10 transition-all"
-          onClick={async () => {
-            console.log("YOYOYOY");
-            if (authClient) {
-              authClient.login({
-                identityProvider: "https://identity.ic0.app",
-                onSuccess: async () => {
-                  const principal = await authClient
-                    .getIdentity()
-                    .getPrincipal();
-                  setPrincipal(principal);
-                },
-              });
-            }
-          }}
-        >
-          Sign In
-        </button>
-        <p> {principal?.toString()} </p>
+    <div className="App ">
+      {/* <div className="relative bg-white"> */}
+      <header>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="flex justify-between items-center border-b-2 border-gray-100 py-6 md:justify-start md:space-x-10">
+            <div className="flex justify-start lg:w-0 lg:flex-1">
+              <button
+                id="signinBtn"
+                className="bg-red-500 border-red-900 hover:bg-red-900 rounded-md p-4 transition-all"
+                onClick={async () => {
+                  console.log("YOYOYOY");
+                  if (authClient) {
+                    authClient.login({
+                      identityProvider: "https://identity.ic0.app",
+                      onSuccess: async () => {
+                        const principal = await authClient
+                          .getIdentity()
+                          .getPrincipal();
+                        setPrincipal(principal);
+                      },
+                    });
+                  }
+                }}
+              >
+                Sign In
+              </button>
+            </div>
+          </div>
+        </div>
       </header>
+      {/* </div> */}
+      {/* <header className="A"></header> */}
+      <div className="grid grid-flow-col auto-cols-max auto-rows-max space-x-4 ...">
+        <div className="bg-white dark:bg-slate-800 rounded-lg px-6 py-8 ring-1 ring-slate-900/5 shadow-xl">
+          <h3 className="text-slate-900 dark:text-white mt-5 text-base font-medium tracking-tight">
+            Users
+          </h3>
+          <p className="text-slate-500 dark:text-slate-400 mt-2 text-sm">1</p>
+        </div>
+
+        <div className="bg-white dark:bg-slate-800 rounded-lg px-6 py-8 ring-1 ring-slate-900/5 shadow-xl">
+          <h3 className="text-slate-900 dark:text-white mt-5 text-base font-medium tracking-tight">
+            Canisters
+          </h3>
+          <p className="text-slate-500 dark:text-slate-400 mt-2 text-sm">1</p>
+        </div>
+
+        <div className="bg-white dark:bg-slate-800 rounded-lg px-6 py-8 ring-1 ring-slate-900/5 shadow-xl">
+          <h3 className="text-slate-900 dark:text-white mt-5 text-base font-medium tracking-tight">
+            Heartbeats
+          </h3>
+          <p className="text-slate-500 dark:text-slate-400 mt-2 text-sm">1</p>
+        </div>
+
+        <p> {principal?.toString()} </p>
+      </div>
     </div>
   );
 }
