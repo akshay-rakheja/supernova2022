@@ -37,6 +37,7 @@ function App() {
         </a>
         <button
           id="signinBtn"
+          className="bg-red-500 border-red-900 hover:bg-red-900 rounded-md p-10 transition-all"
           onClick={async () => {
             console.log("YOYOYOY");
             if (authClient) {

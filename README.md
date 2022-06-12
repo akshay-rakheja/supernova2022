@@ -41,7 +41,22 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh # install Rust
 brew install cmake # Get cmake when its missing
 ```
 
-## To Do
+## Akshay to LEARN
+
+- Reactjs
+- Hooks
+- Tailwind (utility classes)
+
+## To Do TODAY
+
+- Form to buy pulses
+- Form to schedule
+- List of schedules (with a remove button per schedule)
+- Public dashboard with login button
+- FIX backend
+- Add support for day of month recurring events (50%)
+
+## To do in general
 
 - Add wallet-enabled frontend in react app - hooks?
 - connect frontend to our backend
@@ -50,7 +65,6 @@ brew install cmake # Get cmake when its missing
 - Make pulses a DIP-20
 - Check for an SDR-ICP price oracle - on the ledger?
 - Add argument builder in Azle (using dfinity/candid?)
-- Add support for day of month recurring events (50%)
 
 ## To Test
 
