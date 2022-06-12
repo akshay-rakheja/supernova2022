@@ -1,0 +1,27 @@
+{
+  "canisters": {
+    "heartbeat": {
+      "type": "custom",
+      "build": "npm run azle heartbeat",
+      "root": "azle/src",
+      "ts": "azle/src/heartbeat.ts",
+      "candid": "azle/src/heartbeat.did",
+      "wasm": "azle/target/wasm32-unknown-unknown/release/heartbeat.wasm.gz"
+    },
+    "react": {
+      "frontend": {
+        "entrypoint": "react/build/index.html"
+      },
+      "source": ["react/build/"],
+      "type": "assets"
+    },
+    "ticker1": {
+      "type": "custom",
+      "build": "npm run azle ticker1",
+      "root": "src",
+      "ts": "azle/src/ticker2.ts",
+      "candid": "azle/src/ticker2.did",
+      "wasm": "azle/target/wasm32-unknown-unknown/release/ticker1.wasm.gz"
+    }
+  }
+}
