@@ -137,6 +137,10 @@ export const PlugProvider: FC<{
       login,
       logout,
       principal,
+      createActor: plug?.createActor,
+      requestBalance: plug?.requestBalance,
+      requestTransfer: plug?.requestTransfer,
+      batchTransactions: plug?.batchTransactions,
     };
   }, [authenticated, plug, login, logout, principal]);
   if (!authenticated) {
