@@ -1,6 +1,8 @@
 export const idlFactory = ({ IDL }) => {
   const Schedule = IDL.Record({
+    'dom' : IDL.Opt(IDL.Nat8),
     'dow' : IDL.Opt(IDL.Nat8),
+    'month' : IDL.Opt(IDL.Nat8),
     'hour' : IDL.Nat8,
     'minute' : IDL.Nat8,
   });
@@ -30,6 +32,11 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Nat32],
         [],
       ),
+    'add_monthly_schedule' : IDL.Func(
+        [IDL.Principal, IDL.Nat8, IDL.Nat8, IDL.Nat8, IDL.Text],
+        [IDL.Nat32],
+        [],
+      ),
     'add_period' : IDL.Func(
         [IDL.Principal, IDL.Nat, IDL.Text],
         [IDL.Nat32],
@@ -37,6 +44,11 @@ export const idlFactory = ({ IDL }) => {
       ),
     'add_weekly_schedule' : IDL.Func(
         [IDL.Principal, IDL.Nat8, IDL.Nat8, IDL.Nat8, IDL.Text],
+        [IDL.Nat32],
+        [],
+      ),
+    'add_yearly_schedule' : IDL.Func(
+        [IDL.Principal, IDL.Nat8, IDL.Nat8, IDL.Nat8, IDL.Nat8, IDL.Text],
         [IDL.Nat32],
         [],
       ),
@@ -73,7 +85,9 @@ export const idlFactory = ({ IDL }) => {
     'remove' : IDL.Func([IDL.Principal, IDL.Nat32], [], []),
     'remove_message' : IDL.Func([IDL.Principal, IDL.Nat32], [IDL.Nat32], []),
     'set_account_id' : IDL.Func([IDL.Text], [IDL.Text], []),
+    'set_check_cost' : IDL.Func([IDL.Nat], [IDL.Nat], []),
     'set_owner' : IDL.Func([IDL.Principal], [IDL.Principal], []),
+    'set_pulse_cost' : IDL.Func([IDL.Nat], [IDL.Nat], []),
     'set_pulse_price' : IDL.Func([IDL.Nat], [IDL.Nat], []),
     'transfer_pulses' : IDL.Func([IDL.Nat, IDL.Principal], [IDL.Nat], []),
     'whoami' : IDL.Func([], [IDL.Principal], ['query']),

@@ -70,6 +70,8 @@ type Archives = record {
 };
 
 type Schedule = record {
+    "dom": opt nat8;
+    "month": opt nat8;
     "dow": opt nat8;
     "hour": nat8;
     "minute": nat8;
@@ -132,11 +134,15 @@ service: () -> {
     "add_period": (principal, nat, text) -> (nat32);
     "add_weekly_schedule": (principal, nat8, nat8, nat8, text) -> (nat32);
     "add_daily_schedule": (principal, nat8, nat8, text) -> (nat32);
+    "add_monthly_schedule": (principal, nat8, nat8, nat8, text) -> (nat32);
+    "add_yearly_schedule": (principal, nat8, nat8, nat8, nat8, text) -> (nat32);
     "remove": (principal, nat32) -> ();
     "add_message": (principal, nat, text, opt vec nat8) -> (nat32);
     "remove_message": (principal, nat32) -> (nat32);
     "set_owner": (principal) -> (principal);
     "set_pulse_price": (nat) -> (nat);
+    "set_pulse_cost": (nat) -> (nat);
+    "set_check_cost": (nat) -> (nat);
     "set_account_id": (text) -> (text);
     "mint_pulses": (nat) -> (record { "ok": opt nat; "err": opt text; });
     "mint_pulses_for": (nat, principal) -> (nat);

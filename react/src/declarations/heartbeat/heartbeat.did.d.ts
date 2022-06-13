@@ -52,7 +52,9 @@ export interface QueryBlocksResponse {
   >,
 }
 export interface Schedule {
+  'dom' : [] | [number],
   'dow' : [] | [number],
+  'month' : [] | [number],
   'hour' : number,
   'minute' : number,
 }
@@ -100,9 +102,17 @@ export interface _SERVICE {
     [Principal, bigint, string, [] | [Array<number>]],
     number,
   >,
+  'add_monthly_schedule' : ActorMethod<
+    [Principal, number, number, number, string],
+    number,
+  >,
   'add_period' : ActorMethod<[Principal, bigint, string], number>,
   'add_weekly_schedule' : ActorMethod<
     [Principal, number, number, number, string],
+    number,
+  >,
+  'add_yearly_schedule' : ActorMethod<
+    [Principal, number, number, number, number, string],
     number,
   >,
   'getDisplayTime' : ActorMethod<[], string>,
@@ -129,7 +139,9 @@ export interface _SERVICE {
   'remove' : ActorMethod<[Principal, number], undefined>,
   'remove_message' : ActorMethod<[Principal, number], number>,
   'set_account_id' : ActorMethod<[string], string>,
+  'set_check_cost' : ActorMethod<[bigint], bigint>,
   'set_owner' : ActorMethod<[Principal], Principal>,
+  'set_pulse_cost' : ActorMethod<[bigint], bigint>,
   'set_pulse_price' : ActorMethod<[bigint], bigint>,
   'transfer_pulses' : ActorMethod<[bigint, Principal], bigint>,
   'whoami' : ActorMethod<[], Principal>,
