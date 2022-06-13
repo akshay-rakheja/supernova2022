@@ -1,12 +1,10 @@
 {
   "scripts": {
-    "build": "(cd react && npm install && npm run build)",
-    "start": "(cd react && npm run start)",
+    "build": "(cd react && yarn && yarn build)",
+    "start": "(cd react && yarn start)",
     "deploy": "yarn rebuild && dfx deploy",
     "azle": "cd azle && npx azle",
-    "rebuild": "dfx canister create --all && dfx build && dfx generate && cp -r src/declarations react/src/"
-  },
-  "dependencies": {
-    "@stitches/react": "^1.2.8"
+    "rebuild": "dfx canister create --all && dfx build && dfx generate && cp -r src/declarations react/src/",
+    "postinstall": "(cd react && yarn) && (cd azle && yarn)"
   }
 }
