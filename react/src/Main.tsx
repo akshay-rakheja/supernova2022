@@ -1,9 +1,10 @@
 import React, { FC, useState } from "react";
-import { useAuthentication } from "./PlugProvider";
+import { usePlug } from "./PlugProvider";
 
 export const Main: FC = () => {
   const [balance, setBalance] = useState(0);
-  const { principal, logout } = useAuthentication();
+  const { principal, logout, agent } = usePlug();
+  //Connect to canister and make a request
   return (
     <div className="App ">
       {/* <div className="relative bg-white"> */}

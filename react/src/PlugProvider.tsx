@@ -4,31 +4,87 @@ import React, {
   useMemo,
   FC,
   useState,
-  useEffect,
   useCallback,
-  ReactChild,
-  Component,
   ReactElement,
 } from "react";
 
 import { Principal } from "@dfinity/principal";
-import { HttpAgent } from "@dfinity/agent";
+import { Actor, HttpAgent } from "@dfinity/agent";
+import { InterfaceFactory } from "@dfinity/candid/lib/cjs/idl";
 
-const {
-  ic: { plug },
-} = window as unknown as {
-  ic: {
-    plug: {
-      requestConnect: (o: Record<string, any>) => Promise<any>;
-      agent: HttpAgent;
+//#region Plug Type
+type RequestConnectParams = {
+  whitelist?: string[];
+  host?: string;
+  timeout?: number;
+};
+type PublicKey = any;
+type CreateActorParams = {
+  canisterId: string;
+  interfaceFactory: InterfaceFactory;
+};
+type Balance = {
+  amount: number;
+  currency: string;
+  image: string;
+  name: string;
+  value: number;
+};
+type RequestTransferParams = {
+  to: String;
+  amount: number;
+  opts?: {
+    fee?: number;
+    memo?: string;
+    from_subaccount?: Number;
+    created_at_time?: {
+      timestamp_nanos: number;
     };
   };
 };
+type RequestTransferResponse = { height: number };
+type Cycles = number;
+type CanisterId = string;
+type RequestBurnXTCParams = { amount: Cycles; to: CanisterId };
+type Transaction = {
+  idl: any; //@TODO RHD To set this to the right type
+  canisterId: Principal;
+  methodName: string;
+  args: Record<string, any>[];
+  onFail: (res: string) => void;
+  onSuccess: (res: string) => void;
+};
 
+type BatchTransactionResponse = {};
+type Plug = {
+  requestConnect: (o?: RequestConnectParams) => Promise<PublicKey>;
+  agent: HttpAgent;
+  isConnected: () => boolean;
+  createActor: (params: CreateActorParams) => Promise<Actor>;
+  requestBalance: () => Promise<Balance[]>;
+  requestTransfer: (
+    params: RequestTransferParams
+  ) => Promise<RequestTransferResponse>;
+  requestBurnXTC: (
+    params: RequestBurnXTCParams
+  ) => Promise<RequestTransferResponse>;
+  batchTransactions: (
+    transactions: Transaction[]
+  ) => Promise<BatchTransactionResponse>;
+};
+const { ic } = window as unknown as {
+  ic?: {
+    plug?: Plug;
+  };
+};
+const plug = ic?.plug;
+//#endregion
+
+//#region Context Provider
 const context = createContext({
   authenticated: false,
   principal: null as Principal | null,
-  agent: plug.agent,
+  agent: plug?.agent,
   login: () => {},
   logout: () => {},
 });
@@ -51,28 +107,19 @@ export const PlugProvider: FC<{
   const [authenticated, setAuthenticated] = useState(false);
   const [principal, setPrincipal] = useState<Principal | null>(null);
 
-  useEffect(() => {
-    (async () => {
-      // const identity = agent.getIdentity();
-      // if (identity && identity.getPrincipal().toString() !== "2vxsx-fae") {
-      //   setPrincipal(identity.getPrincipal());
-      //   setAuthenticated(true);
-      // }
-    })();
-  }, []);
-
   const login = useCallback(async () => {
-    // Make the request
     try {
-      const publicKey = await plug.requestConnect({
-        whitelist,
-        host,
-        timeout,
-      });
-      if (publicKey) {
-        const principal = await plug.agent.getPrincipal();
-        setPrincipal(principal);
-        setAuthenticated(true);
+      if (plug) {
+        const publicKey = await plug.requestConnect({
+          whitelist,
+          host,
+          timeout,
+        });
+        if (publicKey) {
+          const principal = await plug.agent.getPrincipal();
+          setPrincipal(principal);
+          setAuthenticated(true);
+        }
       }
     } catch (e) {
       console.log("Hi there", e);
@@ -81,30 +128,26 @@ export const PlugProvider: FC<{
 
   const logout = useCallback(() => {
     window.location.reload();
-    // if (authenticated) {
-    //   plug.agent.invalidateIdentity();
-    //   setPrincipal(null);
-    //   setAuthenticated(false);
-    // }
   }, []);
 
   const value = useMemo(() => {
     return {
       authenticated,
-      agent: plug.agent,
+      agent: plug?.agent,
       login,
       logout,
       principal,
     };
-  }, [authenticated, plug.agent, login, logout, principal]);
+  }, [authenticated, plug, login, logout, principal]);
   if (!authenticated) {
     return <Provider value={value}>{LoggedOut ? LoggedOut : null}</Provider>;
   }
   return <Provider value={value}>{children}</Provider>;
 };
 
-export const useAuthentication = () => {
+export const usePlug = () => {
   const data = useContext(context);
   return data;
 };
+//#endregion
 export default PlugProvider;

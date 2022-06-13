@@ -2,7 +2,7 @@ import React from "react";
 import { styled } from "@stitches/react";
 import plugLight from "./assets/plugLight.svg";
 import plugDark from "./assets/plugDark.svg";
-import { useAuthentication } from "./PlugProvider";
+import { usePlug } from "./PlugProvider";
 const Button = styled("button", {
   border: "none",
   background:
@@ -57,7 +57,7 @@ const PlugConnect = ({
   dark?: boolean;
   title?: string;
 }) => {
-  const { login } = useAuthentication();
+  const { login } = usePlug();
   const handleConnect = async () => {
     if (!(window as any).ic?.plug) {
       window.open("https://plugwallet.ooo/", "_blank");
