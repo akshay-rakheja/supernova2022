@@ -87,6 +87,10 @@ const context = createContext({
   agent: plug?.agent,
   login: () => {},
   logout: () => {},
+  createActor: plug?.createActor,
+  requestBalance: plug?.requestBalance,
+  requestTransfer: plug?.requestTransfer,
+  batchTransactions: plug?.batchTransactions,
 });
 
 const { Provider } = context;
