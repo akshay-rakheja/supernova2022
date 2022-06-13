@@ -1,7 +1,8 @@
-import React, { FC } from "react";
-import { useAuthentication } from "./AuthenticationProvider";
+import React, { FC, useState } from "react";
+import { useAuthentication } from "./PlugProvider";
 
 export const Main: FC = () => {
+  const [balance, setBalance] = useState(0);
   const { principal, logout } = useAuthentication();
   return (
     <div className="App ">
@@ -41,6 +42,9 @@ export const Main: FC = () => {
         </button>
 
         <p> {principal?.toString()} </p>
+        <p>My pulse balance {balance}</p>
+        <button>Mint Pulses</button>
+        <button>Schedule an event</button>
       </div>
     </div>
   );

@@ -5,5 +5,8 @@
     "deploy": "yarn rebuild && dfx deploy",
     "azle": "cd azle && npx azle",
     "rebuild": "dfx canister create --all && dfx build && dfx generate && cp -r src/declarations react/src/"
+  },
+  "dependencies": {
+    "@stitches/react": "^1.2.8"
   }
 }
