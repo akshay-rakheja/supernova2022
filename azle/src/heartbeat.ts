@@ -11,13 +11,18 @@ import {
   Init,
   UpdateAsync,
   Stable,
+  PreUpgrade,
+  PostUpgrade,
 } from "azle";
+
 import { Ledger } from "azle/canisters/ledger";
 
 //#region custom types
-type Registry = { [key: string]: UpdateInfo[] };
-type MessageRegistry = { [key: string]: Message[] };
-type PulseLedger = { [key: string]: nat };
+type Mapping<T> = { [key: string]: T };
+type Registry = Mapping<UpdateInfo[]>;
+type MessageRegistry = Mapping<Message[]>;
+type PulseLedger = Mapping<nat>;
+type LastUpdateRegistry = Mapping<nat[]>;
 type Schedule = {
   dom: Opt<nat8>;
   month: Opt<nat8>;
@@ -44,23 +49,95 @@ type Message = {
 };
 
 type StableStore = Stable<{
-  registry: Registry;
-  messageRegistry: MessageRegistry;
-  allowedPulses: PulseLedger;
-  usedPulses: PulseLedger;
-  pulseLedger: PulseLedger;
+  // registry: Registry;
+  // messageRegistry: MessageRegistry;
+  // allowedPulses: PulseLedger;
+  // burnedPulses: PulseLedger;
+  // pulseLedger: PulseLedger;
+  // lastUpdate: LastUpdateRegistry;
   owner: Principal;
   pulse_price: nat;
   check_price_in_pulses: nat;
   pulse_price_in_pulses: nat;
   accountId: string;
-  lastUpdate: { [key: string]: nat[] };
   lastTime: nat;
   period: nat;
 }>;
 
 function getStable() {
   return ic.stableStorage<StableStore>();
+}
+
+let registry: Registry = {};
+let messageRegistry: MessageRegistry = {};
+let allowedPulses: PulseLedger = {};
+let burnedPulses: PulseLedger = {};
+let pulseLedger: PulseLedger = {};
+let lastUpdate: LastUpdateRegistry = {};
+
+type StableList = Stable<{
+  registryList: { key: string; value: UpdateInfo[] }[];
+  messageRegistryList: { key: string; value: Message[] }[];
+  burnedPulsesList: { key: string; value: nat }[];
+  allowedPulsesList: { key: string; value: nat }[];
+  pulseLedgerList: { key: string; value: nat }[];
+  lastUpdateList: { key: string; value: nat[] }[];
+}>;
+
+export function preUpgrade(): PreUpgrade {
+  const stable = ic.stableStorage<StableList>();
+  stable.registryList = Object.entries(registry).map(([key, value]) => ({
+    key,
+    value,
+  }));
+  stable.messageRegistryList = Object.entries(messageRegistry).map(
+    ([key, value]) => ({
+      key,
+      value,
+    })
+  );
+  stable.burnedPulsesList = Object.entries(burnedPulses).map(
+    ([key, value]) => ({
+      key,
+      value,
+    })
+  );
+  stable.allowedPulsesList = Object.entries(allowedPulses).map(
+    ([key, value]) => ({
+      key,
+      value,
+    })
+  );
+  stable.pulseLedgerList = Object.entries(pulseLedger).map(([key, value]) => ({
+    key,
+    value,
+  }));
+  stable.lastUpdateList = Object.entries(lastUpdate).map(([key, value]) => ({
+    key,
+    value,
+  }));
+}
+
+export function postUpgrade(): PostUpgrade {
+  const stable = ic.stableStorage<StableList>();
+  stable.registryList.forEach(({ key, value }) => {
+    registry[key] = value;
+  });
+  stable.messageRegistryList.forEach(({ key, value }) => {
+    messageRegistry[key] = value;
+  });
+  stable.lastUpdateList.forEach(({ key, value }) => {
+    lastUpdate[key] = value;
+  });
+  stable.burnedPulsesList.forEach(({ key, value }) => {
+    burnedPulses[key] = value;
+  });
+  stable.allowedPulsesList.forEach(({ key, value }) => {
+    allowedPulses[key] = value;
+  });
+  stable.pulseLedgerList.forEach(({ key, value }) => {
+    pulseLedger[key] = value;
+  });
 }
 
 //#endregion
@@ -268,7 +345,6 @@ function currentMinute(): nat8 {
 }
 
 //#endregion
-
 //#region internal functions and state
 
 function shouldTick(): boolean {
@@ -283,7 +359,7 @@ function should(period: nat, comparison?: nat): boolean {
 }
 
 function availablePulses(owner: Principal) {
-  return getStable().allowedPulses[owner] - getStable().usedPulses[owner];
+  return allowedPulses[owner] - burnedPulses[owner];
 }
 function canPulse(owner: Principal) {
   return availablePulses(owner) > getStable().pulse_price_in_pulses;
@@ -293,7 +369,7 @@ function canCheck(owner: Principal) {
 }
 
 function burn_pulses(owner: Principal, pulses: bigint) {
-  getStable().usedPulses[owner] += pulses;
+  burnedPulses[owner] += pulses;
 }
 
 function* sendPulse(
@@ -362,11 +438,11 @@ export function add_period(
   func: string
 ): Update<nat32> {
   const owner = ic.caller();
-  if (getStable().allowedPulses[owner] < 1)
+  if (allowedPulses[owner] < 1)
     throw new Error("You must have pulses in the bank");
   if (period_in_seconds < 10) throw new Error("Period must be at least 10s");
-  if (!getStable().registry[canister]) getStable().registry[canister] = [];
-  getStable().registry[canister].push({
+  if (!registry[canister]) registry[canister] = [];
+  registry[canister].push({
     owner,
     period: period_in_seconds * second_in_ns,
     func,
@@ -374,9 +450,9 @@ export function add_period(
     schedule: null,
     args: null,
   });
-  if (!getStable().lastUpdate[canister]) getStable().lastUpdate[canister] = [];
-  getStable().lastUpdate[canister].push(ic.time());
-  return getStable().lastUpdate[canister].length - 1;
+  if (!lastUpdate[canister]) lastUpdate[canister] = [];
+  lastUpdate[canister].push(ic.time());
+  return lastUpdate[canister].length - 1;
 }
 
 export function add_weekly_schedule(
@@ -387,7 +463,7 @@ export function add_weekly_schedule(
   func: string
 ): Update<nat32> {
   const owner = ic.caller();
-  if (getStable().allowedPulses[owner] < 1)
+  if (allowedPulses[owner] < 1)
     throw new Error("You must have pulses in the bank");
   const schedule: Schedule = {
     dow: day_of_week,
@@ -396,8 +472,8 @@ export function add_weekly_schedule(
     dom: null,
     month: null,
   };
-  if (!getStable().registry[canister]) getStable().registry[canister] = [];
-  getStable().registry[canister].push({
+  if (!registry[canister]) registry[canister] = [];
+  registry[canister].push({
     owner,
     func,
     canister,
@@ -405,9 +481,9 @@ export function add_weekly_schedule(
     period: null,
     args: null,
   });
-  if (!getStable().lastUpdate[canister]) getStable().lastUpdate[canister] = [];
-  getStable().lastUpdate[canister].push(setNextUpdate(schedule));
-  return getStable().lastUpdate[canister].length - 1;
+  if (!lastUpdate[canister]) lastUpdate[canister] = [];
+  lastUpdate[canister].push(setNextUpdate(schedule));
+  return lastUpdate[canister].length - 1;
 }
 export function add_daily_schedule(
   canister: Principal,
@@ -416,7 +492,7 @@ export function add_daily_schedule(
   func: string
 ): Update<nat32> {
   const owner = ic.caller();
-  if (getStable().allowedPulses[owner] < 1)
+  if (allowedPulses[owner] < 1)
     throw new Error("You must have pulses in the bank");
   const schedule: Schedule = {
     dow: null,
@@ -425,8 +501,8 @@ export function add_daily_schedule(
     dom: null,
     month: null,
   };
-  if (!getStable().registry[canister]) getStable().registry[canister] = [];
-  getStable().registry[canister].push({
+  if (!registry[canister]) registry[canister] = [];
+  registry[canister].push({
     owner,
     func,
     canister,
@@ -434,9 +510,9 @@ export function add_daily_schedule(
     period: null,
     args: null,
   });
-  if (!getStable().lastUpdate[canister]) getStable().lastUpdate[canister] = [];
-  getStable().lastUpdate[canister].push(setNextUpdate(schedule));
-  return getStable().lastUpdate[canister].length - 1;
+  if (!lastUpdate[canister]) lastUpdate[canister] = [];
+  lastUpdate[canister].push(setNextUpdate(schedule));
+  return lastUpdate[canister].length - 1;
 }
 
 export function add_monthly_schedule(
@@ -447,7 +523,7 @@ export function add_monthly_schedule(
   func: string
 ): Update<nat32> {
   const owner = ic.caller();
-  if (getStable().allowedPulses[owner] < 1)
+  if (allowedPulses[owner] < 1)
     throw new Error("You must have pulses in the bank");
   const schedule: Schedule = {
     dow: null,
@@ -456,8 +532,8 @@ export function add_monthly_schedule(
     dom: day_of_month,
     month: null,
   };
-  if (!getStable().registry[canister]) getStable().registry[canister] = [];
-  getStable().registry[canister].push({
+  if (!registry[canister]) registry[canister] = [];
+  registry[canister].push({
     owner,
     func,
     canister,
@@ -465,9 +541,9 @@ export function add_monthly_schedule(
     period: null,
     args: null,
   });
-  if (!getStable().lastUpdate[canister]) getStable().lastUpdate[canister] = [];
-  getStable().lastUpdate[canister].push(setNextUpdate(schedule));
-  return getStable().lastUpdate[canister].length - 1;
+  if (!lastUpdate[canister]) lastUpdate[canister] = [];
+  lastUpdate[canister].push(setNextUpdate(schedule));
+  return lastUpdate[canister].length - 1;
 }
 export function add_yearly_schedule(
   canister: Principal,
@@ -478,7 +554,7 @@ export function add_yearly_schedule(
   func: string
 ): Update<nat32> {
   const owner = ic.caller();
-  if (getStable().allowedPulses[owner] < 1)
+  if (allowedPulses[owner] < 1)
     throw new Error("You must have pulses in the bank");
   const schedule: Schedule = {
     dow: null,
@@ -487,8 +563,8 @@ export function add_yearly_schedule(
     dom: day_of_month,
     month,
   };
-  if (!getStable().registry[canister]) getStable().registry[canister] = [];
-  getStable().registry[canister].push({
+  if (!registry[canister]) registry[canister] = [];
+  registry[canister].push({
     owner,
     func,
     canister,
@@ -496,40 +572,37 @@ export function add_yearly_schedule(
     period: null,
     args: null,
   });
-  if (!getStable().lastUpdate[canister]) getStable().lastUpdate[canister] = [];
-  getStable().lastUpdate[canister].push(setNextUpdate(schedule));
-  return getStable().lastUpdate[canister].length - 1;
+  if (!lastUpdate[canister]) lastUpdate[canister] = [];
+  lastUpdate[canister].push(setNextUpdate(schedule));
+  return lastUpdate[canister].length - 1;
 }
 
 export function remove(address: Principal, index: nat32): Update<void> {
-  if (ic.caller() !== getStable().registry[address][index].owner)
+  if (ic.caller() !== registry[address][index].owner)
     throw new Error("Not the owner of this schedule");
-  delete getStable().registry[address][index];
+  delete registry[address][index];
 }
 
 export function get_one(principal: Principal, index: nat32): Query<UpdateInfo> {
-  return getStable().registry[principal][index];
+  return registry[principal][index];
 }
 
 export function get_count(principal: Principal): Query<nat32> {
-  return getStable().registry[principal].length;
+  return registry[principal].length;
 }
 
 export function get_all(principal: Principal): Query<UpdateInfo[]> {
-  return getStable().registry[principal];
+  return registry[principal];
 }
 
 export function get_next_update_time(
   principal: Principal,
   index: nat32
 ): Query<nat> {
-  if (getStable().registry[principal][index].period !== null) {
-    return (
-      getStable().lastUpdate[principal][index] +
-      getStable().registry[principal][index].period!
-    );
+  if (registry[principal][index].period !== null) {
+    return lastUpdate[principal][index] + registry[principal][index].period!;
   } else {
-    return getStable().lastUpdate[principal][index];
+    return lastUpdate[principal][index];
   }
 }
 //#endregion
@@ -542,58 +615,57 @@ export function add_message(
   args: Opt<nat8[]>
 ): Update<nat32> {
   const owner = ic.caller();
-  if (getStable().allowedPulses[owner] < 1)
+  if (allowedPulses[owner] < 1)
     throw new Error("You must have pulses in the bank");
   const time = unix_time_code_in_seconds * second_in_ns;
   if (time < ic.time()) throw new Error("Time must be in the future");
-  if (!getStable().messageRegistry[canister])
-    getStable().messageRegistry[canister] = [];
-  getStable().messageRegistry[canister].push({
+  if (!messageRegistry[canister]) messageRegistry[canister] = [];
+  messageRegistry[canister].push({
     args,
     func,
     canister,
     time,
     owner,
   });
-  return getStable().messageRegistry[canister].length - 1;
+  return messageRegistry[canister].length - 1;
 }
 
 export function remove_message(
   canister: Principal,
   index: nat32
 ): Update<nat32> {
-  if (ic.caller() !== getStable().messageRegistry[canister][index].owner)
+  if (ic.caller() !== messageRegistry[canister][index].owner)
     throw new Error("Not the owner of this schedule");
-  delete getStable().messageRegistry[canister][index];
-  return getStable().messageRegistry[canister].length;
+  delete messageRegistry[canister][index];
+  return messageRegistry[canister].length;
 }
 
 export function get_one_message(
   principal: Principal,
   index: nat32
 ): Query<Message> {
-  return getStable().messageRegistry[principal][index];
+  return messageRegistry[principal][index];
 }
 
 export function get_message_count(principal: Principal): Query<nat32> {
-  return getStable().messageRegistry[principal].length;
+  return messageRegistry[principal].length;
 }
 
 export function get_messages(principal: Principal): Query<Message[]> {
-  return getStable().messageRegistry[principal];
+  return messageRegistry[principal];
 }
 //#endregion
 
 //#region owner management
 export function init(): Init {
   getStable().owner = ic.caller();
-  getStable().allowedPulses = {};
-  getStable().messageRegistry = {};
-  getStable().pulseLedger = {};
-  getStable().registry = {};
-  getStable().usedPulses = {};
+  allowedPulses = {};
+  messageRegistry = {};
+  pulseLedger = {};
+  registry = {};
+  burnedPulses = {};
   getStable().lastTime = ic.time();
-  getStable().lastUpdate = {};
+  lastUpdate = {};
   getStable().period = 10n;
   getStable().accountId = "";
   getStable().pulse_price = 1n; // price denominated in e8s (ICP * 1e-8)
@@ -672,12 +744,12 @@ export function* mint_pulses(
   const pulseCount = amount.e8s / getStable().pulse_price;
   const principal = ic.caller();
   if (pulseCount < 1) throw new Error("Pulsecount needs ot be at least 1");
-  if (!getStable().allowedPulses[principal]) {
-    getStable().allowedPulses[principal] = 0n;
-    getStable().usedPulses[principal] = 0n;
+  if (!allowedPulses[principal]) {
+    allowedPulses[principal] = 0n;
+    burnedPulses[principal] = 0n;
   }
-  getStable().allowedPulses[principal] += pulseCount;
-  return { ok: getStable().allowedPulses[principal], err: null };
+  allowedPulses[principal] += pulseCount;
+  return { ok: allowedPulses[principal], err: null };
 }
 
 export function mint_pulses_for(
@@ -686,47 +758,40 @@ export function mint_pulses_for(
 ): Update<nat> {
   if (pulseCount < 1) throw new Error("Pulsecount needs ot be at least 1");
   const principal = onBehalfOf;
-  if (!getStable().allowedPulses[principal]) {
-    getStable().allowedPulses[principal] = 0n;
-    getStable().usedPulses[principal] = 0n;
+  if (!allowedPulses[principal]) {
+    allowedPulses[principal] = 0n;
+    burnedPulses[principal] = 0n;
   }
-  getStable().allowedPulses[principal] += pulseCount;
-  return getStable().allowedPulses[principal];
+  allowedPulses[principal] += pulseCount;
+  return allowedPulses[principal];
 }
 
 export function get_burned_pulses(): Query<nat> {
   const principal = ic.caller();
-  return getStable().usedPulses[principal];
+  return burnedPulses[principal];
 }
 
 export function get_pulses(): Query<nat> {
   const principal = ic.caller();
-  return (
-    getStable().allowedPulses[principal] - getStable().usedPulses[principal]
-  );
+  return allowedPulses[principal] - burnedPulses[principal];
 }
 
 export function get_pulses_for(principal: Principal): Query<nat> {
-  return (
-    getStable().allowedPulses[principal] - getStable().usedPulses[principal]
-  );
+  return allowedPulses[principal] - burnedPulses[principal];
 }
 
 export function transfer_pulses(pulseCount: nat, to: Principal): Update<nat> {
   const principal = ic.caller();
-  if (
-    pulseCount >
-    getStable().allowedPulses[principal] - getStable().usedPulses[principal]
-  ) {
+  if (pulseCount > allowedPulses[principal] - burnedPulses[principal]) {
     throw new Error("you don't have that many pulses available");
   }
-  if (!getStable().allowedPulses[to]) {
-    getStable().allowedPulses[to] = 0n;
-    getStable().usedPulses[to] = 0n;
+  if (!allowedPulses[to]) {
+    allowedPulses[to] = 0n;
+    burnedPulses[to] = 0n;
   }
-  getStable().allowedPulses[principal] -= pulseCount;
-  getStable().allowedPulses[to] += pulseCount;
-  return getStable().allowedPulses[principal];
+  allowedPulses[principal] -= pulseCount;
+  allowedPulses[to] += pulseCount;
+  return allowedPulses[principal];
 }
 
 //#region Interface for current time utility functions
@@ -753,28 +818,24 @@ export function getNowSeconds(): Query<nat32> {
 
 export function* heartbeat(): Heartbeat {
   if (shouldTick()) {
-    for (const address in Object.keys(getStable().registry)) {
-      for (
-        let index = 0;
-        index < getStable().registry[address].length;
-        index++
-      ) {
-        if (getStable().registry[address][index] === null) continue;
-        const updateInfo = getStable().registry[address][index];
+    for (const address in Object.keys(registry)) {
+      for (let index = 0; index < registry[address].length; index++) {
+        if (registry[address][index] === null) continue;
+        const updateInfo = registry[address][index];
         const { period: thisPeriod, schedule, func, args, owner } = updateInfo;
         if (canCheck(owner)) {
           burn_pulses(owner, getStable().check_price_in_pulses);
           if (canPulse(owner)) {
             getStable().lastTime = ic.time();
             if (thisPeriod !== null) {
-              if (should(thisPeriod, getStable().lastUpdate[address][index])) {
-                getStable().lastUpdate[address][index] = ic.time();
+              if (should(thisPeriod, lastUpdate[address][index])) {
+                lastUpdate[address][index] = ic.time();
                 yield* sendPulse(address, func, args, owner);
               }
             } else if (schedule !== null) {
-              if (getStable().lastUpdate[address][index] < ic.time()) {
+              if (lastUpdate[address][index] < ic.time()) {
                 const nextUpdate = setNextUpdate(schedule);
-                getStable().lastUpdate[address][index] = nextUpdate;
+                lastUpdate[address][index] = nextUpdate;
                 yield* sendPulse(address, func, args, owner);
               }
             }
@@ -783,17 +844,16 @@ export function* heartbeat(): Heartbeat {
       }
     }
   }
-  for (const address in Object.keys(getStable().messageRegistry)) {
-    for (let x = getStable().messageRegistry[address].length - 1; x > -1; x--) {
-      if (getStable().messageRegistry[address][x] === null) continue;
-      const { time, args, canister, func, owner } =
-        getStable().messageRegistry[address][x];
+  for (const address in Object.keys(messageRegistry)) {
+    for (let x = messageRegistry[address].length - 1; x > -1; x--) {
+      if (messageRegistry[address][x] === null) continue;
+      const { time, args, canister, func, owner } = messageRegistry[address][x];
       if (canCheck(owner)) {
         burn_pulses(owner, getStable().check_price_in_pulses);
         if (canPulse(owner)) {
           if (time < ic.time()) {
             //Send the message
-            delete getStable().messageRegistry[address][x];
+            delete messageRegistry[address][x];
             sendPulse(address, func, args, owner);
           }
         }
@@ -806,3 +866,4 @@ export function whoami(): Query<Principal> {
   return ic.caller();
 }
 //#endregion
+/** */
