@@ -9,8 +9,15 @@ import React, {
 } from "react";
 
 import { Principal } from "@dfinity/principal";
-import { Actor, HttpAgent } from "@dfinity/agent";
+import {
+  Actor,
+  ActorConfig,
+  ActorMethod,
+  ActorSubclass,
+  HttpAgent,
+} from "@dfinity/agent";
 import { InterfaceFactory } from "@dfinity/candid/lib/cjs/idl";
+import { IDL } from "@dfinity/candid";
 
 //#region Plug Type
 type RequestConnectParams = {
@@ -60,7 +67,12 @@ type Plug = {
   requestConnect: (o?: RequestConnectParams) => Promise<PublicKey>;
   agent: HttpAgent;
   isConnected: () => boolean;
-  createActor: (params: CreateActorParams) => Promise<Actor>;
+  // createActor: (params: CreateActorParams) => Promise<Actor>;
+  createActor: <T = Record<string, ActorMethod>>(
+    interfaceFactory: IDL.InterfaceFactory,
+    configuration: ActorConfig
+  ) => ActorSubclass<T>;
+
   requestBalance: () => Promise<Balance[]>;
   requestTransfer: (
     params: RequestTransferParams
