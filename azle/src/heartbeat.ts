@@ -121,30 +121,42 @@ export function preUpgrade(): PreUpgrade {
 
 export function postUpgrade(): PostUpgrade {
   const stable = ic.stableStorage<StableList>();
-  for (let index of stable.registryList) {
-    registry[index.key] = index.value;
+  if (stable.registryList) {
+    for (let index of stable.registryList) {
+      registry[index.key] = index.value;
+    }
   }
-  // stable.registryList = [];
-  //   for (let index of stable.messageRegistryList) {
-  //     messageRegistry[index.key] = index.value;
-  //   }
-  //   stable.messageRegistryList = [];
-  //   for (let index of stable.lastUpdateList) {
-  //     lastUpdate[index.key] = index.value;
-  //   }
-  //   stable.lastUpdateList = [];
-  //   for (let index of stable.burnedPulsesList) {
-  //     burnedPulses[index.key] = index.value;
-  //   }
-  //   stable.burnedPulsesList = [];
-  //   for (let index of stable.allowedPulsesList) {
-  //     allowedPulses[index.key] = index.value;
-  //   }
-  //   stable.allowedPulsesList = [];
-  //   for (let index of stable.pulseLedgerList) {
-  //     pulseLedger[index.key] = index.value;
-  //   }
-  //   stable.pulseLedgerList = [];
+  stable.registryList = [];
+  if (stable.messageRegistryList) {
+    for (let index of stable.messageRegistryList) {
+      messageRegistry[index.key] = index.value;
+    }
+  }
+  stable.messageRegistryList = [];
+  if (stable.lastUpdateList) {
+    for (let index of stable.lastUpdateList) {
+      lastUpdate[index.key] = index.value;
+    }
+  }
+  stable.lastUpdateList = [];
+  if (stable.burnedPulsesList) {
+    for (let index of stable.burnedPulsesList) {
+      burnedPulses[index.key] = index.value;
+    }
+  }
+  stable.burnedPulsesList = [];
+  if (stable.allowedPulsesList) {
+    for (let index of stable.allowedPulsesList) {
+      allowedPulses[index.key] = index.value;
+    }
+  }
+  stable.allowedPulsesList = [];
+  if (stable.pulseLedgerList) {
+    for (let index of stable.pulseLedgerList) {
+      pulseLedger[index.key] = index.value;
+    }
+  }
+  stable.pulseLedgerList = [];
 }
 
 //#endregion
