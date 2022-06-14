@@ -49,11 +49,7 @@ brew install cmake # Get cmake when its missing
 
 ## To Do TODAY
 
-- Deploy to IC
-- connect frontend to our backend
-
-## To Do Tuesday
-
+- maybe: preupgrade/postupgrade
 - Form to buy pulses
 - Form to schedule
 - List of schedules (with a remove button per schedule)
@@ -67,7 +63,8 @@ brew install cmake # Get cmake when its missing
 
 ## To Test
 
-- maybe: preupgrade/postupgrade
+- Deploy to IC
+- connect frontend to our backend
 - Add wallet-enabled frontend in react app - hooks?
 - Add ledger interaction for buying pulses with ICP
 - use stable storage (Ray doesn't jnderstand stable storage yet and when to use it)
