@@ -86,58 +86,52 @@ type StableList = Stable<{
 
 export function preUpgrade(): PreUpgrade {
   const stable = ic.stableStorage<StableList>();
-  stable.registryList = Object.entries(registry).map(([key, value]) => ({
+  stable.registryList = Object.keys(registry).map((key) => ({
     key,
-    value,
+    value: registry[key],
   }));
-  stable.messageRegistryList = Object.entries(messageRegistry).map(
-    ([key, value]) => ({
-      key,
-      value,
-    })
-  );
-  stable.burnedPulsesList = Object.entries(burnedPulses).map(
-    ([key, value]) => ({
-      key,
-      value,
-    })
-  );
-  stable.allowedPulsesList = Object.entries(allowedPulses).map(
-    ([key, value]) => ({
-      key,
-      value,
-    })
-  );
-  stable.pulseLedgerList = Object.entries(pulseLedger).map(([key, value]) => ({
+  stable.messageRegistryList = Object.keys(messageRegistry).map((key) => ({
     key,
-    value,
+    value: messageRegistry[key],
   }));
-  stable.lastUpdateList = Object.entries(lastUpdate).map(([key, value]) => ({
+  stable.burnedPulsesList = Object.keys(burnedPulses).map((key) => ({
     key,
-    value,
+    value: burnedPulses[key],
+  }));
+  stable.allowedPulsesList = Object.keys(allowedPulses).map((key) => ({
+    key,
+    value: allowedPulses[key],
+  }));
+  stable.pulseLedgerList = Object.keys(pulseLedger).map((key) => ({
+    key,
+    value: pulseLedger[key],
+  }));
+  stable.lastUpdateList = Object.keys(lastUpdate).map((key) => ({
+    key,
+    value: lastUpdate[key],
   }));
 }
 
 export function postUpgrade(): PostUpgrade {
   const stable = ic.stableStorage<StableList>();
-  stable.registryList.forEach(({ key, value }) => {
-    registry[key] = value;
-  });
-  stable.messageRegistryList.forEach(({ key, value }) => {
-    messageRegistry[key] = value;
-  });
-  stable.lastUpdateList.forEach(({ key, value }) => {
-    lastUpdate[key] = value;
-  });
-  stable.burnedPulsesList.forEach(({ key, value }) => {
-    burnedPulses[key] = value;
-  });
-  stable.allowedPulsesList.forEach(({ key, value }) => {
-    allowedPulses[key] = value;
-  });
-  stable.pulseLedgerList.forEach(({ key, value }) => {
-    pulseLedger[key] = value;
-  });
+  for (let index of stable.registryList) {
+    registry[index.key] = index.value;
+  }
+  for (let index of stable.messageRegistryList) {
+    messageRegistry[index.key] = index.value;
+  }
+  for (let index of stable.lastUpdateList) {
+    lastUpdate[index.key] = index.value;
+  }
+  for (let index of stable.burnedPulsesList) {
+    burnedPulses[index.key] = index.value;
+  }
+  for (let index of stable.allowedPulsesList) {
+    allowedPulses[index.key] = index.value;
+  }
+  for (let index of stable.pulseLedgerList) {
+    pulseLedger[index.key] = index.value;
+  }
 }
 
 //#endregion
@@ -656,16 +650,10 @@ export function get_messages(principal: Principal): Query<Message[]> {
 }
 //#endregion
 
-//#region owner management
+// #region owner management
 export function init(): Init {
   getStable().owner = ic.caller();
-  allowedPulses = {};
-  messageRegistry = {};
-  pulseLedger = {};
-  registry = {};
-  burnedPulses = {};
   getStable().lastTime = ic.time();
-  lastUpdate = {};
   getStable().period = 10n;
   getStable().accountId = "";
   getStable().pulse_price = 1n; // price denominated in e8s (ICP * 1e-8)
