@@ -49,27 +49,30 @@ brew install cmake # Get cmake when its missing
 
 ## To Do TODAY
 
+- Deploy to IC
+- connect frontend to our backend
+
+## To Do Tuesday
+
 - Form to buy pulses
 - Form to schedule
 - List of schedules (with a remove button per schedule)
 - Public dashboard with login button
-- FIX backend
-- Add support for day of month recurring events (50%)
 
 ## To do in general
 
-- Add wallet-enabled frontend in react app - hooks?
-- connect frontend to our backend
-- deploy on IC network
-- maybe: preupgrade/postupgrade
 - Make pulses a DIP-20
 - Check for an SDR-ICP price oracle - on the ledger?
 - Add argument builder in Azle (using dfinity/candid?)
 
 ## To Test
 
+- maybe: preupgrade/postupgrade
+- Add wallet-enabled frontend in react app - hooks?
 - Add ledger interaction for buying pulses with ICP
 - use stable storage (Ray doesn't jnderstand stable storage yet and when to use it)
+- FIX backend
+- Add support for day of month recurring events (50%)
 
 ## Done
 
