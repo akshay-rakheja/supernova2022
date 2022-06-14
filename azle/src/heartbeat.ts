@@ -86,27 +86,34 @@ type StableList = Stable<{
 
 export function preUpgrade(): PreUpgrade {
   const stable = ic.stableStorage<StableList>();
-  stable.registryList = Object.keys(registry).map((key) => ({
+  let keys: string[];
+  keys = Object.keys(registry);
+  stable.registryList = keys.map((key) => ({
     key,
     value: registry[key],
   }));
-  stable.messageRegistryList = Object.keys(messageRegistry).map((key) => ({
+  keys = Object.keys(messageRegistry);
+  stable.messageRegistryList = keys.map((key) => ({
     key,
     value: messageRegistry[key],
   }));
-  stable.burnedPulsesList = Object.keys(burnedPulses).map((key) => ({
+  keys = Object.keys(burnedPulses);
+  stable.burnedPulsesList = keys.map((key) => ({
     key,
     value: burnedPulses[key],
   }));
-  stable.allowedPulsesList = Object.keys(allowedPulses).map((key) => ({
+  keys = Object.keys(allowedPulses);
+  stable.allowedPulsesList = keys.map((key) => ({
     key,
     value: allowedPulses[key],
   }));
-  stable.pulseLedgerList = Object.keys(pulseLedger).map((key) => ({
+  keys = Object.keys(pulseLedger);
+  stable.pulseLedgerList = keys.map((key) => ({
     key,
     value: pulseLedger[key],
   }));
-  stable.lastUpdateList = Object.keys(lastUpdate).map((key) => ({
+  keys = Object.keys(lastUpdate);
+  stable.lastUpdateList = keys.map((key) => ({
     key,
     value: lastUpdate[key],
   }));
@@ -117,21 +124,27 @@ export function postUpgrade(): PostUpgrade {
   for (let index of stable.registryList) {
     registry[index.key] = index.value;
   }
-  for (let index of stable.messageRegistryList) {
-    messageRegistry[index.key] = index.value;
-  }
-  for (let index of stable.lastUpdateList) {
-    lastUpdate[index.key] = index.value;
-  }
-  for (let index of stable.burnedPulsesList) {
-    burnedPulses[index.key] = index.value;
-  }
-  for (let index of stable.allowedPulsesList) {
-    allowedPulses[index.key] = index.value;
-  }
-  for (let index of stable.pulseLedgerList) {
-    pulseLedger[index.key] = index.value;
-  }
+  // stable.registryList = [];
+  //   for (let index of stable.messageRegistryList) {
+  //     messageRegistry[index.key] = index.value;
+  //   }
+  //   stable.messageRegistryList = [];
+  //   for (let index of stable.lastUpdateList) {
+  //     lastUpdate[index.key] = index.value;
+  //   }
+  //   stable.lastUpdateList = [];
+  //   for (let index of stable.burnedPulsesList) {
+  //     burnedPulses[index.key] = index.value;
+  //   }
+  //   stable.burnedPulsesList = [];
+  //   for (let index of stable.allowedPulsesList) {
+  //     allowedPulses[index.key] = index.value;
+  //   }
+  //   stable.allowedPulsesList = [];
+  //   for (let index of stable.pulseLedgerList) {
+  //     pulseLedger[index.key] = index.value;
+  //   }
+  //   stable.pulseLedgerList = [];
 }
 
 //#endregion
