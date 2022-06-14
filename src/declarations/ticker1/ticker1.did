@@ -1,0 +1,4 @@
+service: {
+    "count": () -> (int) query;
+    "tick2": () -> (int);
+}

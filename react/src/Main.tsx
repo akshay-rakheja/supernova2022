@@ -1,9 +1,22 @@
 import React, { FC, useState } from "react";
 import { usePlug } from "./PlugProvider";
+import { _SERVICE } from "./declarations/ticker1.did.js";
+import { idlFactory } from "./declarations";
 
 export const Main: FC = () => {
   const [balance, setBalance] = useState(0);
-  const { principal, logout, agent } = usePlug();
+  const { principal, logout, agent, createActor } = usePlug();
+
+  (async () => {
+    if (createActor) {
+      const actor = await createActor<_SERVICE>({
+        canisterId: "2qezm-sqaaa-aaaal-aatoa-cai",
+        interfaceFactory: idlFactory,
+      });
+      console.log("actor", await actor.count());
+    }
+  })();
+
   //Connect to canister and make a request
   return (
     <div className="App ">
