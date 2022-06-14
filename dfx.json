@@ -15,7 +15,7 @@
       "source": ["react/build/"],
       "type": "assets"
     },
-    "ticker1": {
+    "ticker2": {
       "type": "custom",
       "build": "npm run azle ticker1",
       "root": "src",

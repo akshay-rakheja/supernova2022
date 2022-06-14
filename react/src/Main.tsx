@@ -5,18 +5,22 @@ import { idlFactory } from "./declarations";
 
 export const Main: FC = () => {
   const [balance, setBalance] = useState(-1);
-  const { principal, logout, agent, createActor } = usePlug();
+  const { principal, logout, agent, createActor, plug } = usePlug();
   useEffect(() => {
     (async () => {
-      if (createActor) {
+      if (plug) {
         console.log("interfacefactory", idlFactory);
 
-        const actor = await createActor<_SERVICE>({
-          canisterId: "2qezm-sqaaa-aaaal-aatoa-cai",
+        const actor = await plug.createActor<_SERVICE>({
+          canisterId: "fm4kt-oyaaa-aaaap-qaljq-cai",
           interfaceFactory: idlFactory,
         });
-        console.log("I have an actor to work with here", actor, principal);
-        const counter = await actor.count();
+        console.log(
+          "I have an actor to work with here for tick2",
+          actor,
+          principal
+        );
+        const counter = await actor.tick2();
         console.log("Tried running counter");
         console.log("counter", counter);
         console.log("actor", await actor.count());

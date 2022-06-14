@@ -11,7 +11,10 @@ import PlugProvider from "./PlugProvider";
 
 function App() {
   return (
-    <PlugProvider LoggedOut={<LoggedOut />}>
+    <PlugProvider
+      LoggedOut={<LoggedOut />}
+      whitelist={["fm4kt-oyaaa-aaaap-qaljq-cai"]}
+    >
       <Main />
     </PlugProvider>
   );

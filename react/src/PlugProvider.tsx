@@ -91,7 +91,7 @@ const { ic } = window as unknown as {
     plug?: Plug;
   };
 };
-const plug = ic?.plug;
+export const plug = ic?.plug;
 //#endregion
 
 //#region Context Provider
@@ -105,6 +105,7 @@ const context = createContext({
   requestBalance: plug?.requestBalance,
   requestTransfer: plug?.requestTransfer,
   batchTransactions: plug?.batchTransactions,
+  plug,
 });
 
 const { Provider } = context;
@@ -160,6 +161,7 @@ export const PlugProvider: FC<{
       requestBalance: plug?.requestBalance,
       requestTransfer: plug?.requestTransfer,
       batchTransactions: plug?.batchTransactions,
+      plug,
     };
   }, [authenticated, plug, login, logout, principal]);
   if (!authenticated) {
