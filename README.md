@@ -41,12 +41,6 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh # install Rust
 brew install cmake # Get cmake when its missing
 ```
 
-## Akshay to LEARN
-
-- Reactjs
-- Hooks
-- Tailwind (utility classes)
-
 ## To Do TODAY
 
 - maybe: preupgrade/postupgrade
