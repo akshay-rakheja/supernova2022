@@ -67,11 +67,13 @@ type Plug = {
   requestConnect: (o?: RequestConnectParams) => Promise<PublicKey>;
   agent: HttpAgent;
   isConnected: () => boolean;
-  // createActor: (params: CreateActorParams) => Promise<Actor>;
   createActor: <T = Record<string, ActorMethod>>(
-    interfaceFactory: IDL.InterfaceFactory,
-    configuration: ActorConfig
-  ) => ActorSubclass<T>;
+    params: CreateActorParams
+  ) => Promise<ActorSubclass<T>>;
+  // createActor: (
+  //   interfaceFactory: IDL.InterfaceFactory,
+  //   configuration: ActorConfig
+  // ) =>;
 
   requestBalance: () => Promise<Balance[]>;
   requestTransfer: (
@@ -153,7 +155,8 @@ export const PlugProvider: FC<{
       login,
       logout,
       principal,
-      createActor: plug?.createActor,
+      createActor: ((o: CreateActorParams) =>
+        plug?.createActor(o)) as Plug["createActor"],
       requestBalance: plug?.requestBalance,
       requestTransfer: plug?.requestTransfer,
       batchTransactions: plug?.batchTransactions,

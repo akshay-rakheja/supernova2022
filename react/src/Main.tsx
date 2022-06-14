@@ -1,22 +1,28 @@
-import React, { FC, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import { usePlug } from "./PlugProvider";
 import { _SERVICE } from "./declarations/ticker1.did.js";
 import { idlFactory } from "./declarations";
 
 export const Main: FC = () => {
-  const [balance, setBalance] = useState(0);
+  const [balance, setBalance] = useState(-1);
   const { principal, logout, agent, createActor } = usePlug();
+  useEffect(() => {
+    (async () => {
+      if (createActor) {
+        console.log("interfacefactory", idlFactory);
 
-  (async () => {
-    if (createActor) {
-      const actor = await createActor<_SERVICE>({
-        canisterId: "2qezm-sqaaa-aaaal-aatoa-cai",
-        interfaceFactory: idlFactory,
-      });
-      console.log("actor", await actor.count());
-    }
-  })();
-
+        const actor = await createActor<_SERVICE>({
+          canisterId: "2qezm-sqaaa-aaaal-aatoa-cai",
+          interfaceFactory: idlFactory,
+        });
+        console.log("I have an actor to work with here", actor, principal);
+        const counter = await actor.count();
+        console.log("Tried running counter");
+        console.log("counter", counter);
+        console.log("actor", await actor.count());
+      }
+    })();
+  }, []);
   //Connect to canister and make a request
   return (
     <div className="App ">
