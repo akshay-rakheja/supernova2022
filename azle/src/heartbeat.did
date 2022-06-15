@@ -131,6 +131,10 @@ service: () -> {
     "getNow": () -> (nat) query;
     "getNowSeconds": () -> (nat32) query;
     "whoami": () -> (principal) query;
+    "get_total_heartbeats": () -> (nat) query;
+    "get_total_messages": () -> (nat) query;
+    "get_total_burned_pulses": () -> (nat) query;
+    "get_total_pulses": () -> (nat) query;
     "add_period": (principal, nat, text) -> (nat32);
     "add_weekly_schedule": (principal, nat8, nat8, nat8, text) -> (nat32);
     "add_daily_schedule": (principal, nat8, nat8, text) -> (nat32);

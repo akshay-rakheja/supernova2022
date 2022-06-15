@@ -1,10 +1,10 @@
-import React, { FC, Fragment, useEffect, useState } from "react";
+import React, { FC, Fragment, useCallback, useEffect, useState } from "react";
 import PlugButton from "./PlugButton";
 import background from "./assets/bg.png";
 import { usePlug } from "./PlugProvider";
 import { ActorSubclass } from "@dfinity/agent";
 import { _SERVICE } from "./declarations/heartbeat/heartbeat.did";
-import { idlFactory } from "./declarations/heartbeat";
+import { createActor, idlFactory } from "./declarations/heartbeat";
 
 const HEARTBEAT_CANISTER = "st75y-vaaaa-aaaaa-aaalq-cai";
 export const LoggedOut: FC = () => {
@@ -56,19 +56,35 @@ export const LoggedOut: FC = () => {
 /* This example requires Tailwind CSS v2.0+ */
 
 function Stats() {
-  const { createActor } = usePlug();
+  // const { createActor } = usePlug();
   const [actor, setActor] = useState<ActorSubclass<_SERVICE>>();
   useEffect(() => {
     (async () => {
-      if (createActor) {
-        const a = await createActor<_SERVICE>({
-          canisterId: HEARTBEAT_CANISTER,
-          interfaceFactory: idlFactory,
-        });
-        setActor(a);
-      }
+      const a = await createActor(HEARTBEAT_CANISTER);
+      setActor(a);
     })();
-  }, [createActor]);
+  }, []);
+  const getStats = useCallback(async () => {
+    if (actor) {
+      setHeartbeats(await actor.get_total_heartbeats());
+      setMessages(await actor.get_total_messages());
+      setBurnedPulses(await actor.get_total_burned_pulses());
+    }
+  }, [actor]);
+  const [timer, setTimer] = useState<NodeJS.Timer>();
+  useEffect(() => {
+    if (actor) {
+      let timer: NodeJS.Timer;
+      setTimer((oldTimer) => {
+        if (oldTimer) clearInterval(oldTimer);
+        timer = setInterval(getStats, 5000);
+        return timer;
+      });
+    }
+    return () => {
+      clearInterval(timer);
+    };
+  }, [getStats]);
   const [heartbeats, setHeartbeats] = useState(BigInt(0));
   const [messages, setMessages] = useState(BigInt(0));
   const [burnedPulses, setBurnedPulses] = useState(BigInt(0));

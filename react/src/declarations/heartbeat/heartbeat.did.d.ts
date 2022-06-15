@@ -130,6 +130,10 @@ export interface _SERVICE {
   'get_pulse_price' : ActorMethod<[], bigint>,
   'get_pulses' : ActorMethod<[], bigint>,
   'get_pulses_for' : ActorMethod<[Principal], bigint>,
+  'get_total_burned_pulses' : ActorMethod<[], bigint>,
+  'get_total_heartbeats' : ActorMethod<[], bigint>,
+  'get_total_messages' : ActorMethod<[], bigint>,
+  'get_total_pulses' : ActorMethod<[], bigint>,
   'is_owner' : ActorMethod<[], boolean>,
   'mint_pulses' : ActorMethod<
     [bigint],

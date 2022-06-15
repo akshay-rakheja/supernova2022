@@ -75,6 +75,10 @@ export const idlFactory = ({ IDL }) => {
     'get_pulse_price' : IDL.Func([], [IDL.Nat], ['query']),
     'get_pulses' : IDL.Func([], [IDL.Nat], ['query']),
     'get_pulses_for' : IDL.Func([IDL.Principal], [IDL.Nat], ['query']),
+    'get_total_burned_pulses' : IDL.Func([], [IDL.Nat], ['query']),
+    'get_total_heartbeats' : IDL.Func([], [IDL.Nat], ['query']),
+    'get_total_messages' : IDL.Func([], [IDL.Nat], ['query']),
+    'get_total_pulses' : IDL.Func([], [IDL.Nat], ['query']),
     'is_owner' : IDL.Func([], [IDL.Bool], ['query']),
     'mint_pulses' : IDL.Func(
         [IDL.Nat],

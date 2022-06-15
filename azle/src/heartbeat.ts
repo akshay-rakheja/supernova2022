@@ -14,7 +14,6 @@ import {
   PreUpgrade,
   PostUpgrade,
 } from "azle";
-
 import { Ledger } from "azle/canisters/ledger";
 
 //#region custom types
@@ -896,3 +895,19 @@ export function whoami(): Query<Principal> {
 }
 //#endregion
 /** */
+
+export function get_total_heartbeats(): Query<nat> {
+  return getStable().totalHeartbeats || 0n;
+}
+
+export function get_total_messages(): Query<nat> {
+  return getStable().totalMessages || 0n;
+}
+
+export function get_total_burned_pulses(): Query<nat> {
+  return getStable().totalBurnedPulses || 0n;
+}
+
+export function get_total_pulses(): Query<nat> {
+  return getStable().totalPulses || 0n;
+}
