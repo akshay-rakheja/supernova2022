@@ -74,7 +74,7 @@ export const LoggedOut: FC = () => {
       >
         <div
           className={[
-            "flex flex-col justify-around transition-opacity  duration-1000",
+            "flex flex-col justify-between transition-opacity  duration-1000",
             plugNewClass,
           ].join(" ")}
         >
@@ -113,23 +113,27 @@ const Stats: FC<{
     },
   ];
   return (
-    <div>
-      <h3 className="text-2xl leading-6 font-bold text-gray-900">Statistics</h3>
-      <dl className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">
-        {stats.map((item) => (
-          <div
-            key={item.name}
-            className="px-4 py-5 bg-gradient-to-r from-yellow-600 to-blue-800 text-white shadow rounded-lg overflow-hidden sm:p-6 border-4 border-orange-500"
-          >
-            <dt className="text-sm font-medium text-gray-100 truncate">
-              {item.name}
-            </dt>
-            <dd className="mt-1 text-3xl font-semibold text-gray-100">
-              {item.stat}
-            </dd>
-          </div>
-        ))}
-      </dl>
+    <div className="">
+      <div className="p-6 bg-gray-800 opacity-80 rounded-lg mb-6">
+        <h2 className="text-3xl leading-6 font-bold text-gray-100 text-center">
+          Statistics
+        </h2>
+        <dl className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">
+          {stats.map((item) => (
+            <div
+              key={item.name}
+              className="px-4 py-5 bg-gradient-to-r from-yellow-600 to-blue-800 text-white shadow rounded-lg overflow-hidden sm:p-6 border-4 border-orange-500"
+            >
+              <dt className="text-sm font-medium text-gray-100 truncate">
+                {item.name}
+              </dt>
+              <dd className="mt-1 text-3xl font-semibold text-gray-100">
+                {item.stat}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </div>
     </div>
   );
 };
