@@ -8,32 +8,36 @@ import config from "./config.json";
 const {
   canisters: { heartbeat },
 } = config;
-export const LoggedOut: FC = () => {
-  const [newClass, setNewClass] = useState("");
-  const [plugNewClass, setPlugNewClass] = useState("opacity-0");
+
+const useHeartbeat = () => {
   const [actor, setActor] = useState<ActorSubclass<_SERVICE>>();
   useEffect(() => {
     (async () => {
-      const a = await createActor(heartbeat);
+      const a = await createActor(heartbeat, {
+        agentOptions: { host: "https://ic0.app" },
+      });
       setActor(a);
     })();
   }, []);
+  return actor;
+};
+let timer: NodeJS.Timer;
+export const LoggedOut: FC = () => {
+  const [newClass, setNewClass] = useState("");
+  const [plugNewClass, setPlugNewClass] = useState("opacity-0");
+  const actor = useHeartbeat();
   const getStats = useCallback(async () => {
     if (actor) {
+      console.log("Firing getstats");
       setHeartbeats(await actor.get_total_heartbeats());
       setMessages(await actor.get_total_messages());
       setBurnedPulses(await actor.get_total_burned_pulses());
     }
   }, [actor]);
-  const [timer, setTimer] = useState<NodeJS.Timer>();
   useEffect(() => {
     if (actor) {
-      let timer: NodeJS.Timer;
-      setTimer((oldTimer) => {
-        if (oldTimer) clearInterval(oldTimer);
-        timer = setInterval(getStats, 5000);
-        return timer;
-      });
+      clearInterval(timer);
+      timer = setInterval(getStats, 5000);
     }
     return () => {
       clearInterval(timer);

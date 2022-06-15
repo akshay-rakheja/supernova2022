@@ -1,4 +1,4 @@
-import React, {
+import {
   useContext,
   createContext,
   useMemo,
@@ -6,22 +6,15 @@ import React, {
   useState,
   useCallback,
   ReactElement,
-  ReactChild,
   ReactNode,
   Fragment,
 } from "react";
-
 import { Principal } from "@dfinity/principal";
-import {
-  Actor,
-  ActorConfig,
-  ActorMethod,
-  ActorSubclass,
-  HttpAgent,
-} from "@dfinity/agent";
+import { ActorMethod, ActorSubclass, HttpAgent } from "@dfinity/agent";
 import { InterfaceFactory } from "@dfinity/candid/lib/cjs/idl";
-import { IDL } from "@dfinity/candid";
-
+import { useActor } from "./useAgent";
+export { useActor };
+console.log("Hello there");
 //#region Plug Type
 type RequestConnectParams = {
   whitelist?: string[];
@@ -127,6 +120,7 @@ export const PlugProvider: FC<{
   timeout = 120000,
 }) => {
   const [authenticated, setAuthenticated] = useState(false);
+  console.log("I am authenticated maybe", authenticated);
   const [principal, setPrincipal] = useState<Principal | null>(null);
 
   const login = useCallback(async () => {
@@ -149,6 +143,7 @@ export const PlugProvider: FC<{
   }, [host, whitelist, timeout]);
 
   const logout = useCallback(() => {
+    console.log("I ran logout");
     window.location.reload();
   }, []);
 
@@ -179,17 +174,13 @@ export const usePlug = () => {
 };
 //#endregion
 
-export const PlugAuthenticated: FC<{ children: ReactNode }> = ({
-  children,
-}) => {
+export const Authenticated: FC<{ children: ReactNode }> = ({ children }) => {
   const { authenticated } = usePlug();
   if (!authenticated) return null;
   else return <Fragment>{children}</Fragment>;
 };
 
-export const PlugUnauthenticated: FC<{ children: ReactNode }> = ({
-  children,
-}) => {
+export const Unauthenticated: FC<{ children: ReactNode }> = ({ children }) => {
   const { authenticated } = usePlug();
   if (authenticated) return null;
   else return <Fragment>{children}</Fragment>;

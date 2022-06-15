@@ -1,104 +1,35 @@
-import React, { FC, useEffect, useState } from "react";
 import { usePlug } from "./PlugProvider";
 import { _SERVICE } from "./declarations/ticker1.did.js";
-import { idlFactory } from "./declarations";
-import { Fragment } from "react";
+import { Fragment, useCallback, useMemo, useState } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { BellIcon, MenuIcon, XIcon } from "@heroicons/react/outline";
-import config from "./config.json";
-import {
-  CalendarIcon,
-  LocationMarkerIcon,
-  UsersIcon,
-} from "@heroicons/react/solid";
+import useHeartbeat from "./useHeartbeat";
+import { Outlet } from "react-router-dom";
+import Logo from "./assets/icon.png";
+import { createContext, useContext } from "react";
 
-const {
-  canisters: { heartbeat },
-} = config;
+const context = createContext({
+  title: "UNTITLED",
+  setTitle: (title: string) => {},
+});
+const { Provider } = context;
 
-export const Main2: FC = () => {
-  const [balance, setBalance] = useState(BigInt(-1));
-  const { principal, logout, agent, createActor, plug } = usePlug();
-  useEffect(() => {
-    (async () => {
-      if (plug) {
-        console.log("interfacefactory", idlFactory);
-
-        const actor = await plug.createActor<_SERVICE>({
-          canisterId: "fm4kt-oyaaa-aaaap-qaljq-cai",
-          interfaceFactory: idlFactory,
-        });
-        console.log(
-          "I have an actor to work with here for tick2",
-          actor,
-          principal
-        );
-        // const counter = await actor.tick2();
-        // console.log("Tried running counter");
-        // console.log("counter", counter);
-        const balance = await actor.count();
-        setBalance(balance);
-      }
-    })();
-  }, []);
-  //Connect to canister and make a request
-  return (
-    <div className="App ">
-      {/* <div className="relative bg-white"> */}
-      <header>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="flex justify-between items-center border-b-2 border-gray-100 py-6 md:justify-start md:space-x-10">
-            <div className="flex justify-start lg:w-0 lg:flex-1"></div>
-          </div>
-        </div>
-      </header>
-      {/* </div> */}
-      {/* <header className="A"></header> */}
-      <div className="grid grid-flow-col auto-cols-max auto-rows-max space-x-4 ...">
-        <div className="bg-white dark:bg-slate-800 rounded-lg px-6 py-8 ring-1 ring-slate-900/5 shadow-xl">
-          <h3 className="text-slate-900 dark:text-white mt-5 text-base font-medium tracking-tight">
-            Users
-          </h3>
-          <p className="text-slate-500 dark:text-slate-400 mt-2 text-sm">1</p>
-        </div>
-
-        <div className="bg-white dark:bg-slate-800 rounded-lg px-6 py-8 ring-1 ring-slate-900/5 shadow-xl">
-          <h3 className="text-slate-900 dark:text-white mt-5 text-base font-medium tracking-tight">
-            Canisters
-          </h3>
-          <p className="text-slate-500 dark:text-slate-400 mt-2 text-sm">1</p>
-        </div>
-
-        <div className="bg-white dark:bg-slate-800 rounded-lg px-6 py-8 ring-1 ring-slate-900/5 shadow-xl">
-          <h3 className="text-slate-900 dark:text-white mt-5 text-base font-medium tracking-tight">
-            Heartbeats
-          </h3>
-          <p className="text-slate-500 dark:text-slate-400 mt-2 text-sm">1</p>
-        </div>
-        <button onClick={logout} className="bg-red-500 p-md rounded-md">
-          LOG ME OUT
-        </button>
-
-        <p> {principal?.toString()} </p>
-        <p>My pulse balance {balance.toString()}</p>
-        <button>Mint Pulses</button>
-        <button>Schedule an event</button>
-      </div>
-    </div>
-  );
+export const useTitle = (): [string, (title: string) => void] => {
+  const { title, setTitle } = useContext(context);
+  return [title, setTitle];
 };
-
 export default function Main() {
-  const { logout } = usePlug();
+  const { logout, principal } = usePlug();
+  const heartbeat = useHeartbeat();
+
   const user = {
-    name: "Tom Cook",
-    email: "tom@example.com",
-    imageUrl:
-      "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+    name: principal && principal.toString(),
+    email: "",
+    imageUrl: Logo,
   };
   const navigation = [
-    { name: "Dashboard", href: "#", current: true },
-    { name: "Team", href: "#", current: false },
+    { name: "Dashboard", href: "/canisters", current: true },
+    { name: "Team", href: "/canisters/1", current: false },
     { name: "Projects", href: "#", current: false },
     { name: "Calendar", href: "#", current: false },
     { name: "Reports", href: "#", current: false },
@@ -131,6 +62,13 @@ export default function Main() {
   function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(" ");
   }
+  const [title, setTitle] = useState("UNTITLED");
+  const value = useMemo(() => {
+    return {
+      title,
+      setTitle,
+    };
+  }, [title, setTitle]);
 
   return (
     <>
@@ -315,7 +253,7 @@ export default function Main() {
           </Disclosure>
           <header className="py-10">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <h1 className="text-3xl font-bold text-white">Dashboard</h1>
+              <h1 className="text-3xl font-bold text-white">{title}</h1>
             </div>
           </header>
         </div>
@@ -324,99 +262,14 @@ export default function Main() {
           <div className="max-w-7xl mx-auto pb-12 px-4 sm:px-6 lg:px-8">
             {/* Replace with your content */}
             <div className="bg-white rounded-lg shadow px-5 py-6 sm:px-6">
-              <Canisters />
+              <Provider value={value}>
+                <Outlet />
+              </Provider>
             </div>
             {/* /End replace */}
           </div>
         </main>
       </div>
     </>
-  );
-}
-
-const positions = [
-  {
-    id: 1,
-    title: "Back End Developer",
-    type: "Full-time",
-    location: "Remote",
-    department: "Engineering",
-    closeDate: "2020-01-07",
-    closeDateFull: "January 7, 2020",
-  },
-  {
-    id: 2,
-    title: "Front End Developer",
-    type: "Full-time",
-    location: "Remote",
-    department: "Engineering",
-    closeDate: "2020-01-07",
-    closeDateFull: "January 7, 2020",
-  },
-  {
-    id: 3,
-    title: "User Interface Designer",
-    type: "Full-time",
-    location: "Remote",
-    department: "Design",
-    closeDate: "2020-01-14",
-    closeDateFull: "January 14, 2020",
-  },
-];
-
-export function Canisters() {
-  return (
-    <div className="bg-white shadow overflow-hidden sm:rounded-md ">
-      <ul role="list" className="divide-y divide-gray-200">
-        {positions.map((position) => (
-          <li key={position.id}>
-            <a href="#" className="block hover:bg-gray-50">
-              <div className="px-4 py-4 sm:px-6">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium text-indigo-600 truncate">
-                    {position.title}
-                  </p>
-                  <div className="ml-2 flex-shrink-0 flex">
-                    <p className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                      {position.type}
-                    </p>
-                  </div>
-                </div>
-                <div className="mt-2 sm:flex sm:justify-between">
-                  <div className="sm:flex">
-                    <p className="flex items-center text-sm text-gray-500">
-                      <UsersIcon
-                        className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
-                        aria-hidden="true"
-                      />
-                      {position.department}
-                    </p>
-                    <p className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 sm:ml-6">
-                      <LocationMarkerIcon
-                        className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
-                        aria-hidden="true"
-                      />
-                      {position.location}
-                    </p>
-                  </div>
-                  <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
-                    <CalendarIcon
-                      className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
-                      aria-hidden="true"
-                    />
-                    <p>
-                      Closing on{" "}
-                      <time dateTime={position.closeDate}>
-                        {position.closeDateFull}
-                      </time>
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </a>
-          </li>
-        ))}
-      </ul>
-    </div>
   );
 }
