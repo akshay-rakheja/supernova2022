@@ -49,12 +49,6 @@ type Message = {
 };
 
 type StableStore = Stable<{
-  // registry: Registry;
-  // messageRegistry: MessageRegistry;
-  // allowedPulses: PulseLedger;
-  // burnedPulses: PulseLedger;
-  // pulseLedger: PulseLedger;
-  // lastUpdate: LastUpdateRegistry;
   owner: Principal;
   pulse_price: nat;
   check_price_in_pulses: nat;
@@ -62,6 +56,10 @@ type StableStore = Stable<{
   accountId: string;
   lastTime: nat;
   period: nat;
+  totalMessages: Opt<nat>;
+  totalHeartbeats: Opt<nat>;
+  totalPulses: Opt<nat>;
+  totalBurnedPulses: Opt<nat>;
 }>;
 
 function getStable() {
@@ -157,6 +155,10 @@ export function postUpgrade(): PostUpgrade {
     }
   }
   stable.pulseLedgerList = [];
+  // if (!getStable().totalBurnedPulses) getStable().totalBurnedPulses = 0n;
+  // if (!getStable().totalHeartbeats) getStable().totalHeartbeats = 0n;
+  // if (!getStable().totalMessages) getStable().totalMessages = 0n;
+  // if (!getStable().totalPulses) getStable().totalPulses = 0n;
 }
 
 //#endregion
@@ -389,6 +391,8 @@ function canCheck(owner: Principal) {
 
 function burn_pulses(owner: Principal, pulses: bigint) {
   burnedPulses[owner] += pulses;
+  if (!getStable().totalBurnedPulses) getStable().totalBurnedPulses = 0n;
+  getStable().totalBurnedPulses! += pulses;
 }
 
 function* sendPulse(
@@ -398,6 +402,8 @@ function* sendPulse(
   owner: Principal
 ) {
   burn_pulses(owner, getStable().pulse_price_in_pulses);
+  if (!getStable().totalMessages) getStable().totalMessages = 0n;
+  getStable().totalMessages!++;
   if (!args) args = [68, 73, 68, 76, 0, 0]; // DIDL + 2 nulls
   yield ic.call_raw(address, func, args, 0n); //@TODO RHD SUpport passing an argument other than null
 }
@@ -684,6 +690,10 @@ export function init(): Init {
   getStable().pulse_price = 1n; // price denominated in e8s (ICP * 1e-8)
   getStable().pulse_price_in_pulses = 10_000_000n; // (0.1 PULSE)
   getStable().check_price_in_pulses = 10n; // (0.00000001 PULSE)
+  getStable().totalBurnedPulses = 0n;
+  getStable().totalHeartbeats = 0n;
+  getStable().totalMessages = 0n;
+  getStable().totalPulses = 0n;
 }
 export function set_owner(newOwner: Principal): Update<Principal> {
   getStable().owner = newOwner;
@@ -762,6 +772,8 @@ export function* mint_pulses(
     burnedPulses[principal] = 0n;
   }
   allowedPulses[principal] += pulseCount;
+  if (!getStable().totalPulses) getStable().totalPulses = 0n;
+  getStable().totalPulses! += pulseCount;
   return { ok: allowedPulses[principal], err: null };
 }
 
@@ -776,6 +788,8 @@ export function mint_pulses_for(
     burnedPulses[principal] = 0n;
   }
   allowedPulses[principal] += pulseCount;
+  if (!getStable().totalPulses) getStable().totalPulses = 0n;
+  getStable().totalPulses! += pulseCount;
   return allowedPulses[principal];
 }
 
@@ -831,6 +845,8 @@ export function getNowSeconds(): Query<nat32> {
 
 export function* heartbeat(): Heartbeat {
   if (shouldTick()) {
+    if (!getStable().totalHeartbeats) getStable().totalHeartbeats = 0n;
+    getStable().totalHeartbeats!++;
     for (const address in Object.keys(registry)) {
       for (let index = 0; index < registry[address].length; index++) {
         if (registry[address][index] === null) continue;

@@ -4,7 +4,7 @@ import { _SERVICE } from "./declarations/ticker1.did.js";
 import { idlFactory } from "./declarations";
 
 export const Main: FC = () => {
-  const [balance, setBalance] = useState(-1);
+  const [balance, setBalance] = useState(BigInt(-1));
   const { principal, logout, agent, createActor, plug } = usePlug();
   useEffect(() => {
     (async () => {
@@ -20,10 +20,11 @@ export const Main: FC = () => {
           actor,
           principal
         );
-        const counter = await actor.tick2();
-        console.log("Tried running counter");
-        console.log("counter", counter);
-        console.log("actor", await actor.count());
+        // const counter = await actor.tick2();
+        // console.log("Tried running counter");
+        // console.log("counter", counter);
+        const balance = await actor.count();
+        setBalance(balance);
       }
     })();
   }, []);
@@ -66,7 +67,7 @@ export const Main: FC = () => {
         </button>
 
         <p> {principal?.toString()} </p>
-        <p>My pulse balance {balance}</p>
+        <p>My pulse balance {balance.toString()}</p>
         <button>Mint Pulses</button>
         <button>Schedule an event</button>
       </div>
