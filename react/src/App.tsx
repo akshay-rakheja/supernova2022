@@ -1,22 +1,32 @@
-import React, { useState, useEffect, FC } from "react";
-import logo from "./logo.svg";
+import React, { Fragment } from "react";
 import "./App.css";
-import { Actor, HttpAgent } from "@dfinity/agent";
-import { Principal } from "@dfinity/principal";
-import { AuthClient } from "@dfinity/auth-client";
-import AuthenticationProvider from "./AuthClientProvider";
 import LoggedOut from "./LoggedOut";
 import Main from "./Main";
-import PlugProvider from "./PlugProvider";
+import PlugProvider, {
+  PlugAuthenticated,
+  PlugUnauthenticated,
+} from "./PlugProvider";
+import config from "./config.json";
+import { Helmet } from "react-helmet";
+const whitelist = Object.values(config.canisters);
 
 function App() {
   return (
-    <PlugProvider
-      LoggedOut={<LoggedOut />}
-      whitelist={["fm4kt-oyaaa-aaaap-qaljq-cai"]}
-    >
-      <Main />
-    </PlugProvider>
+    <Fragment>
+      <Helmet>
+        <title>DeTi: Decentralized Time</title>
+      </Helmet>
+      <PlugProvider whitelist={whitelist}>
+        <Fragment>
+          <PlugAuthenticated>
+            <Main />
+          </PlugAuthenticated>
+          <PlugUnauthenticated>
+            <LoggedOut />
+          </PlugUnauthenticated>
+        </Fragment>
+      </PlugProvider>
+    </Fragment>
   );
 }
 
