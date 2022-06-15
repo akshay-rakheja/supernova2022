@@ -846,6 +846,7 @@ export function* heartbeat(): Heartbeat {
   if (shouldTick()) {
     if (!getStable().totalHeartbeats) getStable().totalHeartbeats = 0n;
     getStable().totalHeartbeats!++;
+    getStable().lastTime = ic.time();
     for (const address in Object.keys(registry)) {
       for (let index = 0; index < registry[address].length; index++) {
         if (registry[address][index] === null) continue;
@@ -871,18 +872,20 @@ export function* heartbeat(): Heartbeat {
         }
       }
     }
-  }
-  for (const address in Object.keys(messageRegistry)) {
-    for (let x = messageRegistry[address].length - 1; x > -1; x--) {
-      if (messageRegistry[address][x] === null) continue;
-      const { time, args, canister, func, owner } = messageRegistry[address][x];
-      if (canCheck(owner)) {
-        burn_pulses(owner, getStable().check_price_in_pulses);
-        if (canPulse(owner)) {
-          if (time < ic.time()) {
-            //Send the message
-            delete messageRegistry[address][x];
-            sendPulse(address, func, args, owner);
+
+    for (const address in Object.keys(messageRegistry)) {
+      for (let x = messageRegistry[address].length - 1; x > -1; x--) {
+        if (messageRegistry[address][x] === null) continue;
+        const { time, args, canister, func, owner } =
+          messageRegistry[address][x];
+        if (canCheck(owner)) {
+          burn_pulses(owner, getStable().check_price_in_pulses);
+          if (canPulse(owner)) {
+            if (time < ic.time()) {
+              //Send the message
+              delete messageRegistry[address][x];
+              sendPulse(address, func, args, owner);
+            }
           }
         }
       }
