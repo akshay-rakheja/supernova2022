@@ -6,6 +6,9 @@ import React, {
   useState,
   useCallback,
   ReactElement,
+  ReactChild,
+  ReactNode,
+  Fragment,
 } from "react";
 
 import { Principal } from "@dfinity/principal";
@@ -164,7 +167,7 @@ export const PlugProvider: FC<{
       plug,
     };
   }, [authenticated, plug, login, logout, principal]);
-  if (!authenticated) {
+  if (!authenticated && LoggedOut) {
     return <Provider value={value}>{LoggedOut ? LoggedOut : null}</Provider>;
   }
   return <Provider value={value}>{children}</Provider>;
@@ -175,4 +178,21 @@ export const usePlug = () => {
   return data;
 };
 //#endregion
+
+export const PlugAuthenticated: FC<{ children: ReactNode }> = ({
+  children,
+}) => {
+  const { authenticated } = usePlug();
+  if (!authenticated) return null;
+  else return <Fragment>{children}</Fragment>;
+};
+
+export const PlugUnauthenticated: FC<{ children: ReactNode }> = ({
+  children,
+}) => {
+  const { authenticated } = usePlug();
+  if (authenticated) return null;
+  else return <Fragment>{children}</Fragment>;
+};
+
 export default PlugProvider;
