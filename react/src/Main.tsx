@@ -5,13 +5,16 @@ import { idlFactory } from "./declarations";
 import { Fragment } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { BellIcon, MenuIcon, XIcon } from "@heroicons/react/outline";
-
-/* This example requires Tailwind CSS v2.0+ */
+import config from "./config.json";
 import {
   CalendarIcon,
   LocationMarkerIcon,
   UsersIcon,
 } from "@heroicons/react/solid";
+
+const {
+  canisters: { heartbeat },
+} = config;
 
 export const Main2: FC = () => {
   const [balance, setBalance] = useState(BigInt(-1));
@@ -84,7 +87,6 @@ export const Main2: FC = () => {
     </div>
   );
 };
-/* This example requires Tailwind CSS v2.0+ */
 
 export default function Main() {
   const { logout } = usePlug();
