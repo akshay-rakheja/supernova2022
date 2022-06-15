@@ -114,7 +114,7 @@ const Stats: FC<{
   ];
   return (
     <div className="">
-      <div className="p-6 bg-gray-800 opacity-80 rounded-lg mb-6">
+      <div className="p-6 bg-black bg-opacity-60 rounded-lg mb-6">
         <h2 className="text-3xl leading-6 font-bold text-gray-100 text-center">
           Statistics
         </h2>
