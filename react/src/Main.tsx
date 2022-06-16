@@ -4,7 +4,7 @@ import { Fragment, useCallback, useMemo, useState } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { BellIcon, MenuIcon, XIcon } from "@heroicons/react/outline";
 import useHeartbeat from "./useHeartbeat";
-import { Outlet } from "react-router-dom";
+import { Link, Outlet, useResolvedPath } from "react-router-dom";
 import Logo from "./assets/icon.png";
 import { createContext, useContext } from "react";
 
@@ -27,34 +27,44 @@ export default function Main() {
     email: "",
     imageUrl: Logo,
   };
+  const path = useResolvedPath(window.location);
+  console.log("path is ", path);
   const navigation = [
-    { name: "Dashboard", href: "/canisters", current: true },
-    { name: "Team", href: "/canisters/1", current: false },
-    { name: "Projects", href: "#", current: false },
-    { name: "Calendar", href: "#", current: false },
-    { name: "Reports", href: "#", current: false },
+    {
+      name: "Canisters",
+      href: "/canisters",
+      current: path.pathname.startsWith("/canisters"),
+    },
+    {
+      name: "Pulses",
+      href: "/pulses",
+      current: path.pathname.startsWith("/pulses"),
+    },
   ];
   const userNavigation = [
-    {
-      name: "Your Profile",
-      href: "#",
-      onClick: () => {
-        console.log("Clicked your profile");
-      },
-    },
-    {
-      name: "Settings",
-      href: "#",
-      onClick: () => {
-        console.log("Clicked settingsofile");
-      },
-    },
+    // {
+    //   name: "Your Profile",
+    //   href: "#",
+    //   onClick: () => {
+    //     console.log("Clicked your profile");
+    //   },
+    // },
+    // {
+    //   name: "Settings",
+    //   href: "/",
+    //   onClick: () => {
+    //     console.log("Clicked settingsofile");
+    //   },
+    // },
     {
       name: "Sign out",
       href: "#",
       onClick: () => {
         console.log("Clicked sign out");
-        logout();
+        window.location.href = "/";
+        setTimeout(() => {
+          logout();
+        }, 500);
       },
     },
   ];
@@ -81,8 +91,8 @@ export default function Main() {
         ```
       */}
       <div className="min-h-full bg-gradient-to-r from-yellow-600 to-blue-800">
-        <div className="bg-slate-800 pb-32">
-          <Disclosure as="nav" className="bg-slate-800 to-slate-300">
+        <div className="bg-black bg-opacity-60 pb-32">
+          <Disclosure as="nav" className="bg-black ">
             {({ open }) => (
               <>
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
@@ -90,18 +100,20 @@ export default function Main() {
                     <div className="flex items-center justify-between h-16 px-4 sm:px-0">
                       <div className="flex items-center">
                         <div className="flex-shrink-0">
-                          <img
-                            className="h-8 w-8"
-                            src="https://tailwindui.com/img/logos/workflow-mark-indigo-500.svg"
-                            alt="Workflow"
-                          />
+                          <Link to="/">
+                            <img
+                              className="h-10 w-10 rounded-full"
+                              src={Logo}
+                              alt="Workflow"
+                            />
+                          </Link>
                         </div>
                         <div className="hidden md:block">
                           <div className="ml-10 flex items-baseline space-x-4">
                             {navigation.map((item) => (
-                              <a
+                              <Link
                                 key={item.name}
-                                href={item.href}
+                                to={item.href}
                                 className={classNames(
                                   item.current
                                     ? "bg-gray-900 text-white"
@@ -111,31 +123,32 @@ export default function Main() {
                                 aria-current={item.current ? "page" : undefined}
                               >
                                 {item.name}
-                              </a>
+                              </Link>
                             ))}
                           </div>
                         </div>
                       </div>
                       <div className="hidden md:block">
                         <div className="ml-4 flex items-center md:ml-6">
-                          <button
+                          {/* <button
                             type="button"
                             className="bg-gray-800 p-1 text-gray-400 rounded-full hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
                           >
                             <span className="sr-only">View notifications</span>
                             <BellIcon className="h-6 w-6" aria-hidden="true" />
-                          </button>
+                          </button> */}
 
                           {/* Profile dropdown */}
                           <Menu as="div" className="ml-3 relative">
                             <div>
                               <Menu.Button className="max-w-xs bg-gray-800 rounded-full flex items-center text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
                                 <span className="sr-only">Open user menu</span>
-                                <img
-                                  className="h-8 w-8 rounded-full"
-                                  src={user.imageUrl}
-                                  alt=""
-                                />
+                                <span className="p-2 text-white">
+                                  {(principal?.toString() || "").substring(
+                                    0,
+                                    5
+                                  ) + "..."}
+                                </span>
                               </Menu.Button>
                             </div>
                             <Transition
@@ -151,8 +164,8 @@ export default function Main() {
                                 {userNavigation.map((item) => (
                                   <Menu.Item key={item.name}>
                                     {({ active }) => (
-                                      <a
-                                        href={item.href}
+                                      <Link
+                                        to={item.href}
                                         className={classNames(
                                           active ? "bg-gray-100" : "",
                                           "block px-4 py-2 text-sm text-gray-700"
@@ -160,7 +173,7 @@ export default function Main() {
                                         onClick={item.onClick}
                                       >
                                         {item.name}
-                                      </a>
+                                      </Link>
                                     )}
                                   </Menu.Item>
                                 ))}
@@ -211,28 +224,26 @@ export default function Main() {
                   </div>
                   <div className="pt-4 pb-3 border-t border-gray-700">
                     <div className="flex items-center px-5">
-                      <div className="flex-shrink-0">
+                      {/* <div className="flex-shrink-0">
                         <img
                           className="h-10 w-10 rounded-full"
                           src={user.imageUrl}
                           alt=""
                         />
-                      </div>
+                      </div> */}
                       <div className="ml-3">
                         <div className="text-base font-medium leading-none text-white">
-                          {user.name}
-                        </div>
-                        <div className="text-sm font-medium leading-none text-gray-400">
-                          {user.email}
+                          User:{" "}
+                          {user.name ? user.name.substring(0, 25) + "..." : ""}
                         </div>
                       </div>
-                      <button
+                      {/* <button
                         type="button"
                         className="ml-auto bg-gray-800 flex-shrink-0 p-1 text-gray-400 rounded-full hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
                       >
                         <span className="sr-only">View notifications</span>
                         <BellIcon className="h-6 w-6" aria-hidden="true" />
-                      </button>
+                      </button> */}
                     </div>
                     <div className="mt-3 px-2 space-y-1">
                       {userNavigation.map((item) => (
@@ -241,6 +252,7 @@ export default function Main() {
                           as="a"
                           href={item.href}
                           className="block px-3 py-2 rounded-md text-base font-medium text-gray-400 hover:text-white hover:bg-gray-700"
+                          onClick={item.onClick}
                         >
                           {item.name}
                         </Disclosure.Button>

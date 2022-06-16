@@ -404,6 +404,7 @@ function* sendPulse(
   if (!getStable().totalMessages) getStable().totalMessages = 0n;
   getStable().totalMessages!++;
   if (!args) args = [68, 73, 68, 76, 0, 0]; // DIDL + 2 nulls
+
   yield ic.call_raw(address, func, args, 0n); //@TODO RHD SUpport passing an argument other than null
 }
 
@@ -465,18 +466,18 @@ export function add_period(
   if (allowedPulses[owner] < 1)
     throw new Error("You must have pulses in the bank");
   if (period_in_seconds < 10) throw new Error("Period must be at least 10s");
-  if (!registry[canister]) registry[canister] = [];
-  registry[canister].push({
+  if (!registry[owner]) registry[owner] = [];
+  registry[owner].push({
     owner,
-    period: period_in_seconds * second_in_ns,
+    period: period_in_seconds,
     func,
     canister,
     schedule: null,
     args: null,
   });
-  if (!lastUpdate[canister]) lastUpdate[canister] = [];
-  lastUpdate[canister].push(ic.time());
-  return lastUpdate[canister].length - 1;
+  if (!lastUpdate[owner]) lastUpdate[owner] = [];
+  lastUpdate[owner].push(ic.time());
+  return lastUpdate[owner].length - 1;
 }
 
 export function add_weekly_schedule(
@@ -496,8 +497,8 @@ export function add_weekly_schedule(
     dom: null,
     month: null,
   };
-  if (!registry[canister]) registry[canister] = [];
-  registry[canister].push({
+  if (!registry[owner]) registry[owner] = [];
+  registry[owner].push({
     owner,
     func,
     canister,
@@ -505,9 +506,9 @@ export function add_weekly_schedule(
     period: null,
     args: null,
   });
-  if (!lastUpdate[canister]) lastUpdate[canister] = [];
-  lastUpdate[canister].push(setNextUpdate(schedule));
-  return lastUpdate[canister].length - 1;
+  if (!lastUpdate[owner]) lastUpdate[owner] = [];
+  lastUpdate[owner].push(setNextUpdate(schedule));
+  return lastUpdate[owner].length - 1;
 }
 export function add_daily_schedule(
   canister: Principal,
@@ -525,8 +526,8 @@ export function add_daily_schedule(
     dom: null,
     month: null,
   };
-  if (!registry[canister]) registry[canister] = [];
-  registry[canister].push({
+  if (!registry[owner]) registry[owner] = [];
+  registry[owner].push({
     owner,
     func,
     canister,
@@ -534,9 +535,9 @@ export function add_daily_schedule(
     period: null,
     args: null,
   });
-  if (!lastUpdate[canister]) lastUpdate[canister] = [];
-  lastUpdate[canister].push(setNextUpdate(schedule));
-  return lastUpdate[canister].length - 1;
+  if (!lastUpdate[owner]) lastUpdate[owner] = [];
+  lastUpdate[owner].push(setNextUpdate(schedule));
+  return lastUpdate[owner].length - 1;
 }
 
 export function add_monthly_schedule(
@@ -556,8 +557,8 @@ export function add_monthly_schedule(
     dom: day_of_month,
     month: null,
   };
-  if (!registry[canister]) registry[canister] = [];
-  registry[canister].push({
+  if (!registry[owner]) registry[owner] = [];
+  registry[owner].push({
     owner,
     func,
     canister,
@@ -565,9 +566,9 @@ export function add_monthly_schedule(
     period: null,
     args: null,
   });
-  if (!lastUpdate[canister]) lastUpdate[canister] = [];
-  lastUpdate[canister].push(setNextUpdate(schedule));
-  return lastUpdate[canister].length - 1;
+  if (!lastUpdate[owner]) lastUpdate[owner] = [];
+  lastUpdate[owner].push(setNextUpdate(schedule));
+  return lastUpdate[owner].length - 1;
 }
 export function add_yearly_schedule(
   canister: Principal,
@@ -587,8 +588,8 @@ export function add_yearly_schedule(
     dom: day_of_month,
     month,
   };
-  if (!registry[canister]) registry[canister] = [];
-  registry[canister].push({
+  if (!registry[owner]) registry[owner] = [];
+  registry[owner].push({
     owner,
     func,
     canister,
@@ -596,37 +597,39 @@ export function add_yearly_schedule(
     period: null,
     args: null,
   });
-  if (!lastUpdate[canister]) lastUpdate[canister] = [];
-  lastUpdate[canister].push(setNextUpdate(schedule));
-  return lastUpdate[canister].length - 1;
+  if (!lastUpdate[owner]) lastUpdate[owner] = [];
+  lastUpdate[owner].push(setNextUpdate(schedule));
+  return lastUpdate[owner].length - 1;
 }
 
-export function remove(address: Principal, index: nat32): Update<void> {
-  if (ic.caller() !== registry[address][index].owner)
-    throw new Error("Not the owner of this schedule");
-  delete registry[address][index];
+export function remove(index: nat32): Update<void> {
+  const owner = ic.caller();
+  delete registry[owner][index];
 }
 
-export function get_one(principal: Principal, index: nat32): Query<UpdateInfo> {
-  return registry[principal][index];
+export function get_one(index: nat32): Query<UpdateInfo> {
+  const owner = ic.caller();
+  return registry[owner][index];
 }
 
-export function get_count(principal: Principal): Query<nat32> {
-  return registry[principal].length;
+export function get_count(): Query<nat32> {
+  const owner = ic.caller();
+  if (registry[owner]) {
+    return registry[owner].length;
+  } else return 0;
 }
 
-export function get_all(principal: Principal): Query<UpdateInfo[]> {
-  return registry[principal];
+export function get_all(): Query<UpdateInfo[]> {
+  const owner = ic.caller();
+  return registry[owner];
 }
 
-export function get_next_update_time(
-  principal: Principal,
-  index: nat32
-): Query<nat> {
-  if (registry[principal][index].period !== null) {
-    return lastUpdate[principal][index] + registry[principal][index].period!;
+export function get_next_update_time(index: nat32): Query<nat> {
+  const owner = ic.caller();
+  if (registry[owner][index].period !== null) {
+    return lastUpdate[owner][index] + registry[owner][index].period!;
   } else {
-    return lastUpdate[principal][index];
+    return lastUpdate[owner][index];
   }
 }
 //#endregion
@@ -643,40 +646,36 @@ export function add_message(
     throw new Error("You must have pulses in the bank");
   const time = unix_time_code_in_seconds * second_in_ns;
   if (time < ic.time()) throw new Error("Time must be in the future");
-  if (!messageRegistry[canister]) messageRegistry[canister] = [];
-  messageRegistry[canister].push({
+  if (!messageRegistry[owner]) messageRegistry[owner] = [];
+  messageRegistry[owner].push({
     args,
     func,
     canister,
     time,
     owner,
   });
-  return messageRegistry[canister].length - 1;
+  return messageRegistry[owner].length - 1;
 }
 
-export function remove_message(
-  canister: Principal,
-  index: nat32
-): Update<nat32> {
-  if (ic.caller() !== messageRegistry[canister][index].owner)
-    throw new Error("Not the owner of this schedule");
-  delete messageRegistry[canister][index];
-  return messageRegistry[canister].length;
+export function remove_message(index: nat32): Update<nat32> {
+  const owner = ic.caller();
+  delete messageRegistry[owner][index];
+  return messageRegistry[owner].length;
 }
 
-export function get_one_message(
-  principal: Principal,
-  index: nat32
-): Query<Message> {
-  return messageRegistry[principal][index];
+export function get_one_message(index: nat32): Query<Message> {
+  const owner = ic.caller();
+  return messageRegistry[owner][index];
 }
 
-export function get_message_count(principal: Principal): Query<nat32> {
-  return messageRegistry[principal].length;
+export function get_message_count(): Query<nat32> {
+  const owner = ic.caller();
+  return messageRegistry[owner].length;
 }
 
-export function get_messages(principal: Principal): Query<Message[]> {
-  return messageRegistry[principal];
+export function get_messages(): Query<Message[]> {
+  const owner = ic.caller();
+  return messageRegistry[owner];
 }
 //#endregion
 
@@ -847,25 +846,31 @@ export function* heartbeat(): Heartbeat {
     if (!getStable().totalHeartbeats) getStable().totalHeartbeats = 0n;
     getStable().totalHeartbeats!++;
     getStable().lastTime = ic.time();
-    for (const address in Object.keys(registry)) {
-      for (let index = 0; index < registry[address].length; index++) {
-        if (registry[address][index] === null) continue;
-        const updateInfo = registry[address][index];
-        const { period: thisPeriod, schedule, func, args, owner } = updateInfo;
+    for (const owner in Object.keys(registry)) {
+      for (let index = 0; index < registry[owner].length; index++) {
+        if (registry[owner][index] === null) continue;
+        const updateInfo = registry[owner][index];
+        const {
+          period: thisPeriod,
+          schedule,
+          func,
+          args,
+          canister,
+        } = updateInfo;
         if (canCheck(owner)) {
           burn_pulses(owner, getStable().check_price_in_pulses);
           if (canPulse(owner)) {
             getStable().lastTime = ic.time();
             if (thisPeriod !== null) {
-              if (should(thisPeriod, lastUpdate[address][index])) {
-                lastUpdate[address][index] = ic.time();
-                yield* sendPulse(address, func, args, owner);
+              if (should(thisPeriod, lastUpdate[owner][index])) {
+                lastUpdate[owner][index] = ic.time();
+                yield* sendPulse(canister, func, args, owner);
               }
             } else if (schedule !== null) {
-              if (lastUpdate[address][index] < ic.time()) {
+              if (lastUpdate[owner][index] < ic.time()) {
                 const nextUpdate = setNextUpdate(schedule);
-                lastUpdate[address][index] = nextUpdate;
-                yield* sendPulse(address, func, args, owner);
+                lastUpdate[owner][index] = nextUpdate;
+                yield* sendPulse(canister, func, args, owner);
               }
             }
           }
@@ -873,18 +878,17 @@ export function* heartbeat(): Heartbeat {
       }
     }
 
-    for (const address in Object.keys(messageRegistry)) {
-      for (let x = messageRegistry[address].length - 1; x > -1; x--) {
-        if (messageRegistry[address][x] === null) continue;
-        const { time, args, canister, func, owner } =
-          messageRegistry[address][x];
+    for (const owner in Object.keys(messageRegistry)) {
+      for (let x = messageRegistry[owner].length - 1; x > -1; x--) {
+        if (messageRegistry[owner][x] === null) continue;
+        const { time, args, canister, func } = messageRegistry[owner][x];
         if (canCheck(owner)) {
           burn_pulses(owner, getStable().check_price_in_pulses);
           if (canPulse(owner)) {
             if (time < ic.time()) {
               //Send the message
-              delete messageRegistry[address][x];
-              sendPulse(address, func, args, owner);
+              delete messageRegistry[owner][x];
+              yield* sendPulse(canister, func, args, owner);
             }
           }
         }

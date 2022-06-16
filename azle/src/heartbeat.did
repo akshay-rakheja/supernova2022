@@ -114,13 +114,13 @@ type QueryArchiveError = variant { "BadFirstBlockIndex": record { "requested_ind
 type QueryArchiveFn = func (GetBlocksArgs) -> (QueryArchiveResult) query;
 
 service: () -> {
-    "get_one": (principal, nat32) -> (UpdateInfo) query;
-    "get_count": (principal) -> (nat32) query;
-    "get_all": (principal) -> (vec UpdateInfo) query;
-    "get_next_update_time": (principal, nat32) -> (nat) query;
-    "get_one_message": (principal, nat32) -> (Message) query;
-    "get_message_count": (principal) -> (nat32) query;
-    "get_messages": (principal) -> (vec Message) query;
+    "get_one": (nat32) -> (UpdateInfo) query;
+    "get_count": () -> (nat32) query;
+    "get_all": () -> (vec UpdateInfo) query;
+    "get_next_update_time": (nat32) -> (nat) query;
+    "get_one_message": (nat32) -> (Message) query;
+    "get_message_count": () -> (nat32) query;
+    "get_messages": () -> (vec Message) query;
     "is_owner": () -> (bool) query;
     "get_pulse_price": () -> (nat) query;
     "get_account_id": () -> (text) query;
@@ -140,9 +140,9 @@ service: () -> {
     "add_daily_schedule": (principal, nat8, nat8, text) -> (nat32);
     "add_monthly_schedule": (principal, nat8, nat8, nat8, text) -> (nat32);
     "add_yearly_schedule": (principal, nat8, nat8, nat8, nat8, text) -> (nat32);
-    "remove": (principal, nat32) -> ();
+    "remove": (nat32) -> ();
     "add_message": (principal, nat, text, opt vec nat8) -> (nat32);
-    "remove_message": (principal, nat32) -> (nat32);
+    "remove_message": (nat32) -> (nat32);
     "set_owner": (principal) -> (principal);
     "set_pulse_price": (nat) -> (nat);
     "set_pulse_cost": (nat) -> (nat);

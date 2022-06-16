@@ -1,8 +1,12 @@
+import { Principal } from "@dfinity/principal";
 import {
   CalendarIcon,
   LocationMarkerIcon,
   UsersIcon,
 } from "@heroicons/react/solid";
+import { useEffect } from "react";
+import { useTitle } from "./Main";
+import useHeartbeat from "./useHeartbeat";
 
 const positions = [
   {
@@ -35,8 +39,45 @@ const positions = [
 ];
 
 export function Canisters() {
+  const [_, setTitle] = useTitle();
+  useEffect(() => {
+    setTitle("Canisters");
+  }, [setTitle]);
+  const heartbeat = useHeartbeat();
+  useEffect(() => {});
   return (
     <div className="bg-white shadow overflow-hidden sm:rounded-md ">
+      {heartbeat && (
+        <button
+          onClick={async () => {
+            console.log(await heartbeat.get_count());
+            const ret = await heartbeat.get_all();
+            for (let index = 0; index < ret.length; index++) {
+              const period = ret[index];
+              const canisterAddress = period.canister.toString();
+              const nexttime = await heartbeat.get_next_update_time(index);
+              const principalMe = period.owner.toString();
+              console.log({ nexttime, canisterAddress, principalMe, period });
+            }
+          }}
+        >
+          Button me
+        </button>
+      )}
+      {heartbeat && (
+        <button
+          onClick={async () => {
+            const ret = await heartbeat.add_period(
+              Principal.fromText("fm4kt-oyaaa-aaaap-qaljq-cai"),
+              BigInt(20),
+              "tick2"
+            );
+            console.log("scheduled a trigger", ret);
+          }}
+        >
+          Button write
+        </button>
+      )}
       <ul role="list" className="divide-y divide-gray-200">
         {positions.map((position) => (
           <li key={position.id}>

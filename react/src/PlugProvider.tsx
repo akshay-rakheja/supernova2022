@@ -12,7 +12,7 @@ import {
 import { Principal } from "@dfinity/principal";
 import { ActorMethod, ActorSubclass, HttpAgent } from "@dfinity/agent";
 import { InterfaceFactory } from "@dfinity/candid/lib/cjs/idl";
-import { useActor } from "./useAgent";
+import { useActor } from "./useActor";
 export { useActor };
 console.log("Hello there");
 //#region Plug Type
