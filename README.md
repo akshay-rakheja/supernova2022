@@ -43,20 +43,20 @@ brew install cmake # Get cmake when its missing
 
 ## To Do TODAY
 
-- maybe: preupgrade/postupgrade
 - Form to buy pulses
 - Form to schedule
 - List of schedules (with a remove button per schedule)
-- Public dashboard with login button
 
 ## To do in general
 
+- maybe: preupgrade/postupgrade
 - Make pulses a DIP-20
 - Check for an SDR-ICP price oracle - on the ledger?
 - Add argument builder in Azle (using dfinity/candid?)
 
 ## To Test
 
+- Public dashboard with login button
 - Deploy to IC
 - connect frontend to our backend
 - Add wallet-enabled frontend in react app - hooks?
