@@ -31,12 +31,17 @@ export default function Main() {
   console.log("path is ", path);
   const navigation = [
     {
-      name: "Canisters",
-      href: "/canisters",
-      current: path.pathname.startsWith("/canisters"),
+      name: "Schedules",
+      href: "/schedules",
+      current: path.pathname.startsWith("/schedules"),
     },
     {
-      name: "Pulses",
+      name: "Messages",
+      href: "/messages",
+      current: path.pathname.startsWith("/messages"),
+    },
+    {
+      name: "Buy Pulses",
       href: "/pulses",
       current: path.pathname.startsWith("/pulses"),
     },
