@@ -69,6 +69,15 @@ type Archives = record {
     "archives": vec Archive;
 };
 
+type StableLists = record {
+    "registryList": vec RegistryListItem;
+    "messageRegistryList": vec MessageRegistryListItem;
+    "allowedPulsesList": vec AllowedPulsesListItem;
+    "pulseLedgerList": vec PulseLedgerListItem;
+    "burnedPulsesList": vec BurnedPulsesListItem;
+    "lastUpdatedList": vec LastUpdatedListItem;
+};
+
 type Schedule = record {
     "dom": opt nat8;
     "month": opt nat8;
@@ -95,6 +104,36 @@ type Transaction = record {
 
 type Archive = record {
     "canister_id": principal;
+};
+
+type RegistryListItem = record {
+    "key": text;
+    "value": vec UpdateInfo;
+};
+
+type MessageRegistryListItem = record {
+    "key": text;
+    "value": vec Message;
+};
+
+type AllowedPulsesListItem = record {
+    "key": text;
+    "value": nat;
+};
+
+type PulseLedgerListItem = record {
+    "key": text;
+    "value": nat;
+};
+
+type BurnedPulsesListItem = record {
+    "key": text;
+    "value": nat;
+};
+
+type LastUpdatedListItem = record {
+    "key": text;
+    "value": vec nat;
 };
 
 type BlockRange = record {

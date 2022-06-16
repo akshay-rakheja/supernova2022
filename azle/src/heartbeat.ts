@@ -46,20 +46,75 @@ type Message = {
   func: string;
   args: Opt<nat8[]>;
 };
-
+type RegistryListItem = {
+  key: string;
+  value: UpdateInfo[];
+};
+type MessageRegistryListItem = {
+  key: string;
+  value: Message[];
+};
+type NatWrapper = { num: nat };
+type LastUpdatedListItem = { key: string; value: nat[] };
+type PulseLedgerListItem = { key: string; value: nat };
+type AllowedPulsesListItem = { key: string; value: nat };
+type BurnedPulsesListItem = { key: string; value: nat };
+type StableLists = {
+  registryList: RegistryListItem[];
+  messageRegistryList: MessageRegistryListItem[];
+  allowedPulsesList: AllowedPulsesListItem[];
+  pulseLedgerList: PulseLedgerListItem[];
+  burnedPulsesList: BurnedPulsesListItem[];
+  lastUpdatedList: LastUpdatedListItem[];
+};
 type StableStore = Stable<{
   owner: Principal;
   pulse_price: nat;
   check_price_in_pulses: nat;
   pulse_price_in_pulses: nat;
   accountId: string;
-  lastTime: nat;
   period: nat;
   totalMessages: Opt<nat>;
   totalHeartbeats: Opt<nat>;
   totalPulses: Opt<nat>;
   totalBurnedPulses: Opt<nat>;
+  // registryList: RegistryListItem[];
+  // messageRegistryList: MessageRegistryListItem[];
+  // allowedPulsesList: AllowedPulsesListItem[];
+  // pulseLedgerList: PulseLedgerListItem[];
+  // burnedPulsesList: BurnedPulsesListItem[];
+  // lastUpdatedList: LastUpdatedListItem[];
+  upgradeLists: StableLists;
 }>;
+
+function getStableLists() {
+  const newLists = ic.stableStorage<StableStore>().upgradeLists;
+  if (newLists !== null) return newLists;
+  else
+    return {
+      allowedPulsesList: [],
+      burnedPulsesList: [],
+      lastUpdatedList: [],
+      messageRegistryList: [],
+      pulseLedgerList: [],
+      registryList: [],
+    } as StableLists;
+}
+
+function setStableLists(newLists: StableLists) {
+  getStable().upgradeLists = newLists;
+}
+
+function clearStableLists() {
+  getStable().upgradeLists = {
+    allowedPulsesList: [],
+    burnedPulsesList: [],
+    lastUpdatedList: [],
+    messageRegistryList: [],
+    pulseLedgerList: [],
+    registryList: [],
+  };
+}
 
 function getStable() {
   return ic.stableStorage<StableStore>();
@@ -72,92 +127,114 @@ let burnedPulses: PulseLedger = {};
 let pulseLedger: PulseLedger = {};
 let lastUpdate: LastUpdateRegistry = {};
 
-type StableList = Stable<{
-  registryList: { key: string; value: UpdateInfo[] }[];
-  messageRegistryList: { key: string; value: Message[] }[];
-  burnedPulsesList: { key: string; value: nat }[];
-  allowedPulsesList: { key: string; value: nat }[];
-  pulseLedgerList: { key: string; value: nat }[];
-  lastUpdateList: { key: string; value: nat[] }[];
-}>;
-
 export function preUpgrade(): PreUpgrade {
-  const stable = ic.stableStorage<StableList>();
+  console.log("startup repupgrade2");
+  console.log("and again");
+
   let keys: string[];
-  keys = Object.keys(registry);
-  stable.registryList = keys.map((key) => ({
-    key,
-    value: registry[key],
-  }));
-  keys = Object.keys(messageRegistry);
-  stable.messageRegistryList = keys.map((key) => ({
-    key,
-    value: messageRegistry[key],
-  }));
-  keys = Object.keys(burnedPulses);
-  stable.burnedPulsesList = keys.map((key) => ({
-    key,
-    value: burnedPulses[key],
-  }));
-  keys = Object.keys(allowedPulses);
-  stable.allowedPulsesList = keys.map((key) => ({
-    key,
-    value: allowedPulses[key],
-  }));
-  keys = Object.keys(pulseLedger);
-  stable.pulseLedgerList = keys.map((key) => ({
-    key,
-    value: pulseLedger[key],
-  }));
-  keys = Object.keys(lastUpdate);
-  stable.lastUpdateList = keys.map((key) => ({
-    key,
-    value: lastUpdate[key],
-  }));
+  clearStableLists();
+  const lists = getStableLists();
+  console.log("I got the lists in lists");
+  console.log(lists);
+
+  if (registry) {
+    keys = Object.keys(registry);
+    lists.registryList = keys.map((key) => ({
+      key,
+      value: registry[key],
+    }));
+  } else lists.registryList = [];
+  const r = lists.registryList;
+  if (r) {
+    console.log("Registrylist is now", r.length);
+  } else {
+    console.log("R is nothing");
+  }
+
+  if (messageRegistry) {
+    keys = Object.keys(messageRegistry);
+    lists.messageRegistryList = keys.map((key) => ({
+      key,
+      value: messageRegistry[key],
+    }));
+  }
+  if (burnedPulses) {
+    keys = Object.keys(burnedPulses);
+    lists.burnedPulsesList = keys.map((key) => ({
+      key,
+      value: burnedPulses[key],
+    }));
+  }
+  if (allowedPulses) {
+    keys = Object.keys(allowedPulses);
+    lists.allowedPulsesList = keys.map((key) => ({
+      key,
+      value: allowedPulses[key],
+    }));
+  }
+  if (pulseLedger) {
+    keys = Object.keys(pulseLedger);
+    lists.pulseLedgerList = keys.map((key) => ({
+      key,
+      value: pulseLedger[key],
+    }));
+  }
+  if (lastUpdate) {
+    keys = Object.keys(lastUpdate);
+    lists.lastUpdatedList = keys.map((key) => ({
+      key,
+      value: lastUpdate[key],
+    }));
+  }
+  setStableLists(lists);
+  console.log("And now my watch has ended");
 }
 
 export function postUpgrade(): PostUpgrade {
-  const stable = ic.stableStorage<StableList>();
-  if (stable.registryList) {
-    for (let index of stable.registryList) {
+  console.log("Starting postupgrade");
+  const lists = getStableLists();
+  console.log("Regsitrylist before all this nonsense is", lists.registryList);
+  if (lists.registryList) {
+    console.log(
+      "Registrylist before I start pulling from it is",
+      lists.registryList
+    );
+
+    for (let index of lists.registryList!) {
       registry[index.key] = index.value;
     }
   }
-  stable.registryList = [];
-  if (stable.messageRegistryList) {
-    for (let index of stable.messageRegistryList) {
+  console.log("Done with registrylist");
+  if (lists.messageRegistryList !== null) {
+    for (let index of lists.messageRegistryList!) {
       messageRegistry[index.key] = index.value;
     }
   }
-  stable.messageRegistryList = [];
-  if (stable.lastUpdateList) {
-    for (let index of stable.lastUpdateList) {
+  if (lists.lastUpdatedList) {
+    for (let index of lists.lastUpdatedList) {
       lastUpdate[index.key] = index.value;
     }
   }
-  stable.lastUpdateList = [];
-  if (stable.burnedPulsesList) {
-    for (let index of stable.burnedPulsesList) {
+  if (lists.burnedPulsesList) {
+    for (let index of lists.burnedPulsesList) {
       burnedPulses[index.key] = index.value;
     }
   }
-  stable.burnedPulsesList = [];
-  if (stable.allowedPulsesList) {
-    for (let index of stable.allowedPulsesList) {
+  if (lists.allowedPulsesList) {
+    for (let index of lists.allowedPulsesList) {
       allowedPulses[index.key] = index.value;
     }
   }
-  stable.allowedPulsesList = [];
-  if (stable.pulseLedgerList) {
-    for (let index of stable.pulseLedgerList) {
+  if (lists.pulseLedgerList) {
+    for (let index of lists.pulseLedgerList) {
       pulseLedger[index.key] = index.value;
     }
   }
-  stable.pulseLedgerList = [];
-  // if (!getStable().totalBurnedPulses) getStable().totalBurnedPulses = 0n;
-  // if (!getStable().totalHeartbeats) getStable().totalHeartbeats = 0n;
-  // if (!getStable().totalMessages) getStable().totalMessages = 0n;
-  // if (!getStable().totalPulses) getStable().totalPulses = 0n;
+  if (!getStable().totalBurnedPulses) getStable().totalBurnedPulses = 0n;
+  if (!getStable().totalHeartbeats) getStable().totalHeartbeats = 0n;
+  if (!getStable().totalMessages) getStable().totalMessages = 0n;
+  if (!getStable().totalPulses) getStable().totalPulses = 0n;
+  clearStableLists();
 }
 
 //#endregion
@@ -368,13 +445,12 @@ function currentMinute(): nat8 {
 //#region internal functions and state
 
 function shouldTick(): boolean {
-  return should(getStable().period, getStable().lastTime);
+  return should(getStable().period, lastTime);
 }
 
-function should(period: nat, comparison?: nat): boolean {
-  if (!comparison) comparison = getStable().lastTime;
+function should(period: nat, comparison: nat): boolean {
   let now = ic.time();
-  let delta = (now - comparison) / BigInt(1_000_000_000);
+  let delta = (now - comparison) / BigInt(second_in_ns);
   return delta > period;
 }
 
@@ -604,7 +680,8 @@ export function add_yearly_schedule(
 
 export function remove(index: nat32): Update<void> {
   const owner = ic.caller();
-  delete registry[owner][index];
+  if (registry[owner] && registry[owner].length > index)
+    delete registry[owner][index];
 }
 
 export function get_one(index: nat32): Query<UpdateInfo> {
@@ -621,7 +698,8 @@ export function get_count(): Query<nat32> {
 
 export function get_all(): Query<UpdateInfo[]> {
   const owner = ic.caller();
-  return registry[owner];
+  if (registry[owner]) return registry[owner];
+  else return [];
 }
 
 export function get_next_update_time(index: nat32): Query<nat> {
@@ -678,20 +756,27 @@ export function get_messages(): Query<Message[]> {
   return messageRegistry[owner];
 }
 //#endregion
-
+let lastTime: nat = 0n;
 // #region owner management
 export function init(): Init {
   getStable().owner = ic.caller();
-  getStable().lastTime = ic.time();
   getStable().period = 10n;
   getStable().accountId = "";
   getStable().pulse_price = 1n; // price denominated in e8s (ICP * 1e-8)
-  getStable().pulse_price_in_pulses = 10_000_000n; // (0.1 PULSE)
+  getStable().pulse_price_in_pulses = 1_000_000n; // (0.1 PULSE)
   getStable().check_price_in_pulses = 10n; // (0.00000001 PULSE)
   getStable().totalBurnedPulses = 0n;
   getStable().totalHeartbeats = 0n;
   getStable().totalMessages = 0n;
   getStable().totalPulses = 0n;
+  // getStable().registryList = [];
+  // getStable().messageRxegistryList = [];
+  // getStable().lastUpdateList = [];
+  // getStable().allowedPulsesList = [];
+  // getStable().pulseLedgerList = [];
+  // getStable().burnedPulsesList = [];
+  lastTime = ic.time();
+  clearStableLists();
 }
 export function set_owner(newOwner: Principal): Update<Principal> {
   getStable().owner = newOwner;
@@ -744,6 +829,7 @@ export function* mint_pulses(
   blockNumber: nat
 ): UpdateAsync<{ ok: Opt<nat>; err: Opt<string> }> {
   //let's check the ledger
+  /*
   const result = yield ICPCanister.query_blocks({
     start: blockNumber,
     length: 1n,
@@ -762,7 +848,10 @@ export function* mint_pulses(
     );
     throw new Error("Oh noes");
   }
+  
   const pulseCount = amount.e8s / getStable().pulse_price;
+  */
+  const pulseCount = blockNumber;
   const principal = ic.caller();
   if (pulseCount < 1) throw new Error("Pulsecount needs ot be at least 1");
   if (!allowedPulses[principal]) {
@@ -798,11 +887,23 @@ export function get_burned_pulses(): Query<nat> {
 
 export function get_pulses(): Query<nat> {
   const principal = ic.caller();
-  return allowedPulses[principal] - burnedPulses[principal];
+  if (allowedPulses[principal]) {
+    if (burnedPulses[principal]) {
+      return allowedPulses[principal] - burnedPulses[principal];
+    } else {
+      return allowedPulses[principal];
+    }
+  } else return 0n;
 }
 
 export function get_pulses_for(principal: Principal): Query<nat> {
-  return allowedPulses[principal] - burnedPulses[principal];
+  if (allowedPulses[principal]) {
+    if (burnedPulses[principal]) {
+      return allowedPulses[principal] - burnedPulses[principal];
+    } else {
+      return allowedPulses[principal];
+    }
+  } else return 0n;
 }
 
 export function transfer_pulses(pulseCount: nat, to: Principal): Update<nat> {
@@ -842,11 +943,13 @@ export function getNowSeconds(): Query<nat32> {
 //#region Heartbeat
 
 export function* heartbeat(): Heartbeat {
+  const start = ic.time();
   if (shouldTick()) {
+    console.log("Should tick");
     if (!getStable().totalHeartbeats) getStable().totalHeartbeats = 0n;
     getStable().totalHeartbeats!++;
-    getStable().lastTime = ic.time();
-    for (const owner in Object.keys(registry)) {
+    lastTime = ic.time();
+    for (const owner of Object.keys(registry)) {
       for (let index = 0; index < registry[owner].length; index++) {
         if (registry[owner][index] === null) continue;
         const updateInfo = registry[owner][index];
@@ -860,10 +963,9 @@ export function* heartbeat(): Heartbeat {
         if (canCheck(owner)) {
           burn_pulses(owner, getStable().check_price_in_pulses);
           if (canPulse(owner)) {
-            getStable().lastTime = ic.time();
             if (thisPeriod !== null) {
               if (should(thisPeriod, lastUpdate[owner][index])) {
-                lastUpdate[owner][index] = ic.time();
+                lastUpdate[owner][index] = start;
                 yield* sendPulse(canister, func, args, owner);
               }
             } else if (schedule !== null) {
@@ -878,7 +980,7 @@ export function* heartbeat(): Heartbeat {
       }
     }
 
-    for (const owner in Object.keys(messageRegistry)) {
+    for (const owner of Object.keys(messageRegistry)) {
       for (let x = messageRegistry[owner].length - 1; x > -1; x--) {
         if (messageRegistry[owner][x] === null) continue;
         const { time, args, canister, func } = messageRegistry[owner][x];
