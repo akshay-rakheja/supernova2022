@@ -1,6 +1,6 @@
 import { usePlug } from "./PlugProvider";
 import { _SERVICE } from "./declarations/ticker1.did.js";
-import { Fragment, useCallback, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { BellIcon, MenuIcon, XIcon } from "@heroicons/react/outline";
 import useHeartbeat from "./useHeartbeat";
@@ -21,7 +21,17 @@ export const useTitle = (): [string, (title: string) => void] => {
 export default function Main() {
   const { logout, principal } = usePlug();
   const heartbeat = useHeartbeat();
-
+  const [pulses, setPulses] = useState<BigInt>(BigInt(0));
+  useEffect(() => {
+    (async () => {
+      const pulses = await heartbeat?.get_pulses();
+      setPulses(pulses || BigInt(0));
+    })();
+    setInterval(async () => {
+      const pulses = await heartbeat?.get_pulses();
+      setPulses(pulses || BigInt(0));
+    }, 2000);
+  }, [heartbeat]);
   const user = {
     name: principal && principal.toString(),
     email: "",
@@ -41,7 +51,10 @@ export default function Main() {
       current: path.pathname.startsWith("/messages"),
     },
     {
-      name: "Buy Pulses",
+      name:
+        "Buy Pulses (Account: " +
+        (Number(pulses) / 10_000_000).toFixed(7) +
+        ")",
       href: "/pulses",
       current: path.pathname.startsWith("/pulses"),
     },
