@@ -480,8 +480,11 @@ function* sendPulse(
   if (!getStable().totalMessages) getStable().totalMessages = 0n;
   getStable().totalMessages!++;
   if (!args) args = [68, 73, 68, 76, 0, 0]; // DIDL + 2 nulls
-
-  yield ic.call_raw(address, func, args, 0n); //@TODO RHD SUpport passing an argument other than null
+  try {
+    yield ic.call_raw(address, func, args, 0n); //@TODO RHD SUpport passing an argument other than null
+  } catch (e) {
+    console.log("That call did not work for us");
+  }
 }
 
 function setNextUpdate(schedule: Schedule) {
