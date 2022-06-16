@@ -112,7 +112,7 @@ export function Canisters() {
             }
           }}
         >
-          Button me
+          Test Button
         </button>
       )}
       {heartbeat && (
@@ -130,7 +130,7 @@ export function Canisters() {
             getSchedules();
           }}
         >
-          Button write
+          Create Period
         </button>
       )}
       {heartbeat && (
@@ -142,7 +142,7 @@ export function Canisters() {
             console.log("new pulse balance", ret2);
           }}
         >
-          Buy pulses
+          Buy 1 beeellion pulses
         </button>
       )}
       <ul role="list" className="divide-y divide-gray-200">
