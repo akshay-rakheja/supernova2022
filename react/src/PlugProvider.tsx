@@ -126,6 +126,7 @@ export const PlugProvider: FC<{
   const login = useCallback(async () => {
     try {
       if (plug) {
+        console.log("I am authenticating using the host of ", host);
         const publicKey = await plug.requestConnect({
           whitelist,
           host,

@@ -6,15 +6,16 @@ import { _SERVICE } from "./declarations/heartbeat/heartbeat.did";
 import { createActor } from "./declarations/heartbeat";
 import config from "./config.json";
 const {
+  host,
   canisters: { heartbeat },
-} = config;
+} = config[config.mode as "production" | "local"];
 
 const useHeartbeat = () => {
   const [actor, setActor] = useState<ActorSubclass<_SERVICE>>();
   useEffect(() => {
     (async () => {
       const a = await createActor(heartbeat, {
-        agentOptions: { host: "https://ic0.app" },
+        agentOptions: { host },
       });
       setActor(a);
     })();
@@ -48,15 +49,17 @@ export const LoggedOut: FC = () => {
   const [burnedPulses, setBurnedPulses] = useState(BigInt(0));
   useEffect(() => {
     setTimeout(() => {
-      setNewClass("blur");
+      // setNewClass("blur-xl");
       setPlugNewClass("opacity-100");
     }, 2000);
   }, []);
   useEffect(() => {
-    setNewClass("");
-    setTimeout(() => {
-      setNewClass("blur");
-    }, 500);
+    if (heartbeats) {
+      setNewClass("blur-xl");
+      setTimeout(() => {
+        setNewClass("blur-sm");
+      }, 1500);
+    }
   }, [heartbeats]);
   return (
     <Fragment>
@@ -85,7 +88,7 @@ export const LoggedOut: FC = () => {
           <div></div>
           <div className="flex justify-around w-full flex-row">
             <div className="flex">
-              <PlugButton />
+              <PlugButton dark />
             </div>
           </div>
           <Stats
@@ -113,7 +116,7 @@ const Stats: FC<{
     { name: "Messages", stat: messages.toLocaleString() },
     {
       name: "Burned Pulses",
-      stat: (Number(burnedPulses) / 10_000_000).toFixed(2),
+      stat: (Number(burnedPulses) / 10_000_000).toFixed(7),
     },
   ];
   return (

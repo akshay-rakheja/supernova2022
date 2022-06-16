@@ -1,5 +1,15 @@
 {
-  "canisters": {
-    "heartbeat": "fc6h3-viaaa-aaaap-qaliq-cai"
+  "mode": "local",
+  "production": {
+    "host": " https://ic0.app",
+    "canisters": {
+      "heartbeat": "fc6h3-viaaa-aaaap-qaliq-cai"
+    }
+  },
+  "local": {
+    "host": "http://localhost:8000",
+    "canisters": {
+      "heartbeat": "wmio3-kqaaa-aaaaa-aaasq-cai"
+    }
   }
 }

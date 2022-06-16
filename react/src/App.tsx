@@ -7,7 +7,10 @@ import { Helmet } from "react-helmet";
 import NavigationMain from "./NavigationMain";
 import { BrowserRouter } from "react-router-dom";
 import { createBrowserHistory } from "history";
-const whitelist = Object.values(config.canisters);
+const whitelist = Object.values(
+  config[config.mode as "production" | "local"].canisters
+);
+const host = config[config.mode as "production" | "local"].host;
 
 const history = createBrowserHistory({ window });
 function App() {
@@ -16,7 +19,7 @@ function App() {
       <Helmet>
         <title>DeTi: Decentralized Time</title>
       </Helmet>
-      <PlugProvider whitelist={whitelist}>
+      <PlugProvider whitelist={whitelist} host={host}>
         <Fragment>
           <Authenticated>
             <NavigationMain />
