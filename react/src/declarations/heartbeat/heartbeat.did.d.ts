@@ -2,6 +2,7 @@ import type { Principal } from '@dfinity/principal';
 import type { ActorMethod } from '@dfinity/agent';
 
 export interface AccountBalanceArgs { 'account' : Array<number> }
+export interface AllowedPulsesListItem { 'key' : string, 'value' : bigint }
 export interface Archive { 'canister_id' : Principal }
 export interface Archives { 'archives' : Array<Archive> }
 export interface Block {
@@ -10,14 +11,20 @@ export interface Block {
   'parent_hash' : [] | [Array<number>],
 }
 export interface BlockRange { 'blocks' : Array<Block> }
+export interface BurnedPulsesListItem { 'key' : string, 'value' : bigint }
 export interface DecimalsResult { 'decimals' : number }
 export interface GetBlocksArgs { 'start' : bigint, 'length' : bigint }
+export interface LastUpdatedListItem { 'key' : string, 'value' : Array<bigint> }
 export interface Message {
   'owner' : Principal,
   'args' : [] | [Array<number>],
   'func' : string,
   'time' : bigint,
   'canister' : Principal,
+}
+export interface MessageRegistryListItem {
+  'key' : string,
+  'value' : Array<Message>,
 }
 export interface NameResult { 'name' : string }
 export type Operation = {
@@ -32,6 +39,7 @@ export type Operation = {
       'amount' : Tokens,
     }
   };
+export interface PulseLedgerListItem { 'key' : string, 'value' : bigint }
 export type QueryArchiveError = {
     'BadFirstBlockIndex' : {
       'requested_index' : bigint,
@@ -51,12 +59,24 @@ export interface QueryBlocksResponse {
     { 'callback' : QueryArchiveFn, 'start' : bigint, 'length' : bigint }
   >,
 }
+export interface RegistryListItem {
+  'key' : string,
+  'value' : Array<UpdateInfo>,
+}
 export interface Schedule {
   'dom' : [] | [number],
   'dow' : [] | [number],
   'month' : [] | [number],
   'hour' : number,
   'minute' : number,
+}
+export interface StableLists {
+  'burnedPulsesList' : Array<BurnedPulsesListItem>,
+  'pulseLedgerList' : Array<PulseLedgerListItem>,
+  'allowedPulsesList' : Array<AllowedPulsesListItem>,
+  'lastUpdatedList' : Array<LastUpdatedListItem>,
+  'messageRegistryList' : Array<MessageRegistryListItem>,
+  'registryList' : Array<RegistryListItem>,
 }
 export interface SymbolResult { 'symbol' : string }
 export interface TimeStamp { 'timestamp_nanos' : bigint }

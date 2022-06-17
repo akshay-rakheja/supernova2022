@@ -1,4 +1,4 @@
-import { usePlug } from "./PlugProvider";
+import { usePlug } from "@raydeck/useplug";
 import { _SERVICE } from "./declarations/ticker1.did.js";
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";

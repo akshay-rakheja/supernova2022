@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from "react";
-import { usePlug } from "./PlugProvider";
+import { usePlug } from "@raydeck/useplug";
 import { _SERVICE } from "./declarations/ticker1.did.js";
 import { idlFactory } from "./declarations";
 import { Fragment } from "react";

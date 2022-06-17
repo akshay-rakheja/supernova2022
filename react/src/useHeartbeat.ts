@@ -1,4 +1,4 @@
-import { useActor } from "./PlugProvider";
+import { useActor } from "@raydeck/useplug";
 import config from "./config.json";
 import { _SERVICE } from "./declarations/heartbeat/heartbeat.did";
 import { createActor, idlFactory } from "./declarations/heartbeat";

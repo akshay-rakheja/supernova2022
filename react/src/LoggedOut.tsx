@@ -1,9 +1,10 @@
 import React, { FC, Fragment, useCallback, useEffect, useState } from "react";
-import PlugButton from "./PlugButton";
+import { PlugButton } from "@raydeck/useplug";
 import background from "./assets/bg.png";
 import { ActorSubclass } from "@dfinity/agent";
 import { _SERVICE } from "./declarations/heartbeat/heartbeat.did";
 import { createActor } from "./declarations/heartbeat";
+import { FaGithub } from "react-icons/fa";
 import config from "./config.json";
 const {
   host,
@@ -85,12 +86,26 @@ export const LoggedOut: FC = () => {
             plugNewClass,
           ].join(" ")}
         >
-          <div></div>
+          <div className="bg-black bg-opacity-50 flex flex-row w-screen justify-between p-4">
+            <a
+              href="https://github.com/akshay-rakheja/supernova2022"
+              className="text-gray-200 hover:text-gray-700 transition duration-250"
+            >
+              <div className="flex flex-row ">
+                <FaGithub size={20} />
+                <span className="ml-2 font-medium">Fork us on GitHub</span>
+              </div>
+            </a>
+            <div className=" font-bold text-white opacity-50">
+              Or Just Enjoy the Pulses As They Go Out Every 10s
+            </div>
+          </div>
           <div className="flex justify-around w-full flex-row">
             <div className="flex">
               <PlugButton dark />
             </div>
           </div>
+          <div className="flex justify-around w-full flex-row"></div>
           <Stats
             heartbeats={heartbeats}
             messages={messages}

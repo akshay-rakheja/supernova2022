@@ -1,9 +1,9 @@
 {
-  "mode": "local",
+  "mode": "production",
   "production": {
     "host": " https://ic0.app",
     "canisters": {
-      "heartbeat": "fc6h3-viaaa-aaaap-qaliq-cai"
+      "heartbeat": "d4qab-oqaaa-aaaap-qal4a-cai"
     }
   },
   "local": {

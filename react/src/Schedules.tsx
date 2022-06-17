@@ -6,7 +6,7 @@ import {
 } from "@heroicons/react/solid";
 import { useEffect, useState, useCallback, Fragment } from "react";
 import { useTitle } from "./Main";
-import { usePlug } from "./PlugProvider";
+import { usePlug } from "@raydeck/useplug";
 import useHeartbeat from "./useHeartbeat";
 import { UpdateInfo } from "./declarations/heartbeat/heartbeat.did";
 import { ClockIcon } from "@heroicons/react/outline";

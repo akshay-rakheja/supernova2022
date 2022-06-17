@@ -6,39 +6,17 @@ import {
 } from "@heroicons/react/solid";
 import { useEffect, useState, useCallback, Fragment } from "react";
 import { useTitle } from "./Main";
-import { usePlug } from "./PlugProvider";
+import { usePlug } from "@raydeck/useplug";
 import useHeartbeat from "./useHeartbeat";
-import { Message, UpdateInfo } from "./declarations/heartbeat/heartbeat.did";
+import { Message } from "./declarations/heartbeat/heartbeat.did";
 import { ClockIcon } from "@heroicons/react/outline";
-import AddPeriod from "./AddPeriod";
-import AddDailySchedule from "./AddDailySchedule";
-import AddWeeklySchedule from "./AddWeeklySchedule";
-import AddMonthlySchedule from "./AddMonthlySchedule";
 import { DateTime } from "luxon";
-const months = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
-const getMonth = (month: number) => {
-  return months[month];
-};
-const dows = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
-const getDOW = (dow: number) => {
-  return dows[dow];
-};
+import AddMessage from "./AddMessage";
+const ns_to_ms = BigInt(1_000_000);
+const ns_to_s = BigInt(1_000_000_000);
 
 export function Messages() {
-  const [_, setTitle] = useTitle();
+  const [title, setTitle] = useTitle();
   useEffect(() => {
     setTitle("My Messages");
   }, [setTitle]);
@@ -47,32 +25,28 @@ export function Messages() {
   const [messages, setMessages] = useState<(Message | undefined)[]>([]);
   const getMessages = useCallback(async () => {
     if (!heartbeat) return;
-    const updates = await heartbeat?.get_all();
+    const updates = await heartbeat?.get_messages();
     if (updates && updates.length) {
-      setSchedules(updates);
+      setMessages(updates);
     } else {
-      const count = await heartbeat?.get_count();
-      const newUpdates: (UpdateInfo | undefined)[] = [];
+      const count = await heartbeat?.get_message_count();
+      const newUpdates: (Message | undefined)[] = [];
       for (var x = 0; x < count; x++) {
         try {
-          let newRecord = await heartbeat?.get_one(x);
+          let newRecord = await heartbeat?.get_one_message(x);
           newUpdates.push(newRecord);
         } catch (e) {
           newUpdates.push(undefined);
         }
       }
-      setSchedules(newUpdates);
-      console.log("Hi there let's ahve some new schedules please", updates);
+      setMessages(newUpdates);
+      console.log("Hi there let's ahve some new messages please", updates);
     }
   }, [heartbeat, setMessages]);
   const removeMessage = useCallback(
     async (index: number) => {
-      await heartbeat?.remove(index);
-      // setSchedules((old) => {
-      //   old[index] = null;
-      //   return [...old];
-      // });
-      await getSchedules();
+      await heartbeat?.remove_message(index);
+      await getMessages();
     },
     [getMessages, heartbeat]
   );
@@ -82,165 +56,50 @@ export function Messages() {
   useEffect(() => {
     setTitle("My Messages: " + messages.length);
   }, [messages, setTitle]);
-  const [showAddPeriod, setShowAddPeriod] = useState(false);
-  const [showAddDailySchedule, setShowAddDailySchedule] = useState(false);
-  const [showAddWeeklySchedule, setShowAddWeeklySchedule] = useState(false);
-  const [showAddMonthlySchedule, setShowMonthlySchedule] = useState(false);
-  useEffect(() => {
-    if (showAddDailySchedule) {
-      setShowAddPeriod(false);
-      setShowAddWeeklySchedule(false);
-      setShowMonthlySchedule(false);
-    }
-  }, [showAddDailySchedule]);
-  useEffect(() => {
-    if (showAddPeriod) {
-      setShowAddDailySchedule(false);
-      setShowAddWeeklySchedule(false);
-      setShowMonthlySchedule(false);
-    }
-  }, [showAddPeriod]);
-  useEffect(() => {
-    if (showAddWeeklySchedule) {
-      setShowAddDailySchedule(false);
-      setShowAddPeriod(false);
-      setShowMonthlySchedule(false);
-    }
-  }, [showAddWeeklySchedule]);
-  useEffect(() => {
-    if (showAddMonthlySchedule) {
-      setShowAddDailySchedule(false);
-      setShowAddPeriod(false);
-      setShowAddWeeklySchedule(false);
-    }
-  }, [showAddMonthlySchedule]);
-  const showSchedules =
-    !showAddDailySchedule &&
-    !showAddPeriod &&
-    !showAddWeeklySchedule &&
-    !showAddMonthlySchedule;
+  const [showAddMessage, setShowAddMessage] = useState(false);
+
+  const showMessages = !showAddMessage;
   return (
     <div className="bg-white  overflow-hidden sm:rounded-md ">
-      {(showSchedules || showAddPeriod) && (
+      {(showMessages || showAddMessage) && (
         <button
           className="rounded-lg bg-blue-500 text-white p-2 m-2 hover:bg-blue-800 transition"
           onClick={() => {
-            setShowAddPeriod((old) => !old);
+            setShowAddMessage((old) => !old);
           }}
         >
-          {showAddPeriod ? "Hide Form" : "Add A Periodic Pulse"}
+          {showAddMessage ? "Hide Form" : "Add A One-Time Message"}
         </button>
       )}
-      {(showSchedules || showAddDailySchedule) && (
-        <button
-          className="rounded-lg bg-blue-500 text-white p-2 m-2 hover:bg-blue-800 transition"
-          onClick={() => {
-            setShowAddDailySchedule((old) => !old);
-          }}
-        >
-          {showAddDailySchedule ? "Hide Form" : "Add A Daily Schedule"}
-        </button>
-      )}
-      {(showSchedules || showAddWeeklySchedule) && (
-        <button
-          className="rounded-lg bg-blue-500 text-white p-2 m-2 hover:bg-blue-800 transition"
-          onClick={() => {
-            setShowAddWeeklySchedule((old) => !old);
-          }}
-        >
-          {showAddWeeklySchedule ? "Hide Form" : "Add A Weekly Schedule"}
-        </button>
-      )}
-      {(showSchedules || showAddMonthlySchedule) && (
-        <button
-          className="rounded-lg bg-blue-500 text-white p-2 m-2 hover:bg-blue-800 transition"
-          onClick={() => {
-            setShowMonthlySchedule((old) => !old);
-          }}
-        >
-          {showAddMonthlySchedule ? "Hide Form" : "Add A Monthly Schedule"}
-        </button>
-      )}
-      {showAddPeriod && (
-        <AddPeriod
+
+      {showAddMessage && (
+        <AddMessage
           onCancel={() => {
-            setShowAddPeriod(false);
+            setShowAddMessage(false);
           }}
-          onSubmit={async ({ canister, func, period }) => {
+          onSubmit={async ({ canister, func, time }) => {
             console.log("Starting to send the period info from values");
-            await heartbeat?.add_period(
+            await heartbeat?.add_message(
               Principal.fromText(canister),
-              BigInt(period),
-              func
+              BigInt(time.valueOf()) * ns_to_ms,
+              func,
+              []
             );
-            console.log("Got the period info from values");
-            setShowAddPeriod(false);
-            getSchedules();
+            setShowAddMessage(false);
+            getMessages();
           }}
         />
       )}
-      {showAddDailySchedule && (
-        <AddDailySchedule
-          onCancel={() => {
-            setShowAddDailySchedule(false);
-          }}
-          onSubmit={async (values) => {
-            await heartbeat?.add_daily_schedule(
-              Principal.fromText(values.canister),
-              values.hour,
-              values.minute,
-              values.func
-            );
-            setShowAddDailySchedule(false);
-            getSchedules();
-          }}
-        />
-      )}
-      {showAddWeeklySchedule && (
-        <AddWeeklySchedule
-          onCancel={() => {
-            setShowAddWeeklySchedule(false);
-          }}
-          onSubmit={async (values) => {
-            await heartbeat?.add_weekly_schedule(
-              Principal.fromText(values.canister),
-              values.dow,
-              values.hour,
-              values.minute,
-              values.func
-            );
-            setShowAddWeeklySchedule(false);
-            getSchedules();
-          }}
-        />
-      )}
-      {showAddMonthlySchedule && (
-        <AddMonthlySchedule
-          onCancel={() => {
-            setShowMonthlySchedule(false);
-          }}
-          onSubmit={async (values) => {
-            await heartbeat?.add_monthly_schedule(
-              Principal.fromText(values.canister),
-              values.dom,
-              values.hour,
-              values.minute,
-              values.func
-            );
-            setShowMonthlySchedule(false);
-            getSchedules();
-          }}
-        />
-      )}
-      {showSchedules && (
+
+      {showMessages && (
         <div className="space-y-8 divide-y divide-gray-200 pt-8">
           <h3 className="text-lg leading-6 font-medium text-gray-900">
-            My Scheduled Events
+            {messages.length ? "My Messages" : "No Messages Scheduled - Yet!"}
           </h3>
           <ul role="list" className="divide-y divide-gray-200">
-            {schedules.map((updateInfo, index) => {
-              if (!updateInfo) return null;
-              const { canister, func, period, schedule } = updateInfo;
+            {messages.map((message, index) => {
+              if (!message) return null;
+              const { canister, func, time } = message;
               return (
                 <li key={index}>
                   <div className="block hover:bg-gray-50">
@@ -257,61 +116,23 @@ export function Messages() {
                       </div>
                       <div className="mt-2 sm:flex sm:justify-between">
                         <div className="sm:flex">
-                          {!!period.length && (
-                            <p className="flex items-center text-sm text-gray-500">
-                              <ClockIcon
-                                className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
-                                aria-hidden="true"
-                              />
-                              Send every {Number(period)} seconds
-                            </p>
-                          )}
-                          {!!schedule.length &&
-                            (schedule[0].month.length ? (
-                              <p className="flex items-center text-sm text-gray-500">
-                                <ClockIcon
-                                  className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
-                                  aria-hidden="true"
-                                />
-                                Yearly on {schedule[0].dom}{" "}
-                                {getMonth(schedule[0].month[0])} at{" "}
-                                {schedule[0].hour}:
-                                {schedule[0].minute.toString().padStart(2, "0")}{" "}
-                                GMT
-                              </p>
-                            ) : schedule[0].dom.length ? (
-                              <p className="flex items-center text-sm text-gray-500">
-                                <ClockIcon
-                                  className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
-                                  aria-hidden="true"
-                                />
-                                Monthly on day {schedule[0].dom} at{" "}
-                                {schedule[0].hour}:
-                                {schedule[0].minute.toString().padStart(2, "0")}{" "}
-                                GMT
-                              </p>
-                            ) : schedule[0].dow.length ? (
-                              <p className="flex items-center text-sm text-gray-500">
-                                <ClockIcon
-                                  className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
-                                  aria-hidden="true"
-                                />
-                                Weekly on {getDOW(schedule[0].dow[0])} at{" "}
-                                {schedule[0].hour}:
-                                {schedule[0].minute.toString().padStart(2, "0")}{" "}
-                                GMT
-                              </p>
-                            ) : (
-                              <p className="flex items-center text-sm text-gray-500">
-                                <ClockIcon
-                                  className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
-                                  aria-hidden="true"
-                                />
-                                Daily at {schedule[0].hour}:
-                                {schedule[0].minute.toString().padStart(2, "0")}{" "}
-                                GMT
-                              </p>
-                            ))}
+                          <p className="flex items-center text-sm text-gray-500">
+                            <ClockIcon
+                              className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
+                              aria-hidden="true"
+                            />
+                            Send at{" "}
+                            {(() => {
+                              console.log("Time is ", time);
+                              const ms = Number(time / BigInt(ns_to_ms));
+                              console.log("ms is ", ms);
+                              return null;
+                            })()}
+                            {DateTime.fromMillis(
+                              Number(time / BigInt(ns_to_ms))
+                            ).toLocaleString(DateTime.DATETIME_FULL)}
+                          </p>
+
                           {/* <p className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 sm:ml-6">
                       <LocationMarkerIcon
                         className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
@@ -335,7 +156,7 @@ export function Messages() {
                         <div>
                           <button
                             onClick={() => {
-                              removeSchedule(index);
+                              removeMessage(index);
                             }}
                             className={
                               "bg-red-500 hover:bg-red-900 transition duration-250 text-white p-2 rounded-md"
