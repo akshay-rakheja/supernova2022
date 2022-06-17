@@ -1,7 +1,7 @@
 {
-  "mode": "production",
+  "mode": "local",
   "production": {
-    "host": " https://ic0.app",
+    "host": "https://ic0.app",
     "canisters": {
       "heartbeat": "d4qab-oqaaa-aaaap-qal4a-cai"
     }

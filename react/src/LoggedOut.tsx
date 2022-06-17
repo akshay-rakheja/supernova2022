@@ -106,11 +106,13 @@ export const LoggedOut: FC = () => {
             </div>
           </div>
           <div className="flex justify-around w-full flex-row"></div>
-          <Stats
-            heartbeats={heartbeats}
-            messages={messages}
-            burnedPulses={burnedPulses}
-          />
+          <div className="flex justify-around  flex-row bg-red-500 ">
+            <Stats
+              heartbeats={heartbeats}
+              messages={messages}
+              burnedPulses={burnedPulses}
+            />
+          </div>
         </div>
       </div>
     </Fragment>
@@ -135,10 +137,10 @@ const Stats: FC<{
     },
   ];
   return (
-    <div className="">
+    <div>
       <div className="p-6 bg-black bg-opacity-60 rounded-lg mb-6">
         <h2 className="text-3xl leading-6 font-bold text-gray-100 text-center">
-          Statistics
+          Statistics my dude
         </h2>
         <dl className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">
           {stats.map((item) => (

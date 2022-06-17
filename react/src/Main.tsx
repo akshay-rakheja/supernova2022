@@ -33,7 +33,7 @@ export default function Main() {
     intervalRef.current = setInterval(async () => {
       const pulses = await heartbeat?.get_pulses();
       setPulses(pulses || BigInt(0));
-    }, 5000);
+    }, 2000);
   }, [heartbeat]);
   const user = {
     name: principal && principal.toString(),
