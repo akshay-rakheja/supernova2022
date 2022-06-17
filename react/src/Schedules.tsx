@@ -4,13 +4,16 @@ import {
   LocationMarkerIcon,
   UsersIcon,
 } from "@heroicons/react/solid";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, Fragment } from "react";
 import { useTitle } from "./Main";
 import { usePlug } from "./PlugProvider";
 import useHeartbeat from "./useHeartbeat";
 import { UpdateInfo } from "./declarations/heartbeat/heartbeat.did";
 import { ClockIcon } from "@heroicons/react/outline";
 import AddPeriod from "./AddPeriod";
+import AddDailySchedule from "./AddDailySchedule";
+import AddWeeklySchedule from "./AddWeeklySchedule";
+import AddMonthlySchedule from "./AddMonthlySchedule";
 const ns_to_ms = BigInt(1_000_000);
 /** period: Opt<nat>;
   func: string;
@@ -37,6 +40,27 @@ const schedules = [
     func: "Remote",
   },
 ];
+const months = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+const getMonth = (month: number) => {
+  return months[month];
+};
+const dows = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+const getDOW = (dow: number) => {
+  return dows[dow];
+};
 
 export function Canisters() {
   const [_, setTitle] = useTitle();
@@ -81,6 +105,42 @@ export function Canisters() {
     getSchedules();
   }, [heartbeat]);
   const [showAddPeriod, setShowAddPeriod] = useState(false);
+  const [showAddDailySchedule, setShowAddDailySchedule] = useState(false);
+  const [showAddWeeklySchedule, setShowAddWeeklySchedule] = useState(false);
+  const [showAddMonthlySchedule, setShowMonthlySchedule] = useState(false);
+  useEffect(() => {
+    if (showAddDailySchedule) {
+      setShowAddPeriod(false);
+      setShowAddWeeklySchedule(false);
+      setShowMonthlySchedule(false);
+    }
+  }, [showAddDailySchedule]);
+  useEffect(() => {
+    if (showAddPeriod) {
+      setShowAddDailySchedule(false);
+      setShowAddWeeklySchedule(false);
+      setShowMonthlySchedule(false);
+    }
+  }, [showAddPeriod]);
+  useEffect(() => {
+    if (showAddWeeklySchedule) {
+      setShowAddDailySchedule(false);
+      setShowAddPeriod(false);
+      setShowMonthlySchedule(false);
+    }
+  }, [showAddWeeklySchedule]);
+  useEffect(() => {
+    if (showAddMonthlySchedule) {
+      setShowAddDailySchedule(false);
+      setShowAddPeriod(false);
+      setShowAddWeeklySchedule(false);
+    }
+  }, [showAddMonthlySchedule]);
+  const showSchedules =
+    !showAddDailySchedule &&
+    !showAddPeriod &&
+    !showAddWeeklySchedule &&
+    !showAddMonthlySchedule;
   return (
     <div className="bg-white  overflow-hidden sm:rounded-md ">
       <button
@@ -91,18 +151,30 @@ export function Canisters() {
       >
         {showAddPeriod ? "Hide Form" : "Add A Periodic Pulse"}
       </button>
-      {heartbeat && (
-        <button
-          className="rounded-lg bg-blue-500 text-white p-2 m-2 hover:bg-blue-800 transition"
-          onClick={async () => {
-            const ret = await heartbeat.mint_pulses(BigInt(1_000_000_000));
-            const ret2 = await heartbeat.get_pulses();
-            console.log("new pulse balance", ret2);
-          }}
-        >
-          Buy 1 beeellion pulses
-        </button>
-      )}
+      <button
+        className="rounded-lg bg-blue-500 text-white p-2 m-2 hover:bg-blue-800 transition"
+        onClick={() => {
+          setShowAddDailySchedule((old) => !old);
+        }}
+      >
+        {showAddDailySchedule ? "Hide Form" : "Add A Daily Schedule"}
+      </button>
+      <button
+        className="rounded-lg bg-blue-500 text-white p-2 m-2 hover:bg-blue-800 transition"
+        onClick={() => {
+          setShowAddWeeklySchedule((old) => !old);
+        }}
+      >
+        {showAddWeeklySchedule ? "Hide Form" : "Add A Weekly Schedule"}
+      </button>
+      <button
+        className="rounded-lg bg-blue-500 text-white p-2 m-2 hover:bg-blue-800 transition"
+        onClick={() => {
+          setShowMonthlySchedule((old) => !old);
+        }}
+      >
+        {showAddMonthlySchedule ? "Hide Form" : "Add A Monthly Schedule"}
+      </button>
       {showAddPeriod && (
         <AddPeriod
           onCancel={() => {
@@ -121,45 +193,140 @@ export function Canisters() {
           }}
         />
       )}
-      {!showAddPeriod && (
-        <ul role="list" className="divide-y divide-gray-200">
-          {schedules.map((updateInfo, index) => {
-            if (!updateInfo) return null;
-            const { canister, func, period, schedule } = updateInfo;
-            return (
-              <li key={index}>
-                <div className="block hover:bg-gray-50">
-                  <div className="px-4 py-4 sm:px-6">
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm font-medium text-indigo-600 truncate">
-                        {canister.toString()}
-                      </p>
-                      <div className="ml-2 flex-shrink-0 flex">
-                        <p className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                          {func}
+      {showAddDailySchedule && (
+        <AddDailySchedule
+          onCancel={() => {
+            setShowAddDailySchedule(false);
+          }}
+          onSubmit={async (values) => {
+            await heartbeat?.add_daily_schedule(
+              Principal.fromText(values.canister),
+              values.hour,
+              values.minute,
+              values.func
+            );
+            setShowAddDailySchedule(false);
+            getSchedules();
+          }}
+        />
+      )}
+      {showAddWeeklySchedule && (
+        <AddWeeklySchedule
+          onCancel={() => {
+            setShowAddWeeklySchedule(false);
+          }}
+          onSubmit={async (values) => {
+            await heartbeat?.add_weekly_schedule(
+              Principal.fromText(values.canister),
+              values.dow,
+              values.hour,
+              values.minute,
+              values.func
+            );
+            setShowAddWeeklySchedule(false);
+            getSchedules();
+          }}
+        />
+      )}
+      {showAddMonthlySchedule && (
+        <AddMonthlySchedule
+          onCancel={() => {
+            setShowMonthlySchedule(false);
+          }}
+          onSubmit={async (values) => {
+            await heartbeat?.add_monthly_schedule(
+              Principal.fromText(values.canister),
+              values.dom,
+              values.hour,
+              values.minute,
+              values.func
+            );
+            setShowMonthlySchedule(false);
+            getSchedules();
+          }}
+        />
+      )}
+      {showSchedules && (
+        <div className="space-y-8 divide-y divide-gray-200 pt-8">
+          <h3 className="text-lg leading-6 font-medium text-gray-900">
+            My Scheduled Events
+          </h3>
+          <ul role="list" className="divide-y divide-gray-200">
+            {schedules.map((updateInfo, index) => {
+              if (!updateInfo) return null;
+              const { canister, func, period, schedule } = updateInfo;
+              return (
+                <li key={index}>
+                  <div className="block hover:bg-gray-50">
+                    <div className="px-4 py-4 sm:px-6">
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm font-medium text-indigo-600 truncate">
+                          {canister.toString()}
                         </p>
-                      </div>
-                    </div>
-                    <div className="mt-2 sm:flex sm:justify-between">
-                      <div className="sm:flex">
-                        {period && (
-                          <p className="flex items-center text-sm text-gray-500">
-                            <ClockIcon
-                              className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
-                              aria-hidden="true"
-                            />
-                            Send every {Number(period)} seconds
+                        <div className="ml-2 flex-shrink-0 flex">
+                          <p className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                            {func}
                           </p>
-                        )}
-                        {/* <p className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 sm:ml-6">
+                        </div>
+                      </div>
+                      <div className="mt-2 sm:flex sm:justify-between">
+                        <div className="sm:flex">
+                          {!!period.length && (
+                            <p className="flex items-center text-sm text-gray-500">
+                              <ClockIcon
+                                className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
+                                aria-hidden="true"
+                              />
+                              Send every {Number(period)} seconds
+                            </p>
+                          )}
+                          {!!schedule.length &&
+                            (schedule[0].month.length ? (
+                              <p className="flex items-center text-sm text-gray-500">
+                                <ClockIcon
+                                  className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
+                                  aria-hidden="true"
+                                />
+                                Yearly on {schedule[0].dom}{" "}
+                                {getMonth(schedule[0].month[0])} at{" "}
+                                {schedule[0].hour}:{schedule[0].minute}{" "}
+                              </p>
+                            ) : schedule[0].dom.length ? (
+                              <p className="flex items-center text-sm text-gray-500">
+                                <ClockIcon
+                                  className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
+                                  aria-hidden="true"
+                                />
+                                Monthly on day {schedule[0].dom} at{" "}
+                                {schedule[0].hour}:{schedule[0].minute}{" "}
+                              </p>
+                            ) : schedule[0].dow.length ? (
+                              <p className="flex items-center text-sm text-gray-500">
+                                <ClockIcon
+                                  className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
+                                  aria-hidden="true"
+                                />
+                                Weekly on {getDOW(schedule[0].dow[0])} at{" "}
+                                {schedule[0].hour}:{schedule[0].minute}{" "}
+                              </p>
+                            ) : (
+                              <p className="flex items-center text-sm text-gray-500">
+                                <ClockIcon
+                                  className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
+                                  aria-hidden="true"
+                                />
+                                Daily at {schedule[0].hour}:{schedule[0].minute}{" "}
+                              </p>
+                            ))}
+                          {/* <p className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 sm:ml-6">
                       <LocationMarkerIcon
                         className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
                         aria-hidden="true"
                       />
                       {position.location}
                     </p> */}
-                      </div>
-                      {/* <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
+                        </div>
+                        {/* <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
                     <CalendarIcon
                       className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
                       aria-hidden="true"
@@ -171,25 +338,26 @@ export function Canisters() {
                       </time>
                     </p>
                   </div> */}
-                      <div>
-                        <button
-                          onClick={() => {
-                            removeSchedule(index);
-                          }}
-                          className={
-                            "bg-red-500 hover:bg-red-900 transition duration-250 text-white p-2 rounded-md"
-                          }
-                        >
-                          Delete
-                        </button>
+                        <div>
+                          <button
+                            onClick={() => {
+                              removeSchedule(index);
+                            }}
+                            className={
+                              "bg-red-500 hover:bg-red-900 transition duration-250 text-white p-2 rounded-md"
+                            }
+                          >
+                            Delete
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </li>
-            );
-          })}
-        </ul>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
       )}
     </div>
   );

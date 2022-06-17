@@ -6,7 +6,8 @@ import { BellIcon, MenuIcon, XIcon } from "@heroicons/react/outline";
 import useHeartbeat from "./useHeartbeat";
 import { Link, Outlet, useResolvedPath } from "react-router-dom";
 import Logo from "./assets/icon.png";
-import { createContext, useContext } from "react";
+import { createContext, useContext, useRef } from "react";
+import { getNodeMajorVersion, isTemplateExpression } from "typescript";
 
 const context = createContext({
   title: "UNTITLED",
@@ -22,15 +23,17 @@ export default function Main() {
   const { logout, principal } = usePlug();
   const heartbeat = useHeartbeat();
   const [pulses, setPulses] = useState<BigInt>(BigInt(0));
+  const intervalRef = useRef<NodeJS.Timer>();
   useEffect(() => {
     (async () => {
       const pulses = await heartbeat?.get_pulses();
       setPulses(pulses || BigInt(0));
     })();
-    setInterval(async () => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    intervalRef.current = setInterval(async () => {
       const pulses = await heartbeat?.get_pulses();
       setPulses(pulses || BigInt(0));
-    }, 2000);
+    }, 5000);
   }, [heartbeat]);
   const user = {
     name: principal && principal.toString(),
@@ -57,6 +60,9 @@ export default function Main() {
         ")",
       href: "/pulses",
       current: path.pathname.startsWith("/pulses"),
+      onClick: async () => {
+        if (heartbeat) await heartbeat.mint_pulses(BigInt(1_000_000_000));
+      },
     },
   ];
   const userNavigation = [
@@ -128,21 +134,37 @@ export default function Main() {
                         </div>
                         <div className="hidden md:block">
                           <div className="ml-10 flex items-baseline space-x-4">
-                            {navigation.map((item) => (
-                              <Link
-                                key={item.name}
-                                to={item.href}
-                                className={classNames(
-                                  item.current
-                                    ? "bg-gray-900 text-white"
-                                    : "text-gray-300 hover:bg-gray-700 hover:text-white",
-                                  "px-3 py-2 rounded-md text-sm font-medium"
-                                )}
-                                aria-current={item.current ? "page" : undefined}
-                              >
-                                {item.name}
-                              </Link>
-                            ))}
+                            {navigation.map((item) =>
+                              item.onClick ? (
+                                <button
+                                  onClick={item.onClick}
+                                  className={classNames(
+                                    item.current
+                                      ? "bg-gray-900 text-white"
+                                      : "text-gray-300 hover:bg-gray-700 hover:text-white",
+                                    "px-3 py-2 rounded-md text-sm font-medium"
+                                  )}
+                                >
+                                  {item.name}
+                                </button>
+                              ) : (
+                                <Link
+                                  key={item.name}
+                                  to={item.href}
+                                  className={classNames(
+                                    item.current
+                                      ? "bg-gray-900 text-white"
+                                      : "text-gray-300 hover:bg-gray-700 hover:text-white",
+                                    "px-3 py-2 rounded-md text-sm font-medium"
+                                  )}
+                                  aria-current={
+                                    item.current ? "page" : undefined
+                                  }
+                                >
+                                  {item.name}
+                                </Link>
+                              )
+                            )}
                           </div>
                         </div>
                       </div>
