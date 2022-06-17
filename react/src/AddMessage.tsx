@@ -53,7 +53,7 @@ export const AddMessage: FC<{
             <div className="pt-8">
               <div>
                 <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">
-                  Define Time to send a Message
+                  Define a Date and Time to send Message
                 </h3>
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-300"></p>
               </div>
