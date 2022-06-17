@@ -46,7 +46,7 @@ export const AddPeriod: FC<{
         <div className="space-y-8 divide-y divide-gray-200">
           <div className="pt-8">
             <div>
-              <h3 className="text-lg leading-6 font-medium text-gray-900">
+              <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">
                 Define a periodic pulse
               </h3>
               <p className="mt-1 text-sm text-gray-500"></p>
@@ -55,7 +55,7 @@ export const AddPeriod: FC<{
               <div className="sm:col-span-4">
                 <label
                   htmlFor="canister"
-                  className="block text-sm font-medium text-gray-700"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-200"
                 >
                   Canister ID
                 </label>
@@ -73,7 +73,7 @@ export const AddPeriod: FC<{
                 </div>
                 <label
                   htmlFor="period"
-                  className="block text-sm font-medium text-gray-700"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-200"
                 >
                   Seconds between each pulse
                 </label>
@@ -91,7 +91,7 @@ export const AddPeriod: FC<{
                 </div>
                 <label
                   htmlFor="func"
-                  className="block text-sm font-medium text-gray-700"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-200"
                 >
                   Function to call on canister
                 </label>
