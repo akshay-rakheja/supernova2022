@@ -14,32 +14,6 @@ import AddPeriod from "./AddPeriod";
 import AddDailySchedule from "./AddDailySchedule";
 import AddWeeklySchedule from "./AddWeeklySchedule";
 import AddMonthlySchedule from "./AddMonthlySchedule";
-const ns_to_ms = BigInt(1_000_000);
-/** period: Opt<nat>;
-  func: string;
-  schedule: Opt<Schedule>;
-  canister: Principal; */
-// type Schedule = {
-//   dom?: number;
-//   month?: number;
-//   dow?: number;
-//   hour: number;
-//   minute: number;
-// };
-// type UpdateInfo = {
-//   canister: Principal;
-//   period?: BigInt;
-//   schedule?: Schedule;
-//   func: string;
-// };
-const schedules = [
-  {
-    canister: "xxxx-yyyyy-zzzzzz",
-    period: 12,
-    schedule: undefined,
-    func: "Remote",
-  },
-];
 const months = [
   "January",
   "February",
@@ -143,38 +117,46 @@ export function Canisters() {
     !showAddMonthlySchedule;
   return (
     <div className="bg-white  overflow-hidden sm:rounded-md ">
-      <button
-        className="rounded-lg bg-blue-500 text-white p-2 m-2 hover:bg-blue-800 transition"
-        onClick={() => {
-          setShowAddPeriod((old) => !old);
-        }}
-      >
-        {showAddPeriod ? "Hide Form" : "Add A Periodic Pulse"}
-      </button>
-      <button
-        className="rounded-lg bg-blue-500 text-white p-2 m-2 hover:bg-blue-800 transition"
-        onClick={() => {
-          setShowAddDailySchedule((old) => !old);
-        }}
-      >
-        {showAddDailySchedule ? "Hide Form" : "Add A Daily Schedule"}
-      </button>
-      <button
-        className="rounded-lg bg-blue-500 text-white p-2 m-2 hover:bg-blue-800 transition"
-        onClick={() => {
-          setShowAddWeeklySchedule((old) => !old);
-        }}
-      >
-        {showAddWeeklySchedule ? "Hide Form" : "Add A Weekly Schedule"}
-      </button>
-      <button
-        className="rounded-lg bg-blue-500 text-white p-2 m-2 hover:bg-blue-800 transition"
-        onClick={() => {
-          setShowMonthlySchedule((old) => !old);
-        }}
-      >
-        {showAddMonthlySchedule ? "Hide Form" : "Add A Monthly Schedule"}
-      </button>
+      {(showSchedules || showAddPeriod) && (
+        <button
+          className="rounded-lg bg-blue-500 text-white p-2 m-2 hover:bg-blue-800 transition"
+          onClick={() => {
+            setShowAddPeriod((old) => !old);
+          }}
+        >
+          {showAddPeriod ? "Hide Form" : "Add A Periodic Pulse"}
+        </button>
+      )}
+      {(showSchedules || showAddDailySchedule) && (
+        <button
+          className="rounded-lg bg-blue-500 text-white p-2 m-2 hover:bg-blue-800 transition"
+          onClick={() => {
+            setShowAddDailySchedule((old) => !old);
+          }}
+        >
+          {showAddDailySchedule ? "Hide Form" : "Add A Daily Schedule"}
+        </button>
+      )}
+      {(showSchedules || showAddWeeklySchedule) && (
+        <button
+          className="rounded-lg bg-blue-500 text-white p-2 m-2 hover:bg-blue-800 transition"
+          onClick={() => {
+            setShowAddWeeklySchedule((old) => !old);
+          }}
+        >
+          {showAddWeeklySchedule ? "Hide Form" : "Add A Weekly Schedule"}
+        </button>
+      )}
+      {(showSchedules || showAddMonthlySchedule) && (
+        <button
+          className="rounded-lg bg-blue-500 text-white p-2 m-2 hover:bg-blue-800 transition"
+          onClick={() => {
+            setShowMonthlySchedule((old) => !old);
+          }}
+        >
+          {showAddMonthlySchedule ? "Hide Form" : "Add A Monthly Schedule"}
+        </button>
+      )}
       {showAddPeriod && (
         <AddPeriod
           onCancel={() => {
@@ -289,7 +271,9 @@ export function Canisters() {
                                 />
                                 Yearly on {schedule[0].dom}{" "}
                                 {getMonth(schedule[0].month[0])} at{" "}
-                                {schedule[0].hour}:{schedule[0].minute}{" "}
+                                {schedule[0].hour}:
+                                {schedule[0].minute.toString().padStart(2, "0")}{" "}
+                                GMT
                               </p>
                             ) : schedule[0].dom.length ? (
                               <p className="flex items-center text-sm text-gray-500">
@@ -298,7 +282,9 @@ export function Canisters() {
                                   aria-hidden="true"
                                 />
                                 Monthly on day {schedule[0].dom} at{" "}
-                                {schedule[0].hour}:{schedule[0].minute}{" "}
+                                {schedule[0].hour}:
+                                {schedule[0].minute.toString().padStart(2, "0")}{" "}
+                                GMT
                               </p>
                             ) : schedule[0].dow.length ? (
                               <p className="flex items-center text-sm text-gray-500">
@@ -307,7 +293,9 @@ export function Canisters() {
                                   aria-hidden="true"
                                 />
                                 Weekly on {getDOW(schedule[0].dow[0])} at{" "}
-                                {schedule[0].hour}:{schedule[0].minute}{" "}
+                                {schedule[0].hour}:
+                                {schedule[0].minute.toString().padStart(2, "0")}{" "}
+                                GMT
                               </p>
                             ) : (
                               <p className="flex items-center text-sm text-gray-500">
@@ -315,7 +303,9 @@ export function Canisters() {
                                   className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
                                   aria-hidden="true"
                                 />
-                                Daily at {schedule[0].hour}:{schedule[0].minute}{" "}
+                                Daily at {schedule[0].hour}:
+                                {schedule[0].minute.toString().padStart(2, "0")}{" "}
+                                GMT
                               </p>
                             ))}
                           {/* <p className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 sm:ml-6">

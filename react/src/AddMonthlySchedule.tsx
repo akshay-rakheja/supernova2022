@@ -53,6 +53,7 @@ export const AddMonthlySchedule: FC<{
         ) {
           ret.minute = "Minute must be an integer between 0 and 59";
         }
+        console.log("Validating dom", values.dom);
         if (
           values.dom < 0 ||
           values.dom > 31 ||
@@ -65,8 +66,8 @@ export const AddMonthlySchedule: FC<{
         if (values.func.length < 1) ret.func = "Function is required";
         if (/\s/.test(values.func))
           ret.func = "Function must not contain whitespace";
-
         if (Object.values(ret).some(Boolean)) {
+          console.log("Returining", ret);
           return ret;
         }
       }}
@@ -97,7 +98,7 @@ export const AddMonthlySchedule: FC<{
                   <ErrorMessage
                     component="div"
                     name="canister"
-                    className="p-2 text-red-500 font-xs"
+                    className="p-2 text-red-500 text-xs"
                   />
                 </div>
                 <label
@@ -114,9 +115,9 @@ export const AddMonthlySchedule: FC<{
                     className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
                   />
                   <ErrorMessage
-                    component="dom"
-                    name="dow"
-                    className="p-2 text-red-500 font-xs"
+                    component="div"
+                    name="dom"
+                    className="p-2 text-red-500 text-xs"
                   />
                 </div>
                 <label
@@ -134,7 +135,7 @@ export const AddMonthlySchedule: FC<{
                   <ErrorMessage
                     component="div"
                     name="hour"
-                    className="p-2 text-red-500 font-xs"
+                    className="p-2 text-red-500 text-xs"
                   />
                 </div>
                 <label
@@ -152,7 +153,7 @@ export const AddMonthlySchedule: FC<{
                   <ErrorMessage
                     component="div"
                     name="minute"
-                    className="p-2 text-red-500 font-xs"
+                    className="p-2 text-red-500 text-xs"
                   />
                 </div>
                 <label
@@ -170,7 +171,7 @@ export const AddMonthlySchedule: FC<{
                   <ErrorMessage
                     component="div"
                     name="func"
-                    className="p-2 text-red-500 font-xs"
+                    className="p-2 text-red-500 text-xs"
                   />
                 </div>
               </div>

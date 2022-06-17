@@ -480,6 +480,7 @@ function* sendPulse(
   if (!getStable().totalMessages) getStable().totalMessages = 0n;
   getStable().totalMessages!++;
   if (!args) args = [68, 73, 68, 76, 0, 0]; // DIDL + 2 nulls
+  console.log("Will tick to ", address, func);
   try {
     yield ic.call_raw(address, func, args, 0n); //@TODO RHD SUpport passing an argument other than null
   } catch (e) {
@@ -683,8 +684,15 @@ export function add_yearly_schedule(
 
 export function remove(index: nat32): Update<void> {
   const owner = ic.caller();
-  if (registry[owner] && registry[owner].length > index)
-    delete registry[owner][index];
+  if (registry[owner] && registry[owner].length > index) {
+    const newRegistry: UpdateInfo[] = [];
+    for (let x = 0; x < registry[owner].length; x++) {
+      if (x !== index) {
+        newRegistry.push(registry[owner][x]);
+      }
+    }
+    registry[owner] = newRegistry;
+  }
 }
 
 export function get_one(index: nat32): Query<UpdateInfo> {
@@ -740,7 +748,16 @@ export function add_message(
 
 export function remove_message(index: nat32): Update<nat32> {
   const owner = ic.caller();
-  delete messageRegistry[owner][index];
+  const newRegistry: Message[] = [];
+  if (!messageRegistry[owner]) return 0;
+  if (index > messageRegistry[owner].length)
+    return messageRegistry[owner].length;
+  for (let x = 0; x < messageRegistry[owner].length; x++) {
+    if (x != index) {
+      newRegistry.push(messageRegistry[owner][index]);
+    }
+  }
+  messageRegistry[owner] = newRegistry;
   return messageRegistry[owner].length;
 }
 
@@ -953,8 +970,18 @@ export function* heartbeat(): Heartbeat {
     getStable().totalHeartbeats!++;
     lastTime = ic.time();
     for (const owner of Object.keys(registry)) {
+      console.log("Looking at owner in registry", owner);
+      console.log(
+        "Looking at whether I should walk this",
+        registry[owner].length
+      );
       for (let index = 0; index < registry[owner].length; index++) {
+        console.log("Looking at index in registry", index);
         if (registry[owner][index] === null) continue;
+        console.log(
+          "I guess I decided this isn't null",
+          registry[owner][index]
+        );
         const updateInfo = registry[owner][index];
         const {
           period: thisPeriod,
@@ -984,6 +1011,7 @@ export function* heartbeat(): Heartbeat {
     }
 
     for (const owner of Object.keys(messageRegistry)) {
+      let removeIndexes: nat32[] = [];
       for (let x = messageRegistry[owner].length - 1; x > -1; x--) {
         if (messageRegistry[owner][x] === null) continue;
         const { time, args, canister, func } = messageRegistry[owner][x];
@@ -992,11 +1020,23 @@ export function* heartbeat(): Heartbeat {
           if (canPulse(owner)) {
             if (time < ic.time()) {
               //Send the message
-              delete messageRegistry[owner][x];
+              //remove this from the messageregistry
+              removeIndexes.push(x);
+              // messageRegistry[owner].splice(x, 1);
               yield* sendPulse(canister, func, args, owner);
             }
           }
         }
+      }
+      if (removeIndexes.length) {
+        const newIndexes: Message[] = [];
+        for (let x = messageRegistry[owner].length - 1; x > -1; x--) {
+          if (!removeIndexes.includes(x)) {
+            newIndexes.push(messageRegistry[owner][x]);
+          }
+        }
+        messageRegistry[owner] = newIndexes;
+        removeIndexes = [];
       }
     }
   }
