@@ -726,14 +726,14 @@ export function get_next_update_time(index: nat32): Query<nat> {
 //#region Interface for messages (one-time events)
 export function add_message(
   canister: Principal,
-  unix_time_code_in_seconds: nat,
+  unix_time_code_in_ns: nat,
   func: string,
   args: Opt<nat8[]>
 ): Update<nat32> {
   const owner = ic.caller();
   if (allowedPulses[owner] < 1)
     throw new Error("You must have pulses in the bank");
-  const time = unix_time_code_in_seconds * second_in_ns;
+  const time = unix_time_code_in_ns;
   if (time < ic.time()) throw new Error("Time must be in the future");
   if (!messageRegistry[owner]) messageRegistry[owner] = [];
   messageRegistry[owner].push({
@@ -1019,10 +1019,7 @@ export function* heartbeat(): Heartbeat {
           burn_pulses(owner, getStable().check_price_in_pulses);
           if (canPulse(owner)) {
             if (time < ic.time()) {
-              //Send the message
-              //remove this from the messageregistry
               removeIndexes.push(x);
-              // messageRegistry[owner].splice(x, 1);
               yield* sendPulse(canister, func, args, owner);
             }
           }
