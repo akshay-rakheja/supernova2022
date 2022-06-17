@@ -77,7 +77,7 @@ export const AddWeeklySchedule: FC<{
           <div className="pt-8">
             <div>
               <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">
-                Define a periodic pulse
+                Define a Weekly Schedule
               </h3>
               <p className="mt-1 text-sm text-gray-500"></p>
             </div>
@@ -85,7 +85,7 @@ export const AddWeeklySchedule: FC<{
               <div className="sm:col-span-4">
                 <label
                   htmlFor="canister"
-                  className="block text-sm font-medium text-gray-700"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-200"
                 >
                   Canister ID
                 </label>
@@ -103,7 +103,7 @@ export const AddWeeklySchedule: FC<{
                 </div>
                 <label
                   htmlFor="dow"
-                  className="block text-sm font-medium text-gray-700"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-200"
                 >
                   Day of Week on which to deliver
                 </label>
@@ -121,7 +121,7 @@ export const AddWeeklySchedule: FC<{
                 </div>
                 <label
                   htmlFor="hour"
-                  className="block text-sm font-medium text-gray-700"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-200"
                 >
                   Hour on which this should run (in UTC/GMT Time Zone)
                 </label>
@@ -139,7 +139,7 @@ export const AddWeeklySchedule: FC<{
                 </div>
                 <label
                   htmlFor="minute"
-                  className="block text-sm font-medium text-gray-700"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-200"
                 >
                   Minute at which this should run
                 </label>
@@ -157,7 +157,7 @@ export const AddWeeklySchedule: FC<{
                 </div>
                 <label
                   htmlFor="func"
-                  className="block text-sm font-medium text-gray-700"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-200"
                 >
                   Function to call on canister
                 </label>
