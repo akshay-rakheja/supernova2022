@@ -1,8 +1,0 @@
-type Counter = 
- service {
-   bump: () -> (nat);
-   inc: () -> ();
-   inc2: () -> ();
-   read: () -> (nat);
- };
-service : () -> Counter

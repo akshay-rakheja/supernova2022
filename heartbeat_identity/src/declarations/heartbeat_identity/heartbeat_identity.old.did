@@ -1,5 +1,0 @@
-service : {
-  bump: () -> (nat);
-  inc: () -> ();
-  read: () -> (nat);
-}
