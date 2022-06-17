@@ -6,6 +6,7 @@ import { _SERVICE } from "./declarations/heartbeat/heartbeat.did";
 import { createActor } from "./declarations/heartbeat";
 import { FaGithub } from "react-icons/fa";
 import config from "./config.json";
+import { ArrowUpIcon } from "@heroicons/react/outline";
 const {
   host,
   canisters: { heartbeat },
@@ -27,6 +28,7 @@ let timer: NodeJS.Timer;
 export const LoggedOut: FC = () => {
   const [newClass, setNewClass] = useState("");
   const [plugNewClass, setPlugNewClass] = useState("opacity-0");
+  const [iconNewClass, setIconNewClass] = useState("text-black");
   const actor = useHeartbeat();
   const getStats = useCallback(async () => {
     if (actor) {
@@ -57,8 +59,11 @@ export const LoggedOut: FC = () => {
   useEffect(() => {
     if (heartbeats) {
       setNewClass("blur-xl");
+      setIconNewClass("text-white mt-4");
+
       setTimeout(() => {
         setNewClass("blur-sm");
+        setIconNewClass("text-black");
       }, 1500);
     }
   }, [heartbeats]);
@@ -100,13 +105,25 @@ export const LoggedOut: FC = () => {
               Or Just Enjoy the Pulses As They Go Out Every 10s
             </div>
           </div>
-          <div className="flex justify-around w-full flex-row">
-            <div className="flex">
-              <PlugButton dark />
+          <div>
+            <div className="flex justify-around w-full flex-row">
+              <div className="flex">
+                <PlugButton dark />
+              </div>
+            </div>
+            <div>
+              <div className="flex justify-around w-full flex-row">
+                <ArrowUpIcon
+                  className={[
+                    "w-20 h-20 transition duration-1000 ",
+                    iconNewClass,
+                  ].join(" ")}
+                />
+              </div>
             </div>
           </div>
           <div className="flex justify-around w-full flex-row"></div>
-          <div className="flex justify-around  flex-row bg-red-500 ">
+          <div className="flex justify-around  flex-row  ">
             <Stats
               heartbeats={heartbeats}
               messages={messages}
