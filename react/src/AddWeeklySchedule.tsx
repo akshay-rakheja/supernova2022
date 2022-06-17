@@ -76,7 +76,7 @@ export const AddWeeklySchedule: FC<{
         <div className="space-y-8 divide-y divide-gray-200">
           <div className="pt-8">
             <div>
-              <h3 className="text-lg leading-6 font-medium text-gray-900">
+              <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">
                 Define a periodic pulse
               </h3>
               <p className="mt-1 text-sm text-gray-500"></p>

@@ -116,7 +116,7 @@ export function Canisters() {
     !showAddWeeklySchedule &&
     !showAddMonthlySchedule;
   return (
-    <div className="bg-white  overflow-hidden sm:rounded-md ">
+    <div className="  overflow-hidden sm:rounded-md ">
       {(showSchedules || showAddPeriod) && (
         <button
           className="rounded-lg bg-blue-500 text-white p-2 m-2 hover:bg-blue-800 transition"
@@ -230,7 +230,7 @@ export function Canisters() {
       )}
       {showSchedules && (
         <div className="space-y-8 divide-y divide-gray-200 pt-8">
-          <h3 className="text-lg leading-6 font-medium text-gray-900">
+          <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">
             My Scheduled Events
           </h3>
           <ul role="list" className="divide-y divide-gray-200">
@@ -239,15 +239,15 @@ export function Canisters() {
               const { canister, func, period, schedule } = updateInfo;
               return (
                 <li key={index}>
-                  <div className="block hover:bg-gray-50">
+                  <div className="block  ">
                     <div className="px-4 py-4 sm:px-6">
                       <div className="flex items-center justify-between">
-                        <p className="text-sm font-medium text-indigo-600 truncate">
+                        <p className="text-sm font-medium text-indigo-600 dark:text-indigo-100 truncate">
                           {canister.toString()}
                         </p>
                         <div className="ml-2 flex-shrink-0 flex">
-                          <p className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                            {func}
+                          <p className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-100">
+                            to function: {func}
                           </p>
                         </div>
                       </div>

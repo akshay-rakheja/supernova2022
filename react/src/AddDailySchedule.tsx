@@ -63,16 +63,16 @@ export const AddDailySchedule: FC<{
         <div className="space-y-8 divide-y divide-gray-200">
           <div className="pt-8">
             <div>
-              <h3 className="text-lg leading-6 font-medium text-gray-900">
+              <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">
                 Define a periodic pulse
               </h3>
-              <p className="mt-1 text-sm text-gray-500"></p>
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-200"></p>
             </div>
             <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
               <div className="sm:col-span-4">
                 <label
                   htmlFor="canister"
-                  className="block text-sm font-medium text-gray-700"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-200"
                 >
                   Canister ID
                 </label>
@@ -90,7 +90,7 @@ export const AddDailySchedule: FC<{
                 </div>
                 <label
                   htmlFor="hour"
-                  className="block text-sm font-medium text-gray-700"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-200"
                 >
                   Hour on which this should run (in UTC/GMT Time Zone)
                 </label>
@@ -108,7 +108,7 @@ export const AddDailySchedule: FC<{
                 </div>
                 <label
                   htmlFor="minute"
-                  className="block text-sm font-medium text-gray-700"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-200"
                 >
                   Minute at which this should run
                 </label>
@@ -126,7 +126,7 @@ export const AddDailySchedule: FC<{
                 </div>
                 <label
                   htmlFor="func"
-                  className="block text-sm font-medium text-gray-700"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-200"
                 >
                   Function to call on canister
                 </label>
@@ -153,7 +153,7 @@ export const AddDailySchedule: FC<{
               onClick={() => {
                 onCancel();
               }}
-              className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 dark:bg-transparent hover:bg-gray-50 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
               Cancel
             </button>

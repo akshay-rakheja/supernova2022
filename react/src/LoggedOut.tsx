@@ -59,7 +59,7 @@ export const LoggedOut: FC = () => {
   useEffect(() => {
     if (heartbeats) {
       setNewClass("blur-xl");
-      setIconNewClass("text-white mt-4");
+      setIconNewClass("text-white translate-y-10");
 
       setTimeout(() => {
         setNewClass("blur-sm");
@@ -102,7 +102,7 @@ export const LoggedOut: FC = () => {
               </div>
             </a>
             <div className=" font-bold text-white opacity-50">
-              Or Just Enjoy the Pulses As They Go Out Every 10s
+              ...or just enjoy the pulses every 10s
             </div>
           </div>
           <div>
@@ -157,7 +157,7 @@ const Stats: FC<{
     <div>
       <div className="p-6 bg-black bg-opacity-60 rounded-lg mb-6">
         <h2 className="text-3xl leading-6 font-bold text-gray-100 text-center">
-          Statistics my dude
+          Statistics
         </h2>
         <dl className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">
           {stats.map((item) => (

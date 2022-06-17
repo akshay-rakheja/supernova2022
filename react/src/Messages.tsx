@@ -1,10 +1,6 @@
 import { Principal } from "@dfinity/principal";
-import {
-  CalendarIcon,
-  LocationMarkerIcon,
-  UsersIcon,
-} from "@heroicons/react/solid";
-import { useEffect, useState, useCallback, Fragment } from "react";
+
+import { useEffect, useState, useCallback } from "react";
 import { useTitle } from "./Main";
 import { usePlug } from "@raydeck/useplug";
 import useHeartbeat from "./useHeartbeat";
@@ -60,7 +56,7 @@ export function Messages() {
 
   const showMessages = !showAddMessage;
   return (
-    <div className="bg-white  overflow-hidden sm:rounded-md ">
+    <div className=" overflow-hidden sm:rounded-md ">
       {(showMessages || showAddMessage) && (
         <button
           className="rounded-lg bg-blue-500 text-white p-2 m-2 hover:bg-blue-800 transition"
@@ -93,7 +89,7 @@ export function Messages() {
 
       {showMessages && (
         <div className="space-y-8 divide-y divide-gray-200 pt-8">
-          <h3 className="text-lg leading-6 font-medium text-gray-900">
+          <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">
             {messages.length ? "My Messages" : "No Messages Scheduled - Yet!"}
           </h3>
           <ul role="list" className="divide-y divide-gray-200">

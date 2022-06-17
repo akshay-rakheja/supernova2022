@@ -52,16 +52,16 @@ export const AddMessage: FC<{
           <div className="space-y-8 divide-y divide-gray-200">
             <div className="pt-8">
               <div>
-                <h3 className="text-lg leading-6 font-medium text-gray-900">
+                <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">
                   Define a periodic pulse
                 </h3>
-                <p className="mt-1 text-sm text-gray-500"></p>
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-300"></p>
               </div>
               <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
                 <div className="sm:col-span-4">
                   <label
                     htmlFor="canister"
-                    className="block text-sm font-medium text-gray-700"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-200"
                   >
                     Canister ID
                   </label>
@@ -69,17 +69,17 @@ export const AddMessage: FC<{
                     <Field
                       name="canister"
                       type="text"
-                      className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                      className="dark:bg-transparent dark:text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
                     />
                     <ErrorMessage
                       component="div"
                       name="canister"
-                      className="p-2 text-red-500 text-xs"
+                      className="p-2 text-red-500 dark:text-red-200 text-xs"
                     />
                   </div>
                   <label
                     htmlFor="time"
-                    className="block text-sm font-medium text-gray-700"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-200"
                   >
                     Date and Time for this message to fire (shown in your local
                     time)
@@ -88,7 +88,7 @@ export const AddMessage: FC<{
                     <div className={"md:flex flex-row justify-start gap-x-2"}>
                       <div className="mb-2">
                         <DatePicker
-                          className="h-8 text-center text-md font-medium text-gray-600"
+                          className="h-8 text-center text-md font-medium text-gray-600 dark:text-gray-100 bg-transparent "
                           selected={new Date(values.time)}
                           onChange={(newdate) => {
                             if (!newdate) return;
@@ -111,7 +111,7 @@ export const AddMessage: FC<{
                       </div>
                       <div>
                         <TimePicker
-                          className="h-8 text-md font-medium text-gray-600"
+                          className="h-8 text-md font-medium text-gray-600 dark: text-gray-100"
                           value={new Date(values.time)}
                           onChange={(newTime) => {
                             const dateString =
@@ -133,7 +133,7 @@ export const AddMessage: FC<{
                         />
                       </div>
                     </div>
-                    <p className="text-xs font-medium">
+                    <p className="text-xs font-medium dark:text-white">
                       {DateTime.fromMillis(values.time)
                         //   .setZone("GMT")
                         .toLocaleString(DateTime.DATETIME_FULL)}
@@ -142,18 +142,18 @@ export const AddMessage: FC<{
                       name="time"
                       type="number"
                       ref={timeRef}
-                      className="hidden shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                      className="dark:bg-transparent dark:text-white hidden shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
                     />
                     <ErrorMessage
                       component="div"
                       name="time"
-                      className="p-2 text-red-500 text-xs"
+                      className="p-2 text-red-500 dark:text-red-200 text-xs"
                     />
                   </div>
 
                   <label
                     htmlFor="func"
-                    className="block text-sm font-medium text-gray-700"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-200"
                   >
                     Function to call on canister
                   </label>
@@ -161,12 +161,12 @@ export const AddMessage: FC<{
                     <Field
                       name="func"
                       type="text"
-                      className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                      className="dark:bg-transparent dark:text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
                     />
                     <ErrorMessage
                       component="div"
                       name="func"
-                      className="p-2 text-red-500 text-xs"
+                      className="p-2 text-red-500 dark:text-red-200 text-xs"
                     />
                   </div>
                 </div>
@@ -178,11 +178,9 @@ export const AddMessage: FC<{
               <button
                 type="button"
                 onClick={() => {
-                  console.log({ dirty, errors, isSubmitting });
-
-                  //   onCancel();
+                  onCancel();
                 }}
-                className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700  hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
                 Cancel
               </button>

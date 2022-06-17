@@ -115,7 +115,7 @@ export default function Main() {
         ```
       */}
       <div className="min-h-full bg-gradient-to-r from-yellow-600 to-blue-800">
-        <div className="bg-black bg-opacity-60 pb-32">
+        <div className="bg-black bg-opacity-40 pb-12 mb-20 shadow">
           <Disclosure as="nav" className="bg-black ">
             {({ open }) => (
               <>
@@ -313,7 +313,7 @@ export default function Main() {
         <main className="-mt-32">
           <div className="max-w-7xl mx-auto pb-12 px-4 sm:px-6 lg:px-8">
             {/* Replace with your content */}
-            <div className="bg-white rounded-lg shadow px-5 py-6 sm:px-6">
+            <div className="bg-white dark:bg-black dark:bg-opacity-70 rounded-lg shadow px-5 py-6 sm:px-6">
               <Provider value={value}>
                 <Outlet />
               </Provider>
