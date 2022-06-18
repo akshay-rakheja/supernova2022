@@ -156,22 +156,31 @@ const Stats: FC<{
   counter2: bigint;
 }> = ({ counter1, counter3, counter2 }) => {
   // const { createActor } = usePlug();
-
+  const actor = useTicker2();
   const stats = [
     {
       name: "Calls to tick2",
       stat: counter1.toLocaleString(),
       clipboardText: "tick2",
+      onClick: () => {
+        if (actor) actor.reset();
+      },
     },
     {
       name: "Calls to counter2_tick",
       stat: counter2.toLocaleString(),
       clipboardText: "counter2_tick",
+      onClick: () => {
+        if (actor) actor.counter2_reset();
+      },
     },
     {
       name: "Calls to counter3_tick",
       stat: counter3.toLocaleString(),
       clipboardText: "counter3_tick",
+      onClick: () => {
+        if (actor) actor.counter3_reset();
+      },
     },
   ];
   return (
@@ -207,7 +216,16 @@ const Stats: FC<{
                 <ClipboardCopyIcon className="text-white h-4 w-4 ml-1.5 inline-block" />
               </dt>
               <dd className="mt-1 text-3xl font-semibold text-gray-100">
-                {item.stat}
+                <div className="flex w-full justify-between items-baseline">
+                  <div> {item.stat} </div>
+
+                  <button
+                    className="bg-orange-500 hover:bg-orange-800 transition text-xs text-white rounded-md p-1 h-6"
+                    onClick={item.onClick}
+                  >
+                    Reset
+                  </button>
+                </div>
               </dd>
             </div>
           ))}
