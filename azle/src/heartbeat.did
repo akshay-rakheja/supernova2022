@@ -227,7 +227,6 @@ service: () -> {
     "set_account_id": (text) -> (text);
     "mint_pulses": (nat) -> (record { "ok": opt nat; "err": opt text; });
     "mint_pulses_for": (nat, principal) -> (nat);
-    "transfer_pulses": (nat, principal) -> (nat);
     "transfer": (principal, nat) -> (TxReceipt);
     "transferFrom": (principal, principal, nat) -> (TxReceipt);
     "approve": (principal, nat) -> (TxReceipt);

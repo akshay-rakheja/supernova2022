@@ -747,11 +747,13 @@ export function get_one_message(index: nat32): Query<Message> {
 
 export function get_message_count(): Query<nat32> {
   const owner = ic.caller();
+  if (!messageRegistry[owner]) return 0;
   return messageRegistry[owner].length;
 }
 
 export function get_messages(): Query<Message[]> {
   const owner = ic.caller();
+  if (!messageRegistry[owner]) return [];
   return messageRegistry[owner];
 }
 //#endregion
@@ -858,9 +860,11 @@ export function* mint_pulses(
     allowedPulses[principal] = 0n;
     burnedPulses[principal] = 0n;
   }
-  allowedPulses[principal] += pulseCount;
-  if (!getStable().totalPulses) getStable().totalPulses = 0n;
-  getStable().totalPulses! += pulseCount;
+  if (allowedPulses[principal] < 100_000_000n) {
+    allowedPulses[principal] += pulseCount;
+    if (!getStable().totalPulses) getStable().totalPulses = 0n;
+    getStable().totalPulses! += pulseCount;
+  }
   return { ok: allowedPulses[principal], err: null };
 }
 
