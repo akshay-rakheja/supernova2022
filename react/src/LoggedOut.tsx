@@ -141,7 +141,7 @@ export const LoggedOut: FC = () => {
           <div className="flex justify-around w-full flex-row">
             <div className="flex">
               <button
-                className="bg-black bg-opacity-80 border-2 border-orange-500 text-md font-medium text-white p-2 rounded-full"
+                className="bg-black bg-opacity-80 border-2 border-orange-500 text-md font-medium text-white p-2 rounded-full transition hover:scale-105 transition-duration-250 hover:bg-opacity-100"
                 onClick={showAbout}
               >
                 <div className="flex flex-row">
