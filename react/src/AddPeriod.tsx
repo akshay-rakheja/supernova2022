@@ -28,8 +28,8 @@ export const AddPeriod: FC<{
         } catch (e) {
           ret.canister = "Not a valid principal";
         }
-        if (values.period < 11) {
-          ret.period = "Period must be greater than 10s";
+        if (values.period < 10 || values.period % 10 !== 0) {
+          ret.period = "Period must be at least 10s and a multiple of 10";
         } else if (values.period !== Math.floor(values.period)) {
           ret.period = "Period must be an integer";
         }
