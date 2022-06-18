@@ -10,6 +10,9 @@ export function tick2(): Update<int> {
   counter = counter + BigInt(1);
   return counter;
 }
+export function reset(): Update<void> {
+  counter = 0n;
+}
 //#region
 
 //#region counter2 functionality
@@ -22,6 +25,9 @@ export function counter2_tick(): Update<int> {
   counter2 = counter2 + BigInt(1);
   return counter2;
 }
+export function counter2_reset(): Update<void> {
+  counter2 = 0n;
+}
 
 //#region counter2 functionality
 let counter3: nat = BigInt(0);
@@ -32,5 +38,8 @@ export function counter3_tick(): Update<int> {
   console.log("Ticked me!!!!!");
   counter3 = counter3 + BigInt(1);
   return counter;
+}
+export function counter3_reset(): Update<void> {
+  counter3 = 0n;
 }
 //#endregion
