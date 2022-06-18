@@ -108,7 +108,7 @@ export const LoggedOut: FC = () => {
           <div className="bg-black bg-opacity-50 flex flex-row w-screen justify-between p-4">
             <a
               href="https://github.com/akshay-rakheja/supernova2022"
-              className="text-gray-200 hover:text-gray-700 transition duration-250"
+              className="text-gray-200 hover:text-gray-100 hover:scale-105 transition duration-250"
             >
               <div className="flex flex-row ">
                 <FaGithub size={20} />
@@ -119,10 +119,12 @@ export const LoggedOut: FC = () => {
               ...or just enjoy the pulses every 10s
             </div>
           </div>
+          <div></div>
+          <div></div>
           <div>
             <div className="flex justify-around w-full flex-row">
               <div className="flex">
-                <PlugButton dark />
+                <PlugButton dark title="Get Started With Plug" />
               </div>
             </div>
             <div>
@@ -136,12 +138,19 @@ export const LoggedOut: FC = () => {
               </div>
             </div>
           </div>
-          <div></div>
-          <div></div>
+
+          <div className="flex justify-around w-full flex-row"></div>
+          <div className="flex justify-around  flex-row  ">
+            <Stats
+              heartbeats={heartbeats}
+              messages={messages}
+              burnedPulses={burnedPulses}
+            />
+          </div>
           <div className="flex justify-around w-full flex-row">
             <div className="flex">
               <button
-                className="bg-black bg-opacity-80 border-2 border-orange-500 text-md font-medium text-white p-2 rounded-full transition hover:scale-105 transition-duration-250 hover:bg-opacity-100"
+                className="mb-6 bg-black bg-opacity-80 border-2 border-orange-500 text-md font-medium text-white p-2 rounded-full transition hover:scale-105 transition-duration-250 hover:bg-opacity-60"
                 onClick={showAbout}
               >
                 <div className="flex flex-row">
@@ -150,14 +159,6 @@ export const LoggedOut: FC = () => {
                 </div>
               </button>
             </div>
-          </div>
-          <div className="flex justify-around w-full flex-row"></div>
-          <div className="flex justify-around  flex-row  ">
-            <Stats
-              heartbeats={heartbeats}
-              messages={messages}
-              burnedPulses={burnedPulses}
-            />
           </div>
         </div>
       </div>
