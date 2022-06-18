@@ -176,7 +176,6 @@ export const idlFactory = ({ IDL }) => {
         [TxReceipt],
         [],
       ),
-    'transfer_pulses' : IDL.Func([IDL.Nat, IDL.Principal], [IDL.Nat], []),
     'whoami' : IDL.Func([], [IDL.Principal], ['query']),
   });
 };

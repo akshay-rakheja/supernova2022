@@ -3,13 +3,13 @@
   "production": {
     "host": "https://ic0.app",
     "canisters": {
-      "heartbeat": "d4qab-oqaaa-aaaap-qal4a-cai"
+      "heartbeat": "dwes7-aaaaa-aaaap-qamaq-cai"
     }
   },
   "local": {
     "host": "http://localhost:8000",
     "canisters": {
-      "heartbeat": "wmio3-kqaaa-aaaaa-aaasq-cai"
+      "heartbeat": "xub3y-eqaaa-aaaaa-aaawq-cai"
     }
   }
 }

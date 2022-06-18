@@ -226,6 +226,5 @@ export interface _SERVICE {
   'totalSupply' : ActorMethod<[], bigint>,
   'transfer' : ActorMethod<[Principal, bigint], TxReceipt>,
   'transferFrom' : ActorMethod<[Principal, Principal, bigint], TxReceipt>,
-  'transfer_pulses' : ActorMethod<[bigint, Principal], bigint>,
   'whoami' : ActorMethod<[], Principal>,
 }

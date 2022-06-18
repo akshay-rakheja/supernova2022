@@ -4,7 +4,7 @@ import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { BellIcon, MenuIcon, XIcon } from "@heroicons/react/outline";
 import useHeartbeat from "./useHeartbeat";
-import { Link, Outlet, useResolvedPath } from "react-router-dom";
+import { Link, Outlet, useNavigate, useResolvedPath } from "react-router-dom";
 import Logo from "./assets/icon.png";
 import { createContext, useContext, useRef } from "react";
 import { getNodeMajorVersion, isTemplateExpression } from "typescript";
@@ -24,17 +24,24 @@ export default function Main() {
   const heartbeat = useHeartbeat();
   const [pulses, setPulses] = useState<BigInt>(BigInt(0));
   const intervalRef = useRef<NodeJS.Timer>();
+  const navigate = useNavigate();
   useEffect(() => {
     (async () => {
-      const pulses = await heartbeat?.myBalance();
-      setPulses(pulses || BigInt(0));
+      if (heartbeat && navigate) {
+        const pulses = await heartbeat?.myBalance();
+        setPulses(pulses || BigInt(0));
+        console.log("I set those pulses alright", pulses);
+        if (!pulses || pulses === BigInt(0)) {
+          navigate("/tokens");
+        }
+      }
     })();
     if (intervalRef.current) clearInterval(intervalRef.current);
     intervalRef.current = setInterval(async () => {
       const pulses = await heartbeat?.myBalance();
       setPulses(pulses || BigInt(0));
     }, 2000);
-  }, [heartbeat]);
+  }, [heartbeat, navigate]);
   const user = {
     name: principal && principal.toString(),
     email: "",
@@ -54,10 +61,9 @@ export default function Main() {
       current: path.pathname.startsWith("/messages"),
     },
     {
-      name:
-        "Pulses (Account: " + (Number(pulses) / 10_000_000).toFixed(7) + ")",
-      href: "/pulses",
-      current: path.pathname.startsWith("/pulses"),
+      name: "DETI Tokens (" + (Number(pulses) / 10_000_000).toFixed(7) + ")",
+      href: "/tokens",
+      current: path.pathname.startsWith("/tokens"),
     },
   ];
   const userNavigation = [

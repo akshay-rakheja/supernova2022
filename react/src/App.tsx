@@ -26,7 +26,13 @@ function App() {
           </Unauthenticated>
         </Fragment>
       </PlugProvider>
-      <ToastContainer />
+      <ToastContainer
+        position="bottom-right"
+        autoClose={2000}
+        toastClassName={(context) => {
+          return "bg-black text-white bg-opacity-40 p-2 rounded-lg";
+        }}
+      />
     </BrowserRouter>
   );
 }

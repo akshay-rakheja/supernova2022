@@ -1582,10 +1582,10 @@
     recursive-copy "^2.0.10"
     untildify "^4.0.0"
 
-"@raydeck/useplug@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@raydeck/useplug/-/useplug-1.0.0.tgz#e94cef83a69ed3f83f3a8ba42b89df72738f4219"
-  integrity sha512-35z/LinCclv9OPWd5DzKgYWAlFIeCH37VxqgvJYaS+MNzHLuWhYNPUQf/ikTBMChR+zYErigusn9iEhxr0x8Dw==
+"@raydeck/useplug@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@raydeck/useplug/-/useplug-1.0.3.tgz#40acc322c4264702761aeaf1d279d26fc5b2433d"
+  integrity sha512-EXm87MnciXuS3IhPNXBXnVglRoers+EdrcTmdSBGLBGydnq4cO2QfDp0B1NYuacXXAYRa58CbFTM46X0uNqd+g==
   dependencies:
     "@stitches/react" "^1.2.8"
 

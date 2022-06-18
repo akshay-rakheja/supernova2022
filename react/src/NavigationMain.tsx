@@ -13,7 +13,7 @@ export const RouteManager: FC = () => {
       <Route path="/" element={<Main />}>
         <Route path="schedules" element={<Schedules />} />
         <Route path="messages" element={<Messages />} />
-        <Route path="pulses" element={<Pulses />} />
+        <Route path="tokens" element={<Pulses />} />
         <Route path="/" element={<Navigate to="/schedules" replace />} />
         <Route path="*" element={<Navigate to="/schedules" replace />} />
       </Route>

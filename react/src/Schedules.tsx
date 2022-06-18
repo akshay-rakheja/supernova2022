@@ -64,14 +64,19 @@ export function Canisters() {
         setSchedules(newUpdates);
 
         console.log("Hi there let's ahve some new schedules please", updates);
-        setLoading(false);
       }
-    } catch (e) {}
+      setLoading(false);
+    } catch (e) {
+      console.log("That was unpleasant");
+    }
   }, [heartbeat, setSchedules]);
   const removeSchedule = useCallback(
     async (index: number) => {
       setLoading(true);
       try {
+        toast(`Removing Schedule...`, {
+          type: "info",
+        });
         await heartbeat?.remove(index);
         toast(`Removed Schedule...`, {
           type: "success",
@@ -181,6 +186,9 @@ export function Canisters() {
           }}
           onSubmit={async ({ canister, func, period }) => {
             console.log("Starting to send the period info from values");
+            toast(`Adding Schedule to ${canister.substring(0, 7)}...`, {
+              type: "info",
+            });
             await heartbeat?.add_period(
               Principal.fromText(canister),
               BigInt(period),
@@ -202,6 +210,9 @@ export function Canisters() {
             setShowAddDailySchedule(false);
           }}
           onSubmit={async (values) => {
+            toast(`Adding Schedule to ${values.canister.substring(0, 7)}...`, {
+              type: "info",
+            });
             await heartbeat?.add_daily_schedule(
               Principal.fromText(values.canister),
               values.hour,
@@ -223,6 +234,9 @@ export function Canisters() {
             setShowAddWeeklySchedule(false);
           }}
           onSubmit={async (values) => {
+            toast(`Adding Schedule to ${values.canister.substring(0, 7)}...`, {
+              type: "info",
+            });
             await heartbeat?.add_weekly_schedule(
               Principal.fromText(values.canister),
               values.dow,
@@ -245,6 +259,9 @@ export function Canisters() {
             setShowMonthlySchedule(false);
           }}
           onSubmit={async (values) => {
+            toast(`Adding Schedule to ${values.canister.substring(0, 7)}...`, {
+              type: "info",
+            });
             await heartbeat?.add_monthly_schedule(
               Principal.fromText(values.canister),
               values.dom,

@@ -1,6 +1,8 @@
 import { QuestionMarkCircleIcon } from "@heroicons/react/outline";
 import raw from "raw.macro";
 import { FC, useEffect, useRef, useState } from "react";
+import ReactMarkdown from "react-markdown";
+import { toast } from "react-toastify";
 import { useTitle } from "./Main";
 import ModalMD from "./ModalMD";
 import useHeartbeat from "./useHeartbeat";
@@ -31,21 +33,31 @@ const Pulses: FC = () => {
   const [showHelp, setShowHelp] = useState(false);
   return (
     <div>
-      <button
-        onClick={() => setShowHelp(true)}
-        className="rounded-lg bg-blue-500 dark:bg-blue-800 dark:bg-opacity-80 text-white p-2 m-2 hover:bg-blue-800 transition"
-      >
-        <QuestionMarkCircleIcon className="h-6 w-6 text-white mr-2 inline" />{" "}
-        Help
-      </button>
-      <button className="rounded-lg bg-blue-500 dark:bg-blue-800 dark:bg-opacity-80 text-white p-2 m-2 hover:bg-blue-800 transition">
-        Buy Pulses
-      </button>
-
-      <button className="rounded-lg bg-blue-500 dark:bg-blue-800 dark:bg-opacity-80 text-white p-2 m-2 hover:bg-blue-800 transition">
-        Send Pulses to
-      </button>
-      <ModalMD show={showHelp} setShow={setShowHelp} markdown={markdown} />
+      <div className="flex flex-row justify-center">
+        <button
+          onClick={async () => {
+            toast("Minting a DETI...");
+            await heartbeat?.mint_pulses(BigInt(10_000_000));
+            toast("Minted a DETI for you!");
+          }}
+          disabled={pulses > BigInt(100_000_000)}
+          className="rounded-lg bg-orange-500 dark:bg-orange-800 dark:bg-opacity-80 text-white p-2 m-2 hover:bg-blue-800 transition"
+        >
+          {pulses > BigInt(100_000_000)
+            ? "You have your maximum quota of free DETI"
+            : "Limited time only - mint one DETI"}
+        </button>
+        {/* 
+        <button className="rounded-lg bg-blue-500 dark:bg-blue-800 dark:bg-opacity-80 text-white p-2 m-2 hover:bg-blue-800 transition">
+          Send Pulses to
+        </button> */}
+      </div>
+      <div className="flex flex-row justify-center">
+        <article className="prose dark:prose-invert p-4 text-gray-900 dark:text-gray-100 bg-gray-300 dark:bg-black bg-opacity-40 m-4 rounded-lg max-h-full  overflow-scroll border-gray-300 dark:border-gray-600 border-opacity-40 border-2">
+          <ReactMarkdown>{markdown}</ReactMarkdown>
+        </article>
+      </div>
+      {/* <ModalMD show={showHelp} setShow={setShowHelp} markdown={markdown} /> */}
     </div>
   );
 };

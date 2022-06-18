@@ -10,7 +10,7 @@ export const AddPeriod: FC<{
     <Formik
       initialValues={{
         canister: "",
-        period: 0,
+        period: 30,
         func: "",
       }}
       onSubmit={async (values) => {
