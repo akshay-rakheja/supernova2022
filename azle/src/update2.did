@@ -1,4 +1,0 @@
-service: {
-    "count": () -> (int) query;
-    "tick2": () -> ();
-}
