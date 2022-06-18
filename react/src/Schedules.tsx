@@ -14,6 +14,7 @@ import AddPeriod from "./AddPeriod";
 import AddDailySchedule from "./AddDailySchedule";
 import AddWeeklySchedule from "./AddWeeklySchedule";
 import AddMonthlySchedule from "./AddMonthlySchedule";
+import { toast } from "react-toastify";
 const months = [
   "January",
   "February",
@@ -170,6 +171,10 @@ export function Canisters() {
               func
             );
             console.log("Got the period info from values");
+            toast(`Added Schedule to ${canister.substring(0, 7)}...`, {
+              type: "success",
+            });
+
             setShowAddPeriod(false);
             getSchedules();
           }}
@@ -187,6 +192,10 @@ export function Canisters() {
               values.minute,
               values.func
             );
+            toast(`Added Schedule to ${values.canister.substring(0, 7)}...`, {
+              type: "success",
+            });
+
             setShowAddDailySchedule(false);
             getSchedules();
           }}
@@ -205,6 +214,10 @@ export function Canisters() {
               values.minute,
               values.func
             );
+            toast(`Added Schedule to ${values.canister.substring(0, 7)}...`, {
+              type: "success",
+            });
+
             setShowAddWeeklySchedule(false);
             getSchedules();
           }}
@@ -223,6 +236,10 @@ export function Canisters() {
               values.minute,
               values.func
             );
+            toast(`Added Schedule to ${values.canister.substring(0, 7)}...`, {
+              type: "success",
+            });
+
             setShowMonthlySchedule(false);
             getSchedules();
           }}

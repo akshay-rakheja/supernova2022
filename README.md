@@ -44,18 +44,16 @@ brew install cmake # Get cmake when its missing
 ## To Do TODAY
 
 - Form to buy pulses
-- Form to schedule
-- List of schedules (with a remove button per schedule)
+- Make pulses a DIP-20
+- Make Template for TS Dfinity dev (react + azle)
 
 ## To do in general
 
-- maybe: preupgrade/postupgrade
-- Make pulses a DIP-20
-- Check for an SDR-ICP price oracle - on the ledger?
-- Add argument builder in Azle (using dfinity/candid?)
-
 ## To Test
 
+- maybe: preupgrade/postupgrade
+- Form to schedule
+- List of schedules (with a remove button per schedule)
 - Public dashboard with login button
 - Deploy to IC
 - connect frontend to our backend
@@ -70,3 +68,5 @@ brew install cmake # Get cmake when its missing
 ## Willnotdo
 
 - Clone plug wallet for local testing?
+- Check for an SDR-ICP price oracle - on the ledger?
+- Add argument builder in Azle (using dfinity/candid?)

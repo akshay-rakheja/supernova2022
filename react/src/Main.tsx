@@ -8,7 +8,7 @@ import { Link, Outlet, useResolvedPath } from "react-router-dom";
 import Logo from "./assets/icon.png";
 import { createContext, useContext, useRef } from "react";
 import { getNodeMajorVersion, isTemplateExpression } from "typescript";
-
+import ReactMarkdown from "react-markdown";
 const context = createContext({
   title: "UNTITLED",
   setTitle: (title: string) => {},

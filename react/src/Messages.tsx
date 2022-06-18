@@ -8,6 +8,7 @@ import { Message } from "./declarations/heartbeat/heartbeat.did";
 import { ClockIcon } from "@heroicons/react/outline";
 import { DateTime } from "luxon";
 import AddMessage from "./AddMessage";
+import { toast } from "react-toastify";
 const ns_to_ms = BigInt(1_000_000);
 const ns_to_s = BigInt(1_000_000_000);
 
@@ -42,6 +43,10 @@ export function Messages() {
   const removeMessage = useCallback(
     async (index: number) => {
       await heartbeat?.remove_message(index);
+      toast(`Removed Schedule`, {
+        type: "success",
+      });
+
       await getMessages();
     },
     [getMessages, heartbeat]
@@ -81,6 +86,7 @@ export function Messages() {
               func,
               []
             );
+            toast("Scheduled new message", { type: "success" });
             setShowAddMessage(false);
             getMessages();
           }}

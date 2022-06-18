@@ -53,7 +53,7 @@ export const AddMessage: FC<{
             <div className="pt-8">
               <div>
                 <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">
-                  Define a Date and Time to send Message
+                  Define a periodic pulse
                 </h3>
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-300"></p>
               </div>
@@ -69,7 +69,7 @@ export const AddMessage: FC<{
                     <Field
                       name="canister"
                       type="text"
-                      className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                      className="dark:bg-transparent dark:text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
                     />
                     <ErrorMessage
                       component="div"
@@ -88,7 +88,7 @@ export const AddMessage: FC<{
                     <div className={"md:flex flex-row justify-start gap-x-2"}>
                       <div className="mb-2">
                         <DatePicker
-                          className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                          className="h-8 text-center text-md font-medium text-gray-600 dark:text-gray-100 bg-transparent "
                           selected={new Date(values.time)}
                           onChange={(newdate) => {
                             if (!newdate) return;
@@ -161,7 +161,7 @@ export const AddMessage: FC<{
                     <Field
                       name="func"
                       type="text"
-                      className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                      className="dark:bg-transparent dark:text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
                     />
                     <ErrorMessage
                       component="div"

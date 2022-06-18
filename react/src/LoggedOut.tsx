@@ -7,6 +7,7 @@ import { createActor } from "./declarations/heartbeat";
 import { FaGithub } from "react-icons/fa";
 import config from "./config.json";
 import { ArrowUpIcon } from "@heroicons/react/outline";
+import About from "./About";
 const {
   host,
   canisters: { heartbeat },
@@ -29,6 +30,7 @@ export const LoggedOut: FC = () => {
   const [newClass, setNewClass] = useState("");
   const [plugNewClass, setPlugNewClass] = useState("opacity-0");
   const [iconNewClass, setIconNewClass] = useState("text-black");
+  const [aboutNewClass, setAboutNewClass] = useState("");
   const actor = useHeartbeat();
   const getStats = useCallback(async () => {
     if (actor) {
@@ -80,6 +82,7 @@ export const LoggedOut: FC = () => {
           setPlugNewClass("opacity-100");
         }}
       ></div>
+
       <div
         className={[
           "h-screen w-screen absolute flex justify-around content-around transition duration-1000 ",
@@ -130,6 +133,16 @@ export const LoggedOut: FC = () => {
               burnedPulses={burnedPulses}
             />
           </div>
+        </div>
+      </div>
+      <div
+        className={[
+          "flex-col justify-around absolute flex h-screen w-screen bg-white dark:bg-black bg-opacity-80 hidden transition transition-opacity",
+          aboutNewClass,
+        ].join(" ")}
+      >
+        <div className="flex-row justify-around flex">
+          <About />
         </div>
       </div>
     </Fragment>
