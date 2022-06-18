@@ -860,7 +860,7 @@ export function* mint_pulses(
     allowedPulses[principal] = 0n;
     burnedPulses[principal] = 0n;
   }
-  if (allowedPulses[principal] < 100_000_000n) {
+  if (allowedPulses[principal] - burnedPulses[principal] < 100_000_000n) {
     allowedPulses[principal] += pulseCount;
     if (!getStable().totalPulses) getStable().totalPulses = 0n;
     getStable().totalPulses! += pulseCount;
