@@ -26,6 +26,15 @@ export interface MessageRegistryListItem {
   'key' : string,
   'value' : Array<Message>,
 }
+export interface Metadata {
+  'fee' : bigint,
+  'decimals' : number,
+  'owner' : Principal,
+  'logo' : string,
+  'name' : string,
+  'totalSupply' : bigint,
+  'symbol' : string,
+}
 export interface NameResult { 'name' : string }
 export type Operation = {
     'Burn' : { 'from' : Array<number>, 'amount' : Tokens }
@@ -86,6 +95,8 @@ export interface Transaction {
   'operation' : [] | [Operation],
   'created_at_time' : TimeStamp,
 }
+export type TransactionStatus = { 'failed' : null } |
+  { 'succeeded' : null };
 export interface TransferArgs {
   'to' : Array<number>,
   'fee' : Tokens,
@@ -105,6 +116,29 @@ export interface TransferFee { 'transfer_fee' : Tokens }
 export type TransferFeeArg = {};
 export type TransferResult = { 'Ok' : bigint } |
   { 'Err' : TransferError };
+export type TxReceipt = { 'Ok' : bigint } |
+  {
+    'Err' : { 'InsufficientAllowance' : null } |
+      { 'InsufficientBalance' : null } |
+      { 'ErrorOperationStyle' : null } |
+      { 'Unauthorized' : null } |
+      { 'LedgerTrap' : null } |
+      { 'ErrorTo' : null } |
+      { 'Other' : string } |
+      { 'BlockUsed' : null } |
+      { 'AmountTooSmall' : null }
+  };
+export interface TxRecord {
+  'op' : Operation,
+  'to' : Principal,
+  'fee' : bigint,
+  'status' : TransactionStatus,
+  'from' : Principal,
+  'timestamp' : bigint,
+  'caller' : Principal,
+  'index' : bigint,
+  'amount' : bigint,
+}
 export interface UpdateInfo {
   'owner' : Principal,
   'period' : [] | [bigint],
@@ -135,9 +169,22 @@ export interface _SERVICE {
     [Principal, number, number, number, number, string],
     number,
   >,
+  'allowance' : ActorMethod<[Principal, Principal], bigint>,
+  'approve' : ActorMethod<[Principal, bigint], TxReceipt>,
+  'balanceOf' : ActorMethod<[Principal], bigint>,
+  'burn' : ActorMethod<[Principal, bigint], TxReceipt>,
+  'decimals' : ActorMethod<[], number>,
   'getDisplayTime' : ActorMethod<[], string>,
+  'getMetadata' : ActorMethod<[], Metadata>,
   'getNow' : ActorMethod<[], bigint>,
   'getNowSeconds' : ActorMethod<[], number>,
+  'getTransaction' : ActorMethod<[bigint], TxRecord>,
+  'getTransactions' : ActorMethod<[bigint, bigint], Array<TxRecord>>,
+  'getUserTransactionAmount' : ActorMethod<[Principal], bigint>,
+  'getUserTransactions' : ActorMethod<
+    [Principal, bigint, bigint],
+    Array<TxRecord>,
+  >,
   'get_account_id' : ActorMethod<[], string>,
   'get_all' : ActorMethod<[], Array<UpdateInfo>>,
   'get_burned_pulses' : ActorMethod<[], bigint>,
@@ -154,19 +201,32 @@ export interface _SERVICE {
   'get_total_heartbeats' : ActorMethod<[], bigint>,
   'get_total_messages' : ActorMethod<[], bigint>,
   'get_total_pulses' : ActorMethod<[], bigint>,
+  'historySize' : ActorMethod<[], bigint>,
   'is_owner' : ActorMethod<[], boolean>,
+  'logo' : ActorMethod<[], string>,
+  'mint' : ActorMethod<[Principal, bigint], TxReceipt>,
   'mint_pulses' : ActorMethod<
     [bigint],
     { 'ok' : [] | [bigint], 'err' : [] | [string] },
   >,
   'mint_pulses_for' : ActorMethod<[bigint, Principal], bigint>,
+  'name' : ActorMethod<[], string>,
   'remove' : ActorMethod<[number], undefined>,
   'remove_message' : ActorMethod<[number], number>,
+  'setFee' : ActorMethod<[bigint], undefined>,
+  'setFeeTo' : ActorMethod<[Principal], undefined>,
+  'setLogo' : ActorMethod<[string], undefined>,
+  'setName' : ActorMethod<[string], undefined>,
+  'setOwner' : ActorMethod<[Principal], undefined>,
   'set_account_id' : ActorMethod<[string], string>,
   'set_check_cost' : ActorMethod<[bigint], bigint>,
   'set_owner' : ActorMethod<[Principal], Principal>,
   'set_pulse_cost' : ActorMethod<[bigint], bigint>,
   'set_pulse_price' : ActorMethod<[bigint], bigint>,
+  'symbol' : ActorMethod<[], string>,
+  'totalSupply' : ActorMethod<[], bigint>,
+  'transfer' : ActorMethod<[Principal, bigint], TxReceipt>,
+  'transferFrom' : ActorMethod<[Principal, Principal, bigint], TxReceipt>,
   'transfer_pulses' : ActorMethod<[bigint, Principal], bigint>,
   'whoami' : ActorMethod<[], Principal>,
 }

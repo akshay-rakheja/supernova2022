@@ -1,5 +1,5 @@
 Arguments: 
-  /Users/ray/.nvm/versions/node/v18.3.0/bin/node /usr/local/bin/yarn add @psychedelic/plug-connect
+  /Users/ray/.nvm/versions/node/v18.3.0/bin/node /usr/local/bin/yarn add @react-icons/fa
 
 PATH: 
   /Users/ray/.nvm/versions/node/v18.3.0/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/Apple/usr/bin:/Users/ray/.vscode-server/bin/4af164ea3a06f701fe3e89a2bcbb421d2026b68f/bin/remote-cli:/Users/ray/.nvm/versions/node/v18.3.0/bin:/Users/ray/.cargo/bin:/Users/ray/.fig/bin:/Users/ray/.local/bin
@@ -14,7 +14,7 @@ Platform:
   darwin x64
 
 Trace: 
-  Error: https://registry.yarnpkg.com/@psychedelic%2fplug-connect: Not found
+  Error: https://registry.yarnpkg.com/@react-icons%2ffa: Not found
       at params.callback [as _callback] (/usr/local/lib/node_modules/yarn/lib/cli.js:66988:18)
       at self.callback (/usr/local/lib/node_modules/yarn/lib/cli.js:140662:22)
       at Request.emit (node:events:527:28)
@@ -29,11 +29,13 @@ Trace:
 npm manifest: 
   {
     "scripts": {
-      "build": "(cd react && npm install && npm run build)",
-      "start": "(cd react && npm run start)",
+      "build": "(cd react && yarn && yarn build)",
+      "start": "(cd react && yarn start)",
       "deploy": "yarn rebuild && dfx deploy",
       "azle": "cd azle && npx azle",
-      "rebuild": "dfx canister create --all && dfx build && dfx generate && cp -r src/declarations react/src/"
+      "rebuild": "dfx canister create --all && dfx build && dfx generate && cp -r src/declarations react/src/",
+      "generate": "dfx generate heartbeat && cp -r src/declarations react/src/",
+      "postinstall": "(cd react && yarn) && (cd azle && yarn)"
     }
   }
 

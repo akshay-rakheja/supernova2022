@@ -123,7 +123,7 @@ export default function Main() {
                             <img
                               className="h-10 w-10 rounded-full"
                               src={Logo}
-                              alt="Workflow"
+                              alt="DeTi"
                             />
                           </Link>
                         </div>
@@ -240,8 +240,6 @@ export default function Main() {
                     {navigation.map((item) => (
                       <Disclosure.Button
                         key={item.name}
-                        as="a"
-                        href={item.href}
                         className={classNames(
                           item.current
                             ? "bg-gray-900 text-white"
@@ -250,7 +248,7 @@ export default function Main() {
                         )}
                         aria-current={item.current ? "page" : undefined}
                       >
-                        {item.name}
+                        <Link to={item.href}>{item.name}</Link>
                       </Disclosure.Button>
                     ))}
                   </div>

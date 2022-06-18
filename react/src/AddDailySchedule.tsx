@@ -61,7 +61,7 @@ export const AddDailySchedule: FC<{
         }
       }}
     >
-      {({ values, setFieldValue }) => (
+      {({ values, setFieldValue, isValid, isSubmitting }) => (
         <Form>
           <div className="space-y-8 divide-y divide-gray-200">
             <div className="pt-8">
@@ -161,6 +161,7 @@ export const AddDailySchedule: FC<{
               </button>
               <button
                 type="submit"
+                disabled={!isValid || isSubmitting}
                 className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
                 Submit

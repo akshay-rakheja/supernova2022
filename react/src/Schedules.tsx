@@ -1,15 +1,18 @@
 import { Principal } from "@dfinity/principal";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, Fragment } from "react";
 import { useTitle } from "./Main";
 import useHeartbeat from "./useHeartbeat";
 import { UpdateInfo } from "./declarations/heartbeat/heartbeat.did";
-import { ClockIcon } from "@heroicons/react/outline";
+import { ClockIcon, QuestionMarkCircleIcon } from "@heroicons/react/outline";
 import AddPeriod from "./AddPeriod";
 import AddDailySchedule from "./AddDailySchedule";
 import AddWeeklySchedule from "./AddWeeklySchedule";
 import AddMonthlySchedule from "./AddMonthlySchedule";
 import { toast } from "react-toastify";
+import ModalMD from "./ModalMD";
+import raw from "raw.macro";
+const markdown = raw("./schedules.md");
 const months = [
   "January",
   "February",
@@ -38,36 +41,46 @@ export function Canisters() {
     setTitle("My Schedules");
   }, [setTitle]);
   const heartbeat = useHeartbeat();
+  const [loading, setLoading] = useState(true);
   const [schedules, setSchedules] = useState<(UpdateInfo | undefined)[]>([]);
   const getSchedules = useCallback(async () => {
     if (!heartbeat) return;
-    const updates = await heartbeat?.get_all();
-    if (updates && updates.length) {
-      setSchedules(updates);
-    } else {
-      const count = await heartbeat?.get_count();
-      const newUpdates: (UpdateInfo | undefined)[] = [];
-      for (var x = 0; x < count; x++) {
-        try {
-          let newRecord = await heartbeat?.get_one(x);
-          newUpdates.push(newRecord);
-        } catch (e) {
-          newUpdates.push(undefined);
+    setLoading(true);
+    try {
+      const updates = await heartbeat?.get_all();
+      if (updates && updates.length) {
+        setSchedules(updates);
+      } else {
+        const count = await heartbeat?.get_count();
+        const newUpdates: (UpdateInfo | undefined)[] = [];
+        for (var x = 0; x < count; x++) {
+          try {
+            let newRecord = await heartbeat?.get_one(x);
+            newUpdates.push(newRecord);
+          } catch (e) {
+            newUpdates.push(undefined);
+          }
         }
+        setSchedules(newUpdates);
+
+        console.log("Hi there let's ahve some new schedules please", updates);
       }
-      setSchedules(newUpdates);
-      console.log("Hi there let's ahve some new schedules please", updates);
-    }
+    } catch (e) {}
+    setLoading(false);
   }, [heartbeat, setSchedules]);
   const removeSchedule = useCallback(
     async (index: number) => {
-      await heartbeat?.remove(index);
+      setLoading(true);
+      try {
+        await heartbeat?.remove(index);
+        toast(`Removed Schedule...`, {
+          type: "success",
+        });
 
-      toast(`Removed Schedule...`, {
-        type: "success",
-      });
-
-      await getSchedules();
+        await getSchedules();
+      } catch (e) {
+        setLoading(false);
+      }
     },
     [getSchedules, heartbeat]
   );
@@ -111,8 +124,16 @@ export function Canisters() {
     !showAddPeriod &&
     !showAddWeeklySchedule &&
     !showAddMonthlySchedule;
+  const [showHelp, setShowHelp] = useState(false);
   return (
     <div className="  overflow-hidden sm:rounded-md ">
+      <button
+        onClick={() => setShowHelp(true)}
+        className="rounded-lg bg-blue-500 dark:bg-blue-800 dark:bg-opacity-80 text-white p-2 m-2 hover:bg-blue-800 transition"
+      >
+        <QuestionMarkCircleIcon className="h-6 w-6 text-white mr-2 inline-block" />{" "}
+        Help
+      </button>
       {(showSchedules || showAddPeriod) && (
         <button
           className="rounded-lg bg-blue-500 dark:bg-blue-800 dark:bg-opacity-80 text-white p-2 m-2 hover:bg-blue-800 transition"
@@ -242,93 +263,140 @@ export function Canisters() {
       )}
       {showSchedules && (
         <div className="space-y-8 divide-y divide-gray-200 pt-8">
-          <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">
-            My Scheduled Events
-          </h3>
-          <ul role="list" className="divide-y divide-gray-200">
-            {schedules.map((updateInfo, index) => {
-              if (!updateInfo) return null;
-              const { canister, func, period, schedule } = updateInfo;
-              return (
-                <li key={index}>
-                  <div className="block  ">
+          {loading ? (
+            <Fragment>
+              <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100 animate-pulse">
+                <div className="h-2 bg-slate-700 rounded w-20" />
+              </h3>
+              <ul role="list" className="divide-y divide-gray-200 ">
+                <li>
+                  <div className="block hover:bg-gray-50 animate-pulse">
                     <div className="px-4 py-4 sm:px-6">
                       <div className="flex items-center justify-between">
-                        <p className="text-sm font-medium text-indigo-600 dark:text-indigo-100 truncate">
-                          {canister.toString()}
+                        <p className="text-sm font-medium text-indigo-600 truncate">
+                          <div className="h-2 bg-slate-700 rounded w-10" />
                         </p>
                         <div className="ml-2 flex-shrink-0 flex">
-                          <p className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-100">
-                            to function: {func}
+                          <p className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                            <div className="h-2 bg-slate-700 rounded w-20" />
                           </p>
                         </div>
                       </div>
                       <div className="mt-2 sm:flex sm:justify-between">
                         <div className="sm:flex">
-                          {!!period.length && (
-                            <p className="flex items-center text-sm text-gray-500">
-                              <ClockIcon
-                                className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
-                                aria-hidden="true"
-                              />
-                              Send every {Number(period)} seconds
+                          <p className="flex items-center text-sm text-gray-500">
+                            <ClockIcon
+                              className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
+                              aria-hidden="true"
+                            />
+                            <div className="h2- bg-slate-700 rounded w-20" />
+                          </p>
+                        </div>
+
+                        <div></div>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </Fragment>
+          ) : (
+            <Fragment>
+              <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">
+                My Scheduled Events
+              </h3>
+              <ul role="list" className="divide-y divide-gray-200">
+                {schedules.map((updateInfo, index) => {
+                  if (!updateInfo) return null;
+                  const { canister, func, period, schedule } = updateInfo;
+                  return (
+                    <li key={index}>
+                      <div className="block  ">
+                        <div className="px-4 py-4 sm:px-6">
+                          <div className="flex items-center justify-between">
+                            <p className="text-sm font-medium text-indigo-600 dark:text-indigo-100 truncate">
+                              {canister.toString()}
                             </p>
-                          )}
-                          {!!schedule.length &&
-                            (schedule[0].month.length ? (
-                              <p className="flex items-center text-sm text-gray-500">
-                                <ClockIcon
-                                  className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
-                                  aria-hidden="true"
-                                />
-                                Yearly on {schedule[0].dom}{" "}
-                                {getMonth(schedule[0].month[0])} at{" "}
-                                {schedule[0].hour}:
-                                {schedule[0].minute.toString().padStart(2, "0")}{" "}
-                                GMT
+                            <div className="ml-2 flex-shrink-0 flex">
+                              <p className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-100">
+                                to function: {func}
                               </p>
-                            ) : schedule[0].dom.length ? (
-                              <p className="flex items-center text-sm text-gray-500">
-                                <ClockIcon
-                                  className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
-                                  aria-hidden="true"
-                                />
-                                Monthly on day {schedule[0].dom} at{" "}
-                                {schedule[0].hour}:
-                                {schedule[0].minute.toString().padStart(2, "0")}{" "}
-                                GMT
-                              </p>
-                            ) : schedule[0].dow.length ? (
-                              <p className="flex items-center text-sm text-gray-500">
-                                <ClockIcon
-                                  className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
-                                  aria-hidden="true"
-                                />
-                                Weekly on {getDOW(schedule[0].dow[0])} at{" "}
-                                {schedule[0].hour}:
-                                {schedule[0].minute.toString().padStart(2, "0")}{" "}
-                                GMT
-                              </p>
-                            ) : (
-                              <p className="flex items-center text-sm text-gray-500">
-                                <ClockIcon
-                                  className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
-                                  aria-hidden="true"
-                                />
-                                Daily at {schedule[0].hour}:
-                                {schedule[0].minute.toString().padStart(2, "0")}{" "}
-                                GMT
-                              </p>
-                            ))}
-                          {/* <p className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 sm:ml-6">
+                            </div>
+                          </div>
+                          <div className="mt-2 sm:flex sm:justify-between">
+                            <div className="sm:flex">
+                              {!!period.length && (
+                                <p className="flex items-center text-sm text-gray-500">
+                                  <ClockIcon
+                                    className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
+                                    aria-hidden="true"
+                                  />
+                                  Send every {Number(period)} seconds
+                                </p>
+                              )}
+                              {!!schedule.length &&
+                                (schedule[0].month.length ? (
+                                  <p className="flex items-center text-sm text-gray-500">
+                                    <ClockIcon
+                                      className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
+                                      aria-hidden="true"
+                                    />
+                                    Yearly on {schedule[0].dom}{" "}
+                                    {getMonth(schedule[0].month[0])} at{" "}
+                                    {schedule[0].hour}:
+                                    {schedule[0].minute
+                                      .toString()
+                                      .padStart(2, "0")}{" "}
+                                    GMT
+                                  </p>
+                                ) : schedule[0].dom.length ? (
+                                  <p className="flex items-center text-sm text-gray-500">
+                                    <ClockIcon
+                                      className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
+                                      aria-hidden="true"
+                                    />
+                                    Monthly on day {schedule[0].dom} at{" "}
+                                    {schedule[0].hour}:
+                                    {schedule[0].minute
+                                      .toString()
+                                      .padStart(2, "0")}{" "}
+                                    GMT
+                                  </p>
+                                ) : schedule[0].dow.length ? (
+                                  <p className="flex items-center text-sm text-gray-500">
+                                    <ClockIcon
+                                      className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
+                                      aria-hidden="true"
+                                    />
+                                    Weekly on {getDOW(schedule[0].dow[0])} at{" "}
+                                    {schedule[0].hour}:
+                                    {schedule[0].minute
+                                      .toString()
+                                      .padStart(2, "0")}{" "}
+                                    GMT
+                                  </p>
+                                ) : (
+                                  <p className="flex items-center text-sm text-gray-500">
+                                    <ClockIcon
+                                      className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
+                                      aria-hidden="true"
+                                    />
+                                    Daily at {schedule[0].hour}:
+                                    {schedule[0].minute
+                                      .toString()
+                                      .padStart(2, "0")}{" "}
+                                    GMT
+                                  </p>
+                                ))}
+                              {/* <p className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 sm:ml-6">
                       <LocationMarkerIcon
                         className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
                         aria-hidden="true"
                       />
                       {position.location}
                     </p> */}
-                        </div>
-                        {/* <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
+                            </div>
+                            {/* <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
                     <CalendarIcon
                       className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
                       aria-hidden="true"
@@ -340,27 +408,30 @@ export function Canisters() {
                       </time>
                     </p>
                   </div> */}
-                        <div>
-                          <button
-                            onClick={() => {
-                              removeSchedule(index);
-                            }}
-                            className={
-                              "bg-red-500 hover:bg-red-900 transition duration-250 text-white p-2 rounded-md"
-                            }
-                          >
-                            Delete
-                          </button>
+                            <div>
+                              <button
+                                onClick={() => {
+                                  removeSchedule(index);
+                                }}
+                                className={
+                                  "bg-red-500 hover:bg-red-900 transition duration-250 text-white p-2 rounded-md"
+                                }
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
+                    </li>
+                  );
+                })}
+              </ul>
+            </Fragment>
+          )}
         </div>
       )}
+      <ModalMD show={showHelp} setShow={setShowHelp} markdown={markdown} />
     </div>
   );
 }
