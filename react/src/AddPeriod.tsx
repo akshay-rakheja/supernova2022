@@ -63,7 +63,8 @@ export const AddPeriod: FC<{
                   <Field
                     name="canister"
                     type="text"
-                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                    className="dark:bg-transparent dark:text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                    autoFocus
                   />
                   <ErrorMessage
                     component="div"
@@ -81,7 +82,7 @@ export const AddPeriod: FC<{
                   <Field
                     name="period"
                     type="number"
-                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                    className="dark:bg-transparent dark:text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
                   />
                   <ErrorMessage
                     component="div"
@@ -99,7 +100,7 @@ export const AddPeriod: FC<{
                   <Field
                     name="func"
                     type="text"
-                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                    className="dark:bg-transparent dark:text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
                   />
                   <ErrorMessage
                     component="div"
