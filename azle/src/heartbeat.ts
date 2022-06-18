@@ -775,8 +775,8 @@ export function init(): Init {
   // getStable().pulseLedgerList = [];
   // getStable().burnedPulsesList = [];
   lastTime = ic.time();
-  getStable().transactions = [];
   clearStableLists();
+  if (!getStable().transactions) getStable().transactions = [] as TxRecord[];
 }
 export function set_owner(newOwner: Principal): Update<Principal> {
   getStable().owner = newOwner;
@@ -1093,8 +1093,8 @@ export function approve(spender: Principal, value: nat): Update<TxReceipt> {
   return { Err: { ErrorOperationStyle: null } };
 }
 
-let logo_string = "💩";
-
+let logo_string =
+  "https://fl5mh-daaaa-aaaap-qalja-cai.raw.ic0.app/static/media/icon.f5b390e3d153e7f2a6c9.png";
 export function logo(): Query<string> {
   return logo_string;
 }
@@ -1271,11 +1271,12 @@ export function getUserTransactions(
 export function getUserTransactionAmount(who: Principal): Query<nat> {
   const transactions = getStable().transactions;
   let output: nat = 0n;
-  transactions.forEach(({ from, to }) => {
+  for (let x = 0; x < transactions.length; x++) {
+    const { from, to } = transactions[x];
     if (from == who || to == who) {
       output++;
     }
-  });
+  }
   return output;
 }
 
