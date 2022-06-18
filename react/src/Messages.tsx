@@ -114,7 +114,7 @@ export function Messages() {
           {loading ? (
             <Fragment>
               <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100 animate-pulse">
-                <div className="h-2 bg-slate-700 rounded w-20" />
+                <div className="h-4 bg-slate-700 rounded w-80" />
               </h3>
               <ul role="list" className="divide-y divide-gray-200 ">
                 <li>
@@ -122,11 +122,11 @@ export function Messages() {
                     <div className="px-4 py-4 sm:px-6">
                       <div className="flex items-center justify-between">
                         <p className="text-sm font-medium text-indigo-600 truncate">
-                          <div className="h-2 bg-slate-700 rounded w-10" />
+                          <div className="h-2 bg-slate-700 rounded w-60" />
                         </p>
                         <div className="ml-2 flex-shrink-0 flex">
                           <p className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                            <div className="h-2 bg-slate-700 rounded w-20" />
+                            <div className="h-2 bg-slate-700 rounded w-20 m-2" />
                           </p>
                         </div>
                       </div>
@@ -137,7 +137,36 @@ export function Messages() {
                               className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
                               aria-hidden="true"
                             />
-                            <div className="h2- bg-slate-700 rounded w-20" />
+                            <div className="h-2 bg-slate-700 rounded w-40" />
+                          </p>
+                        </div>
+
+                        <div></div>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <div className="block hover:bg-gray-50 animate-pulse">
+                    <div className="px-4 py-4 sm:px-6">
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm font-medium text-indigo-600 truncate">
+                          <div className="h-2 bg-slate-700 rounded w-60" />
+                        </p>
+                        <div className="ml-2 flex-shrink-0 flex">
+                          <p className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                            <div className="h-2 bg-slate-700 rounded w-20 m-2" />
+                          </p>
+                        </div>
+                      </div>
+                      <div className="mt-2 sm:flex sm:justify-between">
+                        <div className="sm:flex">
+                          <p className="flex items-center text-sm text-gray-500">
+                            <ClockIcon
+                              className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
+                              aria-hidden="true"
+                            />
+                            <div className="h-2 bg-slate-700 rounded w-40" />
                           </p>
                         </div>
 
