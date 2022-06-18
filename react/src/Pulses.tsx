@@ -12,7 +12,7 @@ const Pulses: FC = () => {
   const heartbeat = useHeartbeat();
   useEffect(() => {
     (async () => {
-      if (heartbeat) setPulses(await heartbeat?.get_pulses());
+      if (heartbeat) setPulses(await heartbeat?.myBalance());
     })();
   }, [heartbeat]);
   useEffect(() => {
@@ -22,7 +22,7 @@ const Pulses: FC = () => {
   useEffect(() => {
     if (interval.current) clearInterval(interval.current);
     interval.current = setInterval(async () => {
-      if (heartbeat) setPulses(await heartbeat?.get_pulses());
+      if (heartbeat) setPulses(await heartbeat?.myBalance());
     }, 2000);
     return () => {
       clearInterval(interval.current);

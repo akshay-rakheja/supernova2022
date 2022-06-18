@@ -190,8 +190,6 @@ service: () -> {
     "get_pulse_price": () -> (nat) query;
     "get_account_id": () -> (text) query;
     "get_burned_pulses": () -> (nat) query;
-    "get_pulses": () -> (nat) query;
-    "get_pulses_for": (principal) -> (nat) query;
     "getDisplayTime": () -> (text) query;
     "getNow": () -> (nat) query;
     "getNowSeconds": () -> (nat32) query;
@@ -205,6 +203,7 @@ service: () -> {
     "symbol": () -> (text) query;
     "decimals": () -> (nat8) query;
     "totalSupply": () -> (nat) query;
+    "myBalance": () -> (nat) query;
     "balanceOf": (principal) -> (nat) query;
     "allowance": (principal, principal) -> (nat) query;
     "getMetadata": () -> (Metadata) query;

@@ -80,6 +80,7 @@ type StableStore = Stable<{
   totalPulses: Opt<nat>;
   totalBurnedPulses: Opt<nat>;
   upgradeLists: StableLists;
+  transactions: TxRecord[];
 }>;
 
 function getStableLists() {
@@ -774,6 +775,7 @@ export function init(): Init {
   // getStable().pulseLedgerList = [];
   // getStable().burnedPulsesList = [];
   lastTime = ic.time();
+  getStable().transactions = [];
   clearStableLists();
 }
 export function set_owner(newOwner: Principal): Update<Principal> {
@@ -893,18 +895,33 @@ function _get_pulses(principal: Principal): nat {
   } else return 0n;
 }
 
-export function get_pulses(): Query<nat> {
-  const principal = ic.caller();
-  return _get_pulses(principal);
-}
+// export function get_pulses(): Query<nat> {
+//   const principal = ic.caller();
+//   return _get_pulses(principal);
+// }
 
-export function get_pulses_for(principal: Principal): Query<nat> {
-  return _get_pulses(principal);
-}
+// export function get_pulses_for(principal: Principal): Query<nat> {
+//   return _get_pulses(principal);
+// }
 
-function _transfer_pulses(from: Principal, to: Principal, pulseCount: nat) {
+function _transfer_pulses(
+  from: Principal,
+  to: Principal,
+  pulseCount: nat
+): nat {
   if (pulseCount > _get_pulses(from)) {
-    throw new Error("you don't have that many pulses available");
+    getStable().transactions.push({
+      amount: pulseCount,
+      caller: from,
+      from,
+      to,
+      fee: 0n,
+      index: BigInt(getStable().transactions.length),
+      op: { transfer: null },
+      status: { failed: null },
+      timestamp: ic.time(),
+    });
+    return 0n;
   }
   if (!allowedPulses[to]) {
     allowedPulses[to] = 0n;
@@ -912,7 +929,18 @@ function _transfer_pulses(from: Principal, to: Principal, pulseCount: nat) {
   }
   allowedPulses[from] -= pulseCount;
   allowedPulses[to] += pulseCount;
-  return allowedPulses[from];
+  getStable().transactions.push({
+    amount: pulseCount,
+    caller: from,
+    from,
+    to,
+    fee: 0n,
+    index: BigInt(getStable().transactions.length),
+    op: { transfer: null },
+    status: { succeeded: null },
+    timestamp: ic.time(),
+  });
+  return pulseCount;
 }
 
 export function transfer_pulses(pulseCount: nat, to: Principal): Update<nat> {
@@ -1106,6 +1134,11 @@ export function totalSupply(): Query<nat> {
   return getStable().totalPulses || 0n;
 }
 
+export function myBalance(): Query<nat> {
+  const who = ic.caller();
+  return allowedPulses[who] - burnedPulses[who] || 0n;
+}
+
 export function balanceOf(who: Principal): Query<nat> {
   return allowedPulses[who] - burnedPulses[who] || 0n;
 }
@@ -1212,28 +1245,52 @@ type TxRecord = {
   status: TransactionStatus;
 };
 
-// @TODO: implement this
 export function getTransaction(index: nat): Query<TxRecord> {
-  throw new Error("Not implemented");
+  const index32 = Number(index);
+  return getStable().transactions[index32];
 }
 
-// @TODO: implement this
 export function getTransactions(start: nat, limit: nat): Query<TxRecord[]> {
-  throw new Error("Not implemented");
+  const start32 = Number(start);
+  const limit32 = Number(limit);
+  const output: TxRecord[] = [];
+  const transactions = getStable().transactions;
+  for (let x = 0; x < limit32; x++) {
+    const index = start32 + x;
+    if (x < transactions.length) output.push(transactions[index]);
+  }
+  return transactions;
 }
 
-// @TODO: implement this
 export function getUserTransactions(
   who: Principal,
   start: nat,
   limit: nat
 ): Query<TxRecord[]> {
-  throw new Error("Not implemented");
+  const start32 = Number(start);
+  const limit32 = Number(limit);
+  const output: TxRecord[] = [];
+  const transactions = getStable().transactions;
+  for (let x = 0; x < limit32; x++) {
+    const index = start32 + x;
+    if (
+      (x < transactions.length && transactions[index].from == who) ||
+      transactions[index].to == who
+    )
+      output.push(transactions[index]);
+  }
+  return transactions;
 }
 
-// @TODO: implement this
 export function getUserTransactionAmount(who: Principal): Query<nat> {
-  throw new Error("Not implemented");
+  const transactions = getStable().transactions;
+  let output: nat = 0n;
+  transactions.forEach(({ from, to }) => {
+    if (from == who || to == who) {
+      output++;
+    }
+  });
+  return output;
 }
 
 //#endregion

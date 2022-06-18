@@ -26,12 +26,12 @@ export default function Main() {
   const intervalRef = useRef<NodeJS.Timer>();
   useEffect(() => {
     (async () => {
-      const pulses = await heartbeat?.get_pulses();
+      const pulses = await heartbeat?.myBalance();
       setPulses(pulses || BigInt(0));
     })();
     if (intervalRef.current) clearInterval(intervalRef.current);
     intervalRef.current = setInterval(async () => {
-      const pulses = await heartbeat?.get_pulses();
+      const pulses = await heartbeat?.myBalance();
       setPulses(pulses || BigInt(0));
     }, 2000);
   }, [heartbeat]);
