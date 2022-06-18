@@ -6,7 +6,7 @@
     "deploy": "yarn rebuild && dfx deploy",
     "azle": "cd azle && npx azle",
     "rebuild": "dfx canister create --all && dfx build && dfx generate && cp -r src/declarations react/src/ && cp -r src/declarations react-ticker/src/",
-    "generate": "dfx generate heartbeat && cp -r src/declarations react/src/ && cp -r src/declarations react-ticker/src/",
+    "generate": "dfx generate heartbeat && dfx generate ticker2 && cp -r src/declarations react/src/ && cp -r src/declarations react-ticker/src/",
     "postinstall": "(cd react && yarn) && (cd azle && yarn)"
   },
   "dependencies": {}
