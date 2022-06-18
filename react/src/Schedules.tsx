@@ -72,6 +72,10 @@ export function Canisters() {
       //   old[index] = null;
       //   return [...old];
       // });
+      toast(`Removed Schedule...`, {
+        type: "success",
+      });
+
       await getSchedules();
     },
     [getSchedules, heartbeat]
