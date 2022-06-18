@@ -1,4 +1,8 @@
 service: {
     "count": () -> (int) query;
+    "count_counter2": () -> (int) query;
+    "count_counter3": () -> (int) query;
     "tick2": () -> (int);
+    "counter2_tick": () -> (int);
+    "counter3_tick": () -> (int);
 }
