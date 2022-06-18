@@ -1,12 +1,7 @@
 import { Principal } from "@dfinity/principal";
-import {
-  CalendarIcon,
-  LocationMarkerIcon,
-  UsersIcon,
-} from "@heroicons/react/solid";
-import { useEffect, useState, useCallback, Fragment } from "react";
+
+import { useEffect, useState, useCallback } from "react";
 import { useTitle } from "./Main";
-import { usePlug } from "@raydeck/useplug";
 import useHeartbeat from "./useHeartbeat";
 import { UpdateInfo } from "./declarations/heartbeat/heartbeat.did";
 import { ClockIcon } from "@heroicons/react/outline";
@@ -43,7 +38,6 @@ export function Canisters() {
     setTitle("My Schedules");
   }, [setTitle]);
   const heartbeat = useHeartbeat();
-  const { principal } = usePlug();
   const [schedules, setSchedules] = useState<(UpdateInfo | undefined)[]>([]);
   const getSchedules = useCallback(async () => {
     if (!heartbeat) return;
@@ -68,10 +62,7 @@ export function Canisters() {
   const removeSchedule = useCallback(
     async (index: number) => {
       await heartbeat?.remove(index);
-      // setSchedules((old) => {
-      //   old[index] = null;
-      //   return [...old];
-      // });
+
       toast(`Removed Schedule...`, {
         type: "success",
       });
@@ -124,7 +115,7 @@ export function Canisters() {
     <div className="  overflow-hidden sm:rounded-md ">
       {(showSchedules || showAddPeriod) && (
         <button
-          className="rounded-lg bg-blue-500 text-white p-2 m-2 hover:bg-blue-800 transition"
+          className="rounded-lg bg-blue-500 dark:bg-blue-800 dark:bg-opacity-80 text-white p-2 m-2 hover:bg-blue-800 transition"
           onClick={() => {
             setShowAddPeriod((old) => !old);
           }}
@@ -134,7 +125,7 @@ export function Canisters() {
       )}
       {(showSchedules || showAddDailySchedule) && (
         <button
-          className="rounded-lg bg-blue-500 text-white p-2 m-2 hover:bg-blue-800 transition"
+          className="rounded-lg bg-blue-500 dark:bg-blue-800 dark:bg-opacity-80 text-white p-2 m-2 hover:bg-blue-800 transition"
           onClick={() => {
             setShowAddDailySchedule((old) => !old);
           }}
@@ -144,7 +135,7 @@ export function Canisters() {
       )}
       {(showSchedules || showAddWeeklySchedule) && (
         <button
-          className="rounded-lg bg-blue-500 text-white p-2 m-2 hover:bg-blue-800 transition"
+          className="rounded-lg bg-blue-500 dark:bg-blue-800 dark:bg-opacity-80 text-white p-2 m-2 hover:bg-blue-800 transition"
           onClick={() => {
             setShowAddWeeklySchedule((old) => !old);
           }}
@@ -154,7 +145,7 @@ export function Canisters() {
       )}
       {(showSchedules || showAddMonthlySchedule) && (
         <button
-          className="rounded-lg bg-blue-500 text-white p-2 m-2 hover:bg-blue-800 transition"
+          className="rounded-lg bg-blue-500 dark:bg-blue-800 dark:bg-opacity-80 text-white p-2 m-2 hover:bg-blue-800 transition"
           onClick={() => {
             setShowMonthlySchedule((old) => !old);
           }}

@@ -6,7 +6,7 @@ import { _SERVICE } from "./declarations/heartbeat/heartbeat.did";
 import { createActor } from "./declarations/heartbeat";
 import { FaGithub } from "react-icons/fa";
 import config from "./config.json";
-import { ArrowUpIcon } from "@heroicons/react/outline";
+import { ArrowUpIcon, QuestionMarkCircleIcon } from "@heroicons/react/outline";
 import About from "./About";
 const {
   host,
@@ -30,7 +30,18 @@ export const LoggedOut: FC = () => {
   const [newClass, setNewClass] = useState("");
   const [plugNewClass, setPlugNewClass] = useState("opacity-0");
   const [iconNewClass, setIconNewClass] = useState("text-black");
-  const [aboutNewClass, setAboutNewClass] = useState("");
+  const [aboutNewClass, setAboutNewClass] = useState("hidden");
+
+  const showAbout = useCallback(() => {
+    console.log("Hello!!!");
+    setAboutNewClass(" visible opacity-0 ");
+    setTimeout(() => {
+      setAboutNewClass("visible opacity-100");
+    }, 50);
+  }, []);
+  const hideAbout = useCallback(() => {
+    setAboutNewClass("hidden opacity-0");
+  }, []);
   const actor = useHeartbeat();
   const getStats = useCallback(async () => {
     if (actor) {
@@ -125,6 +136,21 @@ export const LoggedOut: FC = () => {
               </div>
             </div>
           </div>
+          <div></div>
+          <div></div>
+          <div className="flex justify-around w-full flex-row">
+            <div className="flex">
+              <button
+                className="bg-black bg-opacity-80 border-2 border-orange-500 text-md font-medium text-white p-2 rounded-full"
+                onClick={showAbout}
+              >
+                <div className="flex flex-row">
+                  <QuestionMarkCircleIcon className="h-6 w-6 mr-2" />
+                  About This Service
+                </div>
+              </button>
+            </div>
+          </div>
           <div className="flex justify-around w-full flex-row"></div>
           <div className="flex justify-around  flex-row  ">
             <Stats
@@ -136,12 +162,13 @@ export const LoggedOut: FC = () => {
         </div>
       </div>
       <div
+        onClick={hideAbout}
         className={[
-          "flex-col justify-around absolute flex h-screen w-screen bg-white dark:bg-black bg-opacity-80 hidden transition transition-opacity",
+          "pointer flex-col justify-around absolute flex h-screen w-screen bg-white dark:bg-black dark:bg-opacity-80 transition transition-opacity",
           aboutNewClass,
         ].join(" ")}
       >
-        <div className="flex-row justify-around flex">
+        <div className="flex-row justify-around flex max-h-screen">
           <About />
         </div>
       </div>

@@ -55,14 +55,9 @@ export default function Main() {
     },
     {
       name:
-        "Buy Pulses (Account: " +
-        (Number(pulses) / 10_000_000).toFixed(7) +
-        ")",
+        "Pulses (Account: " + (Number(pulses) / 10_000_000).toFixed(7) + ")",
       href: "/pulses",
       current: path.pathname.startsWith("/pulses"),
-      onClick: async () => {
-        if (heartbeat) await heartbeat.mint_pulses(BigInt(1_000_000_000));
-      },
     },
   ];
   const userNavigation = [
@@ -134,37 +129,34 @@ export default function Main() {
                         </div>
                         <div className="hidden md:block">
                           <div className="ml-10 flex items-baseline space-x-4">
-                            {navigation.map((item) =>
-                              item.onClick ? (
-                                <button
-                                  onClick={item.onClick}
-                                  className={classNames(
-                                    item.current
-                                      ? "bg-gray-900 text-white"
-                                      : "text-gray-300 hover:bg-gray-700 hover:text-white",
-                                    "px-3 py-2 rounded-md text-sm font-medium"
-                                  )}
-                                >
-                                  {item.name}
-                                </button>
-                              ) : (
-                                <Link
-                                  key={item.name}
-                                  to={item.href}
-                                  className={classNames(
-                                    item.current
-                                      ? "bg-gray-900 text-white"
-                                      : "text-gray-300 hover:bg-gray-700 hover:text-white",
-                                    "px-3 py-2 rounded-md text-sm font-medium"
-                                  )}
-                                  aria-current={
-                                    item.current ? "page" : undefined
-                                  }
-                                >
-                                  {item.name}
-                                </Link>
-                              )
-                            )}
+                            {navigation.map((item) => (
+                              // item.onClick ? (
+                              //   <button
+                              //     onClick={item.onClick}
+                              //     className={classNames(
+                              //       item.current
+                              //         ? "bg-gray-900 text-white"
+                              //         : "text-gray-300 hover:bg-gray-700 hover:text-white",
+                              //       "px-3 py-2 rounded-md text-sm font-medium"
+                              //     )}
+                              //   >
+                              //     {item.name}
+                              //   </button>
+                              // ) :
+                              <Link
+                                key={item.name}
+                                to={item.href}
+                                className={classNames(
+                                  item.current
+                                    ? "bg-gray-900 text-white"
+                                    : "text-gray-300 hover:bg-gray-700 hover:text-white",
+                                  "px-3 py-2 rounded-md text-sm font-medium"
+                                )}
+                                aria-current={item.current ? "page" : undefined}
+                              >
+                                {item.name}
+                              </Link>
+                            ))}
                           </div>
                         </div>
                       </div>

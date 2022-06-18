@@ -6,6 +6,16 @@ const Pulses: FC = () => {
   useEffect(() => {
     setTitle("Pulses");
   }, [setTitle]);
-  return <div>Helloooooooo</div>;
+  return (
+    <div>
+      <button className="rounded-lg bg-blue-500 dark:bg-blue-800 dark:bg-opacity-80 text-white p-2 m-2 hover:bg-blue-800 transition">
+        Buy Pulses
+      </button>
+
+      <button className="rounded-lg bg-blue-500 dark:bg-blue-800 dark:bg-opacity-80 text-white p-2 m-2 hover:bg-blue-800 transition">
+        Send Pulses to
+      </button>
+    </div>
+  );
 };
 export default Pulses;

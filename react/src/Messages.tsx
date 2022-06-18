@@ -64,7 +64,7 @@ export function Messages() {
     <div className=" overflow-hidden sm:rounded-md ">
       {(showMessages || showAddMessage) && (
         <button
-          className="rounded-lg bg-blue-500 text-white p-2 m-2 hover:bg-blue-800 transition"
+          className="rounded-lg bg-blue-500 dark:bg-blue-800 dark:bg-opacity-80 text-white p-2 m-2 hover:bg-blue-800 transition"
           onClick={() => {
             setShowAddMessage((old) => !old);
           }}
