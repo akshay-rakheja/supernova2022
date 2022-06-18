@@ -13,6 +13,7 @@ import {
   Stable,
   PreUpgrade,
   PostUpgrade,
+  Variant,
 } from "azle";
 import { Ledger } from "azle/canisters/ledger";
 
@@ -905,8 +906,7 @@ export function get_burned_pulses(): Query<nat> {
   return burnedPulses[principal];
 }
 
-export function get_pulses(): Query<nat> {
-  const principal = ic.caller();
+function _get_pulses(principal: Principal): nat {
   if (allowedPulses[principal]) {
     if (burnedPulses[principal]) {
       return allowedPulses[principal] - burnedPulses[principal];
@@ -914,30 +914,34 @@ export function get_pulses(): Query<nat> {
       return allowedPulses[principal];
     }
   } else return 0n;
+}
+
+export function get_pulses(): Query<nat> {
+  const principal = ic.caller();
+  return _get_pulses(principal);
 }
 
 export function get_pulses_for(principal: Principal): Query<nat> {
-  if (allowedPulses[principal]) {
-    if (burnedPulses[principal]) {
-      return allowedPulses[principal] - burnedPulses[principal];
-    } else {
-      return allowedPulses[principal];
-    }
-  } else return 0n;
+  return _get_pulses(principal);
 }
 
-export function transfer_pulses(pulseCount: nat, to: Principal): Update<nat> {
-  const principal = ic.caller();
-  if (pulseCount > allowedPulses[principal] - burnedPulses[principal]) {
+function _transfer_pulses(from: Principal, to: Principal, pulseCount: nat){
+  if (pulseCount > _get_pulses(from)) {
     throw new Error("you don't have that many pulses available");
   }
   if (!allowedPulses[to]) {
     allowedPulses[to] = 0n;
     burnedPulses[to] = 0n;
   }
-  allowedPulses[principal] -= pulseCount;
+  allowedPulses[from] -= pulseCount;
   allowedPulses[to] += pulseCount;
-  return allowedPulses[principal];
+  return allowedPulses[from];
+}
+
+
+export function transfer_pulses(pulseCount: nat, to: Principal): Update<nat> {
+  const principal = ic.caller();
+  return _transfer_pulses(principal, to, pulseCount);
 }
 
 //#region Interface for current time utility functions
@@ -1060,3 +1064,210 @@ export function get_total_burned_pulses(): Query<nat> {
 export function get_total_pulses(): Query<nat> {
   return getStable().totalPulses || 0n;
 }
+
+
+
+//#region DIP20
+
+type TxReceipt=Variant<{
+
+  Ok: nat;
+  Err:Variant<{
+    InsufficientAllowance: null;
+    InsufficientBalance: null;
+    ErrorOperationStyle: null;
+    Unauthorized: null;
+    LedgerTrap: null;
+    ErrorTo:null;
+    Other: string;
+    BlockUsed: null;
+    AmountTooSmall: null;
+  }>
+}>
+
+export function transfer(to: Principal, value: nat): Update<TxReceipt> {
+  const from = ic.caller();
+  if (from === to) return { Err: { ErrorTo: null } };
+  _transfer_pulses(from, to, value);
+  return {Ok: value};
+}
+
+
+// @TODO: Implement this 
+export function transferFrom(from: Principal, to: Principal, value: nat): Update<TxReceipt> {
+  const owner = ic.caller();
+  if(from != owner) return {Err: {Unauthorized: null}};
+  if (from === to) return { Err: { ErrorTo: null } };
+  _transfer_pulses(from, to, value);
+  return {Ok: value};
+}
+
+
+// @TODO: Implement this
+export function approve(spender: Principal, value: nat): Update<TxReceipt> {
+
+  return {Err: {ErrorOperationStyle: null}}
+}
+
+let logo_string = "💩"
+
+export function logo(): Query<string> {
+  return logo_string;
+}
+
+let name_string = "Pulses"
+export function name(): Query<string> {
+  return name_string;
+}
+
+let symbol_string = "DETI"
+
+export function symbol(): Query<string> {
+  return symbol_string;
+}
+
+let decimals_number = 8
+
+export function decimals(): Query<nat8> {
+return decimals_number;
+
+}
+
+export function totalSupply(): Query<nat> {
+  return getStable().totalPulses || 0n;
+}
+
+export function balanceOf(who: Principal): Query<nat> {
+  return allowedPulses[who]- burnedPulses[who] || 0n;
+}
+
+// @TODO: implement this
+export function allowance(owner: Principal, spender: Principal): Query<nat> {
+  return 0n;
+}
+
+type Metadata = {
+    logo : string; // base64 encoded logo or logo url
+    name : string; // token name
+    symbol : string; // token symbol
+    decimals : nat8; // token decimal
+    totalSupply : nat; // token total supply
+    owner : Principal; // token owner
+    fee : nat; // fee for update calls
+}
+
+export function getMetadata(): Query<Metadata> {
+
+  const metadata : Metadata ={
+    logo: logo_string,
+    name: name_string,
+    symbol: symbol_string,
+    decimals: decimals_number,
+    totalSupply: getStable().totalPulses || 0n,
+    owner: getStable().owner,
+    fee: 0n,
+  }
+  return metadata;
+}
+
+// @TODO: implement this
+export function mint(to: Principal, value: nat): Update<TxReceipt> {
+  const owner = ic.caller();
+  if (owner !== getStable().owner) return {Err: {Unauthorized: null}};
+  return {Err: {Other: "We dont do that here!"}};
+}
+
+// @TODO: implement this
+export function burn(from: Principal, value: nat): Update<TxReceipt> {
+  const owner = ic.caller();
+  return{Err: {Other: "We dont do that here!"}};
+}
+ 
+export function setName(name: string): Update<void> {
+  const owner = ic.caller();
+  if (owner !== getStable().owner) return;
+  name_string = name;
+}
+
+export function setLogo(logo: string): Update<void> {
+  const owner = ic.caller();
+  if (owner !== getStable().owner) return;
+  logo_string = logo;
+}
+
+// @TODO: implement this
+export function setFee(newFee: nat): Update<void> {
+  const owner = ic.caller();
+  if (owner !== getStable().owner) return;
+  return;
+}
+
+// @TODO: implement this
+export function setFeeTo(newFeeTo: Principal): Update<void> {
+  const owner = ic.caller();
+  if (owner !== getStable().owner) return;
+  return;
+}
+
+
+export function setOwner(newOwner: Principal): Update<void> {
+  const owner = ic.caller();
+  if (owner !== getStable().owner) return;
+  getStable().owner = newOwner;
+
+}
+
+// @TODO: implement this
+export function historySize(): Query<nat> {
+  return 0n
+}
+
+type Operation = Variant<{
+    approve: null
+    mint: null
+    transfer: null
+    transferFrom: null  
+}>
+
+type TransactionStatus = Variant<{
+    succeeded: null
+    failed: null
+}>
+
+type TxRecord = {
+    caller: Principal;
+    op: Operation; // operation type
+    index: nat; // transaction index
+    from: Principal;
+    to: Principal;
+    amount: nat;
+    fee: nat;
+    timestamp: nat;
+    status: TransactionStatus;
+};
+
+
+// @TODO: implement this
+export function getTransaction(index: nat): Query<TxRecord> {
+  throw new Error("Not implemented");
+}
+
+// @TODO: implement this
+export function getTransactions(start: nat, limit: nat): Query<TxRecord[]> {
+  throw new Error("Not implemented");
+}
+
+
+// @TODO: implement this
+export function getUserTransactions(who: Principal, start: nat, limit: nat): Query<TxRecord[]> {
+  throw new Error("Not implemented");
+}
+
+
+// @TODO: implement this
+export function getUserTransactionAmount(who: Principal): Query<nat> {
+  throw new Error("Not implemented");
+}
+
+
+//#endregion
