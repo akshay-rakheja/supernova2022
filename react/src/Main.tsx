@@ -61,9 +61,14 @@ export default function Main() {
       current: path.pathname.startsWith("/messages"),
     },
     {
-      name: "DETI Tokens (" + (Number(pulses) / 10_000_000).toFixed(7) + ")",
+      name:
+        "DETI Tokens (" +
+        (Number(pulses) / 10_000_000).toFixed(7) +
+        ")" +
+        (pulses && pulses < BigInt(10_000_000) ? " - Running Low!" : ""),
       href: "/tokens",
       current: path.pathname.startsWith("/tokens"),
+      className: pulses < BigInt(10_000_000) ? " bg-red-800" : "",
     },
   ];
   const userNavigation = [
@@ -156,7 +161,8 @@ export default function Main() {
                                   item.current
                                     ? "bg-gray-900 text-white"
                                     : "text-gray-300 hover:bg-gray-700 hover:text-white",
-                                  "px-3 py-2 rounded-md text-sm font-medium"
+                                  "px-3 py-2 rounded-md text-sm font-medium " +
+                                    item.className
                                 )}
                                 aria-current={item.current ? "page" : undefined}
                               >

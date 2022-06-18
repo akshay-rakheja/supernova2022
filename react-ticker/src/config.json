@@ -1,5 +1,5 @@
 {
-  "mode": "local",
+  "mode": "production",
   "production": {
     "host": "https://ic0.app",
     "canisters": {

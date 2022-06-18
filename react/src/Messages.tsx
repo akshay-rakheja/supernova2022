@@ -40,8 +40,8 @@ export function Messages() {
         }
       }
       setMessages(newUpdates);
-      setLoading(false);
     }
+    setLoading(false);
   }, [heartbeat, setMessages]);
   const removeMessage = useCallback(
     async (index: number) => {

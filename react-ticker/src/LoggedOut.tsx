@@ -163,6 +163,7 @@ const Stats: FC<{
       stat: counter1.toLocaleString(),
       clipboardText: "tick2",
       onClick: () => {
+        toast("Resetting counter to 0");
         if (actor) actor.reset();
       },
     },
@@ -171,6 +172,7 @@ const Stats: FC<{
       stat: counter2.toLocaleString(),
       clipboardText: "counter2_tick",
       onClick: () => {
+        toast("Resetting counter2 to 0");
         if (actor) actor.counter2_reset();
       },
     },
@@ -179,6 +181,7 @@ const Stats: FC<{
       stat: counter3.toLocaleString(),
       clipboardText: "counter3_tick",
       onClick: () => {
+        toast("Resetting counter3 to 0");
         if (actor) actor.counter3_reset();
       },
     },
