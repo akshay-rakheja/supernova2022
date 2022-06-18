@@ -79,12 +79,6 @@ type StableStore = Stable<{
   totalHeartbeats: Opt<nat>;
   totalPulses: Opt<nat>;
   totalBurnedPulses: Opt<nat>;
-  // registryList: RegistryListItem[];
-  // messageRegistryList: MessageRegistryListItem[];
-  // allowedPulsesList: AllowedPulsesListItem[];
-  // pulseLedgerList: PulseLedgerListItem[];
-  // burnedPulsesList: BurnedPulsesListItem[];
-  // lastUpdatedList: LastUpdatedListItem[];
   upgradeLists: StableLists;
 }>;
 
@@ -129,14 +123,9 @@ let pulseLedger: PulseLedger = {};
 let lastUpdate: LastUpdateRegistry = {};
 
 export function preUpgrade(): PreUpgrade {
-  console.log("startup repupgrade2");
-  console.log("and again");
-
   let keys: string[];
   clearStableLists();
   const lists = getStableLists();
-  console.log("I got the lists in lists");
-  console.log(lists);
 
   if (registry) {
     keys = Object.keys(registry);
@@ -146,11 +135,6 @@ export function preUpgrade(): PreUpgrade {
     }));
   } else lists.registryList = [];
   const r = lists.registryList;
-  if (r) {
-    console.log("Registrylist is now", r.length);
-  } else {
-    console.log("R is nothing");
-  }
 
   if (messageRegistry) {
     keys = Object.keys(messageRegistry);
@@ -188,19 +172,12 @@ export function preUpgrade(): PreUpgrade {
     }));
   }
   setStableLists(lists);
-  console.log("And now my watch has ended");
 }
 
 export function postUpgrade(): PostUpgrade {
   console.log("Starting postupgrade");
   const lists = getStableLists();
-  console.log("Regsitrylist before all this nonsense is", lists.registryList);
   if (lists.registryList) {
-    console.log(
-      "Registrylist before I start pulling from it is",
-      lists.registryList
-    );
-
     for (let index of lists.registryList!) {
       registry[index.key] = index.value;
     }
@@ -925,7 +902,7 @@ export function get_pulses_for(principal: Principal): Query<nat> {
   return _get_pulses(principal);
 }
 
-function _transfer_pulses(from: Principal, to: Principal, pulseCount: nat){
+function _transfer_pulses(from: Principal, to: Principal, pulseCount: nat) {
   if (pulseCount > _get_pulses(from)) {
     throw new Error("you don't have that many pulses available");
   }
@@ -937,7 +914,6 @@ function _transfer_pulses(from: Principal, to: Principal, pulseCount: nat){
   allowedPulses[to] += pulseCount;
   return allowedPulses[from];
 }
-
 
 export function transfer_pulses(pulseCount: nat, to: Principal): Update<nat> {
   const principal = ic.caller();
@@ -969,7 +945,6 @@ export function getNowSeconds(): Query<nat32> {
 export function* heartbeat(): Heartbeat {
   const start = ic.time();
   if (shouldTick()) {
-    console.log("Should tick");
     if (!getStable().totalHeartbeats) getStable().totalHeartbeats = 0n;
     getStable().totalHeartbeats!++;
     lastTime = ic.time();
@@ -982,10 +957,7 @@ export function* heartbeat(): Heartbeat {
       for (let index = 0; index < registry[owner].length; index++) {
         console.log("Looking at index in registry", index);
         if (registry[owner][index] === null) continue;
-        console.log(
-          "I guess I decided this isn't null",
-          registry[owner][index]
-        );
+
         const updateInfo = registry[owner][index];
         const {
           period: thisPeriod,
@@ -1065,72 +1037,69 @@ export function get_total_pulses(): Query<nat> {
   return getStable().totalPulses || 0n;
 }
 
-
-
 //#region DIP20
 
-type TxReceipt=Variant<{
-
+type TxReceipt = Variant<{
   Ok: nat;
-  Err:Variant<{
+  Err: Variant<{
     InsufficientAllowance: null;
     InsufficientBalance: null;
     ErrorOperationStyle: null;
     Unauthorized: null;
     LedgerTrap: null;
-    ErrorTo:null;
+    ErrorTo: null;
     Other: string;
     BlockUsed: null;
     AmountTooSmall: null;
-  }>
-}>
+  }>;
+}>;
 
 export function transfer(to: Principal, value: nat): Update<TxReceipt> {
   const from = ic.caller();
   if (from === to) return { Err: { ErrorTo: null } };
   _transfer_pulses(from, to, value);
-  return {Ok: value};
+  return { Ok: value };
 }
 
-
-// @TODO: Implement this 
-export function transferFrom(from: Principal, to: Principal, value: nat): Update<TxReceipt> {
+// @TODO: Implement this
+export function transferFrom(
+  from: Principal,
+  to: Principal,
+  value: nat
+): Update<TxReceipt> {
   const owner = ic.caller();
-  if(from != owner) return {Err: {Unauthorized: null}};
+  if (from != owner) return { Err: { Unauthorized: null } };
   if (from === to) return { Err: { ErrorTo: null } };
   _transfer_pulses(from, to, value);
-  return {Ok: value};
+  return { Ok: value };
 }
-
 
 // @TODO: Implement this
 export function approve(spender: Principal, value: nat): Update<TxReceipt> {
-
-  return {Err: {ErrorOperationStyle: null}}
+  return { Err: { ErrorOperationStyle: null } };
 }
 
-let logo_string = "💩"
+let logo_string = "💩";
 
 export function logo(): Query<string> {
   return logo_string;
 }
 
-let name_string = "Pulses"
+let name_string = "Pulses";
 export function name(): Query<string> {
   return name_string;
 }
 
-let symbol_string = "DETI"
+let symbol_string = "DETI";
 
 export function symbol(): Query<string> {
   return symbol_string;
 }
 
-let decimals_number = 8
+let decimals_number = 8;
 
 export function decimals(): Query<nat8> {
-return decimals_number;
-
+  return decimals_number;
 }
 
 export function totalSupply(): Query<nat> {
@@ -1138,7 +1107,7 @@ export function totalSupply(): Query<nat> {
 }
 
 export function balanceOf(who: Principal): Query<nat> {
-  return allowedPulses[who]- burnedPulses[who] || 0n;
+  return allowedPulses[who] - burnedPulses[who] || 0n;
 }
 
 // @TODO: implement this
@@ -1147,18 +1116,17 @@ export function allowance(owner: Principal, spender: Principal): Query<nat> {
 }
 
 type Metadata = {
-    logo : string; // base64 encoded logo or logo url
-    name : string; // token name
-    symbol : string; // token symbol
-    decimals : nat8; // token decimal
-    totalSupply : nat; // token total supply
-    owner : Principal; // token owner
-    fee : nat; // fee for update calls
-}
+  logo: string; // base64 encoded logo or logo url
+  name: string; // token name
+  symbol: string; // token symbol
+  decimals: nat8; // token decimal
+  totalSupply: nat; // token total supply
+  owner: Principal; // token owner
+  fee: nat; // fee for update calls
+};
 
 export function getMetadata(): Query<Metadata> {
-
-  const metadata : Metadata ={
+  const metadata: Metadata = {
     logo: logo_string,
     name: name_string,
     symbol: symbol_string,
@@ -1166,23 +1134,23 @@ export function getMetadata(): Query<Metadata> {
     totalSupply: getStable().totalPulses || 0n,
     owner: getStable().owner,
     fee: 0n,
-  }
+  };
   return metadata;
 }
 
 // @TODO: implement this
 export function mint(to: Principal, value: nat): Update<TxReceipt> {
   const owner = ic.caller();
-  if (owner !== getStable().owner) return {Err: {Unauthorized: null}};
-  return {Err: {Other: "We dont do that here!"}};
+  if (owner !== getStable().owner) return { Err: { Unauthorized: null } };
+  return { Err: { Other: "We dont do that here!" } };
 }
 
 // @TODO: implement this
 export function burn(from: Principal, value: nat): Update<TxReceipt> {
   const owner = ic.caller();
-  return{Err: {Other: "We dont do that here!"}};
+  return { Err: { Other: "We dont do that here!" } };
 }
- 
+
 export function setName(name: string): Update<void> {
   const owner = ic.caller();
   if (owner !== getStable().owner) return;
@@ -1209,43 +1177,40 @@ export function setFeeTo(newFeeTo: Principal): Update<void> {
   return;
 }
 
-
 export function setOwner(newOwner: Principal): Update<void> {
   const owner = ic.caller();
   if (owner !== getStable().owner) return;
   getStable().owner = newOwner;
-
 }
 
 // @TODO: implement this
 export function historySize(): Query<nat> {
-  return 0n
+  return 0n;
 }
 
 type Operation = Variant<{
-    approve: null
-    mint: null
-    transfer: null
-    transferFrom: null  
-}>
+  approve: null;
+  mint: null;
+  transfer: null;
+  transferFrom: null;
+}>;
 
 type TransactionStatus = Variant<{
-    succeeded: null
-    failed: null
-}>
+  succeeded: null;
+  failed: null;
+}>;
 
 type TxRecord = {
-    caller: Principal;
-    op: Operation; // operation type
-    index: nat; // transaction index
-    from: Principal;
-    to: Principal;
-    amount: nat;
-    fee: nat;
-    timestamp: nat;
-    status: TransactionStatus;
+  caller: Principal;
+  op: Operation; // operation type
+  index: nat; // transaction index
+  from: Principal;
+  to: Principal;
+  amount: nat;
+  fee: nat;
+  timestamp: nat;
+  status: TransactionStatus;
 };
-
 
 // @TODO: implement this
 export function getTransaction(index: nat): Query<TxRecord> {
@@ -1257,17 +1222,18 @@ export function getTransactions(start: nat, limit: nat): Query<TxRecord[]> {
   throw new Error("Not implemented");
 }
 
-
 // @TODO: implement this
-export function getUserTransactions(who: Principal, start: nat, limit: nat): Query<TxRecord[]> {
+export function getUserTransactions(
+  who: Principal,
+  start: nat,
+  limit: nat
+): Query<TxRecord[]> {
   throw new Error("Not implemented");
 }
-
 
 // @TODO: implement this
 export function getUserTransactionAmount(who: Principal): Query<nat> {
   throw new Error("Not implemented");
 }
-
 
 //#endregion
