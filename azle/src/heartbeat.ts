@@ -895,15 +895,6 @@ function _get_pulses(principal: Principal): nat {
   } else return 0n;
 }
 
-// export function get_pulses(): Query<nat> {
-//   const principal = ic.caller();
-//   return _get_pulses(principal);
-// }
-
-// export function get_pulses_for(principal: Principal): Query<nat> {
-//   return _get_pulses(principal);
-// }
-
 function _transfer_pulses(
   from: Principal,
   to: Principal,
@@ -941,11 +932,6 @@ function _transfer_pulses(
     timestamp: ic.time(),
   });
   return pulseCount;
-}
-
-export function transfer_pulses(pulseCount: nat, to: Principal): Update<nat> {
-  const principal = ic.caller();
-  return _transfer_pulses(principal, to, pulseCount);
 }
 
 //#region Interface for current time utility functions
