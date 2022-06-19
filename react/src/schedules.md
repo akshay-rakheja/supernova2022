@@ -1,6 +1,6 @@
 ## Schedule Recurring Messages
 
-Send messages every day, week or month - or even just a regular frequenc measured in seconds.
+Send messages every day, week or month - or even just a regular frequency measured in seconds.
 
 Pick the schedule via the blue button above. `Period` refers to a function that should fire every X seconds. DeTi checks its registry every 10 seconds, so one cannot run more frequently than that, nor on a schedule that is not a multiple of 10 seconds.
 
