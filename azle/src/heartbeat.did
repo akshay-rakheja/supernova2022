@@ -190,8 +190,6 @@ service: () -> {
     "get_pulse_price": () -> (nat) query;
     "get_account_id": () -> (text) query;
     "get_burned_pulses": () -> (nat) query;
-    "get_pulses": () -> (nat) query;
-    "get_pulses_for": (principal) -> (nat) query;
     "getDisplayTime": () -> (text) query;
     "getNow": () -> (nat) query;
     "getNowSeconds": () -> (nat32) query;
@@ -205,6 +203,7 @@ service: () -> {
     "symbol": () -> (text) query;
     "decimals": () -> (nat8) query;
     "totalSupply": () -> (nat) query;
+    "myBalance": () -> (nat) query;
     "balanceOf": (principal) -> (nat) query;
     "allowance": (principal, principal) -> (nat) query;
     "getMetadata": () -> (Metadata) query;
@@ -228,7 +227,6 @@ service: () -> {
     "set_account_id": (text) -> (text);
     "mint_pulses": (nat) -> (record { "ok": opt nat; "err": opt text; });
     "mint_pulses_for": (nat, principal) -> (nat);
-    "transfer_pulses": (nat, principal) -> (nat);
     "transfer": (principal, nat) -> (TxReceipt);
     "transferFrom": (principal, principal, nat) -> (TxReceipt);
     "approve": (principal, nat) -> (TxReceipt);

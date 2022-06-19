@@ -15,6 +15,28 @@ type Message = record {
     "args": opt vec nat8;
 };
 
+type Metadata = record {
+    "logo": text;
+    "name": text;
+    "symbol": text;
+    "decimals": nat8;
+    "totalSupply": nat;
+    "owner": principal;
+    "fee": nat;
+};
+
+type TxRecord = record {
+    "caller": principal;
+    "op": Operation;
+    "index": nat;
+    "from": principal;
+    "to": principal;
+    "amount": nat;
+    "fee": nat;
+    "timestamp": nat;
+    "status": TransactionStatus;
+};
+
 type TransferArgs = record {
     "memo": nat64;
     "amount": Tokens;
@@ -140,6 +162,8 @@ type BlockRange = record {
     "blocks": vec Block;
 };
 
+type TxReceipt = variant { "Ok": nat; "Err": variant { "InsufficientAllowance": null; "InsufficientBalance": null; "ErrorOperationStyle": null; "Unauthorized": null; "LedgerTrap": null; "ErrorTo": null; "Other": text; "BlockUsed": null; "AmountTooSmall": null } };
+
 type TransferResult = variant { "Ok": nat64; "Err": TransferError };
 
 type QueryArchiveResult = variant { "Ok": BlockRange; "Err": QueryArchiveError };
@@ -149,6 +173,8 @@ type TransferError = variant { "BadFee": record { "expected_fee": Tokens; }; "In
 type Operation = variant { "Mint": record { "to": vec nat8; "amount": Tokens; }; "Burn": record { "from": vec nat8; "amount": Tokens; }; "Transfer": record { "from": vec nat8; "to": vec nat8; "amount": Tokens; "fee": Tokens; } };
 
 type QueryArchiveError = variant { "BadFirstBlockIndex": record { "requested_index": nat64; "first_valid_index": nat64; }; "Other": record { "error_code": nat64; "error_message": text; } };
+
+type TransactionStatus = variant { "succeeded": null; "failed": null };
 
 type QueryArchiveFn = func (GetBlocksArgs) -> (QueryArchiveResult) query;
 
@@ -164,8 +190,6 @@ service: () -> {
     "get_pulse_price": () -> (nat) query;
     "get_account_id": () -> (text) query;
     "get_burned_pulses": () -> (nat) query;
-    "get_pulses": () -> (nat) query;
-    "get_pulses_for": (principal) -> (nat) query;
     "getDisplayTime": () -> (text) query;
     "getNow": () -> (nat) query;
     "getNowSeconds": () -> (nat32) query;
@@ -174,6 +198,20 @@ service: () -> {
     "get_total_messages": () -> (nat) query;
     "get_total_burned_pulses": () -> (nat) query;
     "get_total_pulses": () -> (nat) query;
+    "logo": () -> (text) query;
+    "name": () -> (text) query;
+    "symbol": () -> (text) query;
+    "decimals": () -> (nat8) query;
+    "totalSupply": () -> (nat) query;
+    "myBalance": () -> (nat) query;
+    "balanceOf": (principal) -> (nat) query;
+    "allowance": (principal, principal) -> (nat) query;
+    "getMetadata": () -> (Metadata) query;
+    "historySize": () -> (nat) query;
+    "getTransaction": (nat) -> (TxRecord) query;
+    "getTransactions": (nat, nat) -> (vec TxRecord) query;
+    "getUserTransactions": (principal, nat, nat) -> (vec TxRecord) query;
+    "getUserTransactionAmount": (principal) -> (nat) query;
     "add_period": (principal, nat, text) -> (nat32);
     "add_weekly_schedule": (principal, nat8, nat8, nat8, text) -> (nat32);
     "add_daily_schedule": (principal, nat8, nat8, text) -> (nat32);
@@ -190,4 +228,14 @@ service: () -> {
     "mint_pulses": (nat) -> (record { "ok": opt nat; "err": opt text; });
     "mint_pulses_for": (nat, principal) -> (nat);
     "transfer_pulses": (nat, principal) -> (nat);
+    "transfer": (principal, nat) -> (TxReceipt);
+    "transferFrom": (principal, principal, nat) -> (TxReceipt);
+    "approve": (principal, nat) -> (TxReceipt);
+    "mint": (principal, nat) -> (TxReceipt);
+    "burn": (principal, nat) -> (TxReceipt);
+    "setName": (text) -> ();
+    "setLogo": (text) -> ();
+    "setFee": (nat) -> ();
+    "setFeeTo": (principal) -> ();
+    "setOwner": (principal) -> ();
 }

@@ -1,0 +1,15 @@
+{
+  "mode": "production",
+  "production": {
+    "host": "https://ic0.app",
+    "canisters": {
+      "ticker2": "fm4kt-oyaaa-aaaap-qaljq-cai"
+    }
+  },
+  "local": {
+    "host": "http://localhost:8000",
+    "canisters": {
+      "ticker2": "tzq7c-xqaaa-aaaaa-aaamq-cai"
+    }
+  }
+}

@@ -8,46 +8,6 @@
       "candid": "src/heartbeat.did",
       "wasm": "target/wasm32-unknown-unknown/release/heartbeat.wasm.gz"
     },
-    "update": {
-      "type": "custom",
-      "build": "npx azle update",
-      "root": "src",
-      "ts": "src/update.ts",
-      "candid": "src/update.did",
-      "wasm": "target/wasm32-unknown-unknown/release/update.wasm.gz"
-    },
-    "update2": {
-      "type": "custom",
-      "build": "npx azle update2",
-      "root": "src",
-      "ts": "src/update.ts",
-      "candid": "src/update.did",
-      "wasm": "target/wasm32-unknown-unknown/release/update2.wasm.gz"
-    },
-    "update3": {
-      "type": "custom",
-      "build": "npx azle update3",
-      "root": "src",
-      "ts": "src/update.ts",
-      "candid": "src/update.did",
-      "wasm": "target/wasm32-unknown-unknown/release/update3.wasm.gz"
-    },
-    "update4": {
-      "type": "custom",
-      "build": "npx azle update4",
-      "root": "src",
-      "ts": "src/update2.ts",
-      "candid": "src/update2.did",
-      "wasm": "target/wasm32-unknown-unknown/release/update4.wasm.gz"
-    },
-    "update5": {
-      "type": "custom",
-      "build": "npx azle update5",
-      "root": "src",
-      "ts": "src/update2.ts",
-      "candid": "src/update2.did",
-      "wasm": "target/wasm32-unknown-unknown/release/update5.wasm.gz"
-    },
     "ticker1": {
       "type": "custom",
       "build": "npx azle ticker1",

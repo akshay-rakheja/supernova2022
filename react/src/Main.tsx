@@ -4,7 +4,7 @@ import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { BellIcon, MenuIcon, XIcon } from "@heroicons/react/outline";
 import useHeartbeat from "./useHeartbeat";
-import { Link, Outlet, useResolvedPath } from "react-router-dom";
+import { Link, Outlet, useNavigate, useResolvedPath } from "react-router-dom";
 import Logo from "./assets/icon.png";
 import { createContext, useContext, useRef } from "react";
 import { getNodeMajorVersion, isTemplateExpression } from "typescript";
@@ -24,17 +24,24 @@ export default function Main() {
   const heartbeat = useHeartbeat();
   const [pulses, setPulses] = useState<BigInt>(BigInt(0));
   const intervalRef = useRef<NodeJS.Timer>();
+  const navigate = useNavigate();
   useEffect(() => {
     (async () => {
-      const pulses = await heartbeat?.get_pulses();
-      setPulses(pulses || BigInt(0));
+      if (heartbeat && navigate) {
+        const pulses = await heartbeat?.myBalance();
+        setPulses(pulses || BigInt(0));
+        console.log("I set those pulses alright", pulses);
+        if (!pulses || pulses === BigInt(0)) {
+          navigate("/tokens");
+        }
+      }
     })();
     if (intervalRef.current) clearInterval(intervalRef.current);
     intervalRef.current = setInterval(async () => {
-      const pulses = await heartbeat?.get_pulses();
+      const pulses = await heartbeat?.myBalance();
       setPulses(pulses || BigInt(0));
     }, 2000);
-  }, [heartbeat]);
+  }, [heartbeat, navigate]);
   const user = {
     name: principal && principal.toString(),
     email: "",
@@ -55,9 +62,13 @@ export default function Main() {
     },
     {
       name:
-        "Pulses (Account: " + (Number(pulses) / 10_000_000).toFixed(7) + ")",
-      href: "/pulses",
-      current: path.pathname.startsWith("/pulses"),
+        "DETI Tokens (" +
+        (Number(pulses) / 10_000_000).toFixed(7) +
+        ")" +
+        (pulses && pulses < BigInt(10_000_000) ? " - Running Low!" : ""),
+      href: "/tokens",
+      current: path.pathname.startsWith("/tokens"),
+      className: pulses < BigInt(10_000_000) ? " bg-red-800" : "",
     },
   ];
   const userNavigation = [
@@ -123,7 +134,7 @@ export default function Main() {
                             <img
                               className="h-10 w-10 rounded-full"
                               src={Logo}
-                              alt="Workflow"
+                              alt="DeTi"
                             />
                           </Link>
                         </div>
@@ -150,7 +161,8 @@ export default function Main() {
                                   item.current
                                     ? "bg-gray-900 text-white"
                                     : "text-gray-300 hover:bg-gray-700 hover:text-white",
-                                  "px-3 py-2 rounded-md text-sm font-medium"
+                                  "px-3 py-2 rounded-md text-sm font-medium " +
+                                    item.className
                                 )}
                                 aria-current={item.current ? "page" : undefined}
                               >
@@ -240,8 +252,6 @@ export default function Main() {
                     {navigation.map((item) => (
                       <Disclosure.Button
                         key={item.name}
-                        as="a"
-                        href={item.href}
                         className={classNames(
                           item.current
                             ? "bg-gray-900 text-white"
@@ -250,7 +260,7 @@ export default function Main() {
                         )}
                         aria-current={item.current ? "page" : undefined}
                       >
-                        {item.name}
+                        <Link to={item.href}>{item.name}</Link>
                       </Disclosure.Button>
                     ))}
                   </div>

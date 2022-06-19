@@ -7,7 +7,10 @@ import { createActor } from "./declarations/heartbeat";
 import { FaGithub } from "react-icons/fa";
 import config from "./config.json";
 import { ArrowUpIcon, QuestionMarkCircleIcon } from "@heroicons/react/outline";
-import About from "./About";
+import ModalMD from "./ModalMD";
+import raw from "raw.macro";
+const markdown = raw("./about.md");
+
 const {
   host,
   canisters: { heartbeat },
@@ -30,18 +33,7 @@ export const LoggedOut: FC = () => {
   const [newClass, setNewClass] = useState("");
   const [plugNewClass, setPlugNewClass] = useState("opacity-0");
   const [iconNewClass, setIconNewClass] = useState("text-black");
-  const [aboutNewClass, setAboutNewClass] = useState("hidden");
-
-  const showAbout = useCallback(() => {
-    console.log("Hello!!!");
-    setAboutNewClass(" visible opacity-0 ");
-    setTimeout(() => {
-      setAboutNewClass("visible opacity-100");
-    }, 50);
-  }, []);
-  const hideAbout = useCallback(() => {
-    setAboutNewClass("hidden opacity-0");
-  }, []);
+  const [isOpen, setIsOpen] = useState(false);
   const actor = useHeartbeat();
   const getStats = useCallback(async () => {
     if (actor) {
@@ -151,7 +143,10 @@ export const LoggedOut: FC = () => {
             <div className="flex">
               <button
                 className="mb-6 bg-black bg-opacity-80 border-2 border-orange-500 text-md font-medium text-white p-2 rounded-full transition hover:scale-105 transition-duration-250 hover:bg-opacity-60"
-                onClick={showAbout}
+                onClick={(event) => {
+                  setIsOpen(true);
+                  console.log("clicky clicky");
+                }}
               >
                 <div className="flex flex-row">
                   <QuestionMarkCircleIcon className="h-6 w-6 mr-2" />
@@ -162,17 +157,7 @@ export const LoggedOut: FC = () => {
           </div>
         </div>
       </div>
-      <div
-        onClick={hideAbout}
-        className={[
-          "pointer flex-col justify-around absolute flex h-screen w-screen bg-white dark:bg-black dark:bg-opacity-80 transition transition-opacity",
-          aboutNewClass,
-        ].join(" ")}
-      >
-        <div className="flex-row justify-around flex max-h-screen">
-          <About />
-        </div>
-      </div>
+      <ModalMD show={isOpen} setShow={setIsOpen} markdown={markdown} />
     </Fragment>
   );
 };

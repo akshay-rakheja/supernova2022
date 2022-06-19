@@ -25,13 +25,14 @@ Now your canisters can never forget.
 
 Click anywhere to close. Click ${"`"}Connect to Plug${"`"} to start making your canisters unstoppable. 
 
+We are very ratr
+
 *Akshay and Ray*
 
 `.trim();
 const About: FC = () => {
-  console.log("I will show the thing now");
   return (
-    <article className="prose dark:prose-invert p-4 bg-black bg-opacity-80 m-4 rounded-lg max-h-80 overflow-scroll">
+    <article className="prose dark:prose-invert p-4 text-gray-900 dark:text-gray-100 bg-white dark:bg-black bg-opacity-80 m-4 rounded-lg max-h-full  overflow-scroll border-gray-300 shadow-md dark:border-gray-600 border-opacity-40 border-2">
       <ReactMarkdown>{about}</ReactMarkdown>
     </article>
   );
