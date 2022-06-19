@@ -48,7 +48,6 @@ export default function Main() {
     imageUrl: Logo,
   };
   const path = useResolvedPath(window.location);
-  console.log("path is ", path);
   const navigation = [
     {
       name: "Schedules",
