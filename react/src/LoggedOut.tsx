@@ -175,7 +175,7 @@ const Stats: FC<{
     { name: "Heartbeats", stat: heartbeats.toLocaleString() },
     { name: "Messages", stat: messages.toLocaleString() },
     {
-      name: "Burned Pulses",
+      name: "Burned DETI Tokens",
       stat: (Number(burnedPulses) / 10_000_000).toFixed(7),
     },
   ];
