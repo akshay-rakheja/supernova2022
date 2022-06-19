@@ -8,13 +8,14 @@ Internet Computer, by being computer-first, allows functionality that is outside
 
 At the same time, we were blown away by the work of Jordan Last and his collaborators at Demergent Labs on [Azle](https://github.com/demergentlabs/azle). This lets one build with all the speed and familiarity of Typescript while compiling to the WASM that IC requires for its code.
 
-There was an opportunity to make a unique IC capability uniquely easy as a service to people making dynamic, decentralized apps. We can imagine use cases:
+There was an opportunity to make a unique IC capability uniquely easy as a service to people making dynamic, decentralized apps. We can imagine use cases across many categories:
 
-- Time-limited asynchronous market orders that execute or expire a certain period after going in
-- Autonmous Metaverse NFTs that "behave" even when the user is not around, perhaps even reacting to special events (birthdays, holidays etc)
-- Multiplayer games that move their common world forward independent of individual player actions
-- Dead-man-switches that activate certain actions when a user does not otherwise specify "stop" beforehand. (Messages are cancellable).
-- Skynet's origin from Terminator 3
+- _SocialFi_: DAO governance that acts on the common will after votes by using a time certain for the election. Then the autonomous organization can execute without requiring human intervention.
+- _GameFi_: Multiplayer games that move their common world forward independent of individual player actions
+- _Metaverse_: Autonmous Metaverse NFTs that "behave" even when the user is not around, perhaps even reacting to special events (birthdays, holidays etc)
+- _Async DeFi_: Time-limited asynchronous market orders that execute or expire a certain period after going in
+- _Public Good_: Dead-man-switches that activate certain actions when a user does not otherwise specify "stop" beforehand, releasing information or executing actions to protect protesters. (Messages are cancellable).
+- _Blue Sky_: Skynet's origin from Terminator 3
 
 ## What it does
 
@@ -30,11 +31,13 @@ We made our front-end using React (via create-react-app), Tailwind CSS, and Reac
 
 ## Challenges and Accomplishments
 
-We're proud of figuring out a path to make the heartbeat more economical as a means of activating IC Canisters. Slowing the main check allows us to manage the vast majority of scheduling use cases while keeping cycle usage in check.
+**The IC Factor** We wanted to focus on an aspect of IC that is different from other blockchain technologies. The focus on unstoppability and advancing to autonomy is very IC and very much unlike other distributed ledger systems. IC can not just record - it can _behave_.
 
-We are also proud of making Azle work in a nontrivial application. The system is wonderful but, like the whole IC ecosystem, very much in development, and figuring out where the quirks were was a technical challenge. But a worthwhile one!
+**Social Utility**: We're proud of figuring out a path to make the heartbeat more economical as a means of activating IC Canisters. Slowing the main check allows us to manage the vast majority of scheduling use cases while keeping cycle usage in check.
 
-Finally, being able to leave behind tools for the community furthers our own idea of how we want to contribute to the blockchain community. The NPM package and template are a start and we hope that they will allow others to make progress more quickly.
+**Technical Accomplishment**: We are also proud of making Azle work in a nontrivial application. The system is wonderful but, like the whole IC ecosystem, very much in development, and figuring out where the quirks were was a technical challenge. But a worthwhile one!
+
+**Giving Back** Finally, being able to leave behind tools for the community furthers our own idea of how we want to contribute to the blockchain community. The NPM package and template are a start and we hope that they will allow others to make progress more quickly.
 
 And we hope they do it with Azle!
 
