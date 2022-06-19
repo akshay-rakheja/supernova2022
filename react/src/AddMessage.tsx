@@ -19,7 +19,7 @@ export const AddMessage: FC<{
         func: "",
       }}
       onSubmit={async ({ time, func, canister }) => {
-        onSubmit({ func, canister, time: new Date(time) });
+        await onSubmit({ func, canister, time: new Date(time) });
       }}
       validate={(values) => {
         const ret = {} as {

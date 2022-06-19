@@ -24,7 +24,7 @@ export const AddMonthlySchedule: FC<{
         dom: 0,
       }}
       onSubmit={async (values) => {
-        onSubmit(values);
+        await onSubmit(values);
       }}
       validate={(values) => {
         const ret = {} as {

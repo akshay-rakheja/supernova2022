@@ -14,7 +14,7 @@ export const AddPeriod: FC<{
         func: "",
       }}
       onSubmit={async (values) => {
-        onSubmit(values);
+        await onSubmit(values);
       }}
       validate={(values) => {
         const ret = {

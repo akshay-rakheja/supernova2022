@@ -4,7 +4,16 @@ import React, { FC, Fragment } from "react";
 import { NumberLiteralType } from "typescript";
 import TimePicker from "react-time-picker";
 import { DateTime } from "luxon";
-
+import { FaShieldVirus } from "react-icons/fa";
+const daysOfWeek = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
 export const AddWeeklySchedule: FC<{
   onSubmit: (args: {
     canister: string;
@@ -25,7 +34,7 @@ export const AddWeeklySchedule: FC<{
         dow: 0,
       }}
       onSubmit={async (values) => {
-        onSubmit(values);
+        await onSubmit(values);
       }}
       validate={(values) => {
         const ret = {} as {
@@ -59,7 +68,7 @@ export const AddWeeklySchedule: FC<{
         if (
           values.dow < 0 ||
           values.dow > 6 ||
-          values.dow !== Math.floor(values.dow)
+          values.dow != Math.floor(values.dow)
         ) {
           ret.dow =
             "Day of week must be an integer between 0 (Sunday) and 6 (Saturday) ";
@@ -109,14 +118,44 @@ export const AddWeeklySchedule: FC<{
                     htmlFor="dow"
                     className="block text-sm font-medium text-gray-700 dark:text-gray-200"
                   >
-                    Day of Week (0 for Sunday through 6 for Saturday) on which to deliver
+                    Day of Week (0 for Sunday through 6 for Saturday) on which
+                    to deliver
                   </label>
                   <div className="mb-4">
-                    <Field
-                      name="dow"
-                      type="number"
-                      className="dark:bg-transparent dark:text-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                    />
+                    {daysOfWeek.map((name, index) => (
+                      <div
+                        key={name}
+                        className={[
+                          "cursor-pointer flex items-center p-2 m-2 border-2 border-gray-500 rounded-md ",
+                          index == values.dow && "bg-gray-200 dark:bg-black",
+                        ].join(" ")}
+                        onClick={() => {
+                          setFieldValue("dow", index, true);
+                        }}
+                      >
+                        <Field
+                          id={"dow_" + index.toString()}
+                          value={index}
+                          name="dow"
+                          type="radio"
+                          defaultChecked={!index}
+                          className={[
+                            "focus:ring-indigo-500 dark:focus:ring-indigo-900 h-4 w-4 text-indigo-600 dark:text-indigo-100 border-gray-300 dark:border-gray-200",
+                            index == values.dow && " b g-black",
+                          ].join(" ")}
+                        />
+                        <label
+                          htmlFor={"dow_" + index.toString()}
+                          className={[
+                            "ml-3 block text-sm font-medium text-gray-700 dark:text-gray-200",
+                            index == values.dow && " b g-black",
+                          ].join(" ")}
+                        >
+                          {name}
+                        </label>
+                      </div>
+                    ))}
+
                     <ErrorMessage
                       component="div"
                       name="dow"
@@ -193,7 +232,10 @@ export const AddWeeklySchedule: FC<{
               <button
                 type="submit"
                 disabled={!isValid || isSubmitting}
-                className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className={[
+                  "ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500",
+                  (!isValid || isSubmitting) && "bg-gray-500",
+                ].join(" ")}
               >
                 Submit
               </button>
