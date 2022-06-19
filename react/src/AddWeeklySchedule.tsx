@@ -109,7 +109,7 @@ export const AddWeeklySchedule: FC<{
                     htmlFor="dow"
                     className="block text-sm font-medium text-gray-700 dark:text-gray-200"
                   >
-                    Day of Week on which to deliver
+                    Day of Week (0 for Sunday through 6 for Saturday) on which to deliver
                   </label>
                   <div className="mb-4">
                     <Field

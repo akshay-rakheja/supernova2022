@@ -15,4 +15,3 @@ node_modules/
 dist/
 
 target/
-canister_ids.json

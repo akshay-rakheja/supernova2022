@@ -40,7 +40,7 @@ export const ModalMD: FC<{
           >
             <Dialog.Panel className="flex-row justify-around flex max-h-screen ">
               <article className="prose dark:prose-invert p-4 text-gray-900 dark:text-gray-100 bg-white dark:bg-black bg-opacity-40 m-4 rounded-lg max-h-full  overflow-scroll border-gray-300 shadow-md dark:border-gray-600 border-opacity-40 border-2">
-                <ReactMarkdown>{markdown}</ReactMarkdown>
+                <ReactMarkdown linkTarget={"_blank"}>{markdown}</ReactMarkdown>
               </article>
             </Dialog.Panel>
           </div>

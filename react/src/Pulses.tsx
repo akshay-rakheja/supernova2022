@@ -18,7 +18,7 @@ const Pulses: FC = () => {
     })();
   }, [heartbeat]);
   useEffect(() => {
-    setTitle("Pulses: " + (Number(pulses) / 10_000_000).toFixed(7));
+    setTitle("DETI Tokens: " + (Number(pulses) / 10_000_000).toFixed(7));
   }, [setTitle, pulses]);
   const interval = useRef<NodeJS.Timer>();
   useEffect(() => {
@@ -30,18 +30,24 @@ const Pulses: FC = () => {
       clearInterval(interval.current);
     };
   }, [heartbeat]);
-  const [showHelp, setShowHelp] = useState(false);
+  const [minting, setMinting] = useState(false);
   return (
     <div>
       <div className="flex flex-row justify-center">
         <button
           onClick={async () => {
             toast("Minting a DETI...");
+            setMinting(true);
             await heartbeat?.mint_pulses(BigInt(10_000_000));
             toast("Minted a DETI for you!");
+            setMinting(false);
           }}
-          disabled={pulses > BigInt(100_000_000)}
-          className="rounded-lg bg-orange-800 dark:bg-orange-500 font-medium dark:bg-opacity-80 text-white p-2 m-2 hover:bg-orange-800 transition"
+          disabled={minting || pulses > BigInt(100_000_000)}
+          className={[
+            "rounded-lg bg-orange-800 dark:bg-orange-500 font-medium dark:bg-opacity-80 text-white p-2 m-2 hover:bg-orange-800 transition",
+            (minting || pulses > BigInt(100_000_000)) &&
+              "bg-gray-500 dark:bg-gray-800 text-gray-300",
+          ].join(" ")}
         >
           {pulses > BigInt(100_000_000)
             ? "You have your maximum quota of free DETI"
@@ -60,12 +66,18 @@ const Pulses: FC = () => {
       <div className="flex flex-row justify-center">
         <button
           onClick={async () => {
+            setMinting(true);
             toast("Minting a DETI...");
             await heartbeat?.mint_pulses(BigInt(10_000_000));
+            setMinting(false);
             toast("Minted a DETI for you!");
           }}
-          disabled={pulses > BigInt(100_000_000)}
-          className="rounded-lg bg-orange-500 dark:bg-orange-500 font-medium dark:bg-opacity-80 text-white p-2 m-2 hover:bg-orange-800 transition"
+          disabled={minting || pulses > BigInt(100_000_000)}
+          className={[
+            "rounded-lg bg-orange-800 dark:bg-orange-500 font-medium dark:bg-opacity-80 text-white p-2 m-2 hover:bg-orange-800 transition",
+            (minting || pulses > BigInt(100_000_000)) &&
+              "bg-gray-500 dark:bg-gray-800 text-gray-300",
+          ].join(" ")}
         >
           {pulses > BigInt(100_000_000)
             ? "You have your maximum quota of free DETI"

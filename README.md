@@ -13,7 +13,7 @@ There was an opportunity to make a unique IC capability uniquely easy as a servi
 - _SocialFi_: DAO governance that acts on the common will after votes by using a time certain for the election. Then the autonomous organization can execute without requiring human intervention.
 - _GameFi_: Multiplayer games that move their common world forward independent of individual player actions. For example, a battle royale style gameplay could keep changing the map on a regular basis to keep the intensity of gameplay.
 - _Metaverse_: Autonmous Metaverse NFTs that "behave" even when the user is not around, perhaps even reacting to special events (birthdays, holidays etc)
-- _Async DeFi_: Time-limited asynchronous market orders that execute or expire a certain period after going in
+- _DeFi_: Time-limited asynchronous market orders that execute or expire a certain period after going in
 - _Public Good_: Dead-man-switches that activate certain actions when a user does not otherwise specify "stop" beforehand, releasing information or executing actions to protect protesters. (Messages are cancellable).
 - _Blue Sky_: Skynet's origin from Terminator 3
 
@@ -63,9 +63,9 @@ We would love to continue to work on this project, which we think would be helpf
 
 ## Thanks
 
-We are grateful to the DFINITY Foundation, Demergent Labs, Psychedelic Studios, and Jordan Last personally for the rapid education we have received in this hackathon.
+We are grateful to the DFINITY Foundation, Demergent Labs, Psychedelic Studios, and Jordan Last personally for the rapid education we have received in this hackathon and exposing us to this very cool and different blockchain technology.
 
-## How to Install
+## Try it yourself! How to Install
 
 ### Prerequisites
 

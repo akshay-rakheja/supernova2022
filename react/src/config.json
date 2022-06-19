@@ -3,13 +3,23 @@
   "production": {
     "host": "https://ic0.app",
     "canisters": {
-      "heartbeat": "dwes7-aaaaa-aaaap-qamaq-cai"
+      "heartbeat": "dwes7-aaaaa-aaaap-qamaq-cai",
+      "react": "fl5mh-daaaa-aaaap-qalja-cai",
+      "react-ticker": "d7hzd-wiaaa-aaaap-qamba-cai",
+      "ticker1": "ff7bp-yqaaa-aaaap-qalia-cai",
+      "ticker2": "fm4kt-oyaaa-aaaap-qaljq-cai"
     }
   },
   "local": {
     "host": "http://localhost:8000",
     "canisters": {
-      "heartbeat": "xub3y-eqaaa-aaaaa-aaawq-cai"
+      "__Candid_UI": "ryjl3-tyaaa-aaaaa-aaaba-cai",
+      "heartbeat": "xub3y-eqaaa-aaaaa-aaawq-cai",
+      "react": "rkp4c-7iaaa-aaaaa-aaaca-cai",
+      "react-test": "r7inp-6aaaa-aaaaa-aaabq-cai",
+      "react-ticker": "x5cqe-syaaa-aaaaa-aaaxa-cai",
+      "ticker1": "rno2w-sqaaa-aaaaa-aaacq-cai",
+      "ticker2": "tzq7c-xqaaa-aaaaa-aaamq-cai"
     }
   }
 }
