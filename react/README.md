@@ -1,4 +1,15 @@
-# Getting Started with Create React App
+# DETI Frontend
+
+This contains the code for the front-end of the DETI decentralized time service for Internet Computer.
+
+It is built with:
+
+- Create React App
+- Tailwind and Headless UI
+- React-Router
+- Plug Wallet support
+
+## Thanks
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 

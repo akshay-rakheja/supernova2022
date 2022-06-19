@@ -1,13 +1,18 @@
 {
   "scripts": {
-    "build": "(cd react && yarn && yarn build) && (cd react-ticker && yarn && yarn build)",
+    "build": "node log_env.js && (cd react && yarn && yarn build) && (cd react-ticker && yarn && yarn build)",
     "start": "(cd react && yarn start)",
     "start:ticker": "(cd react-ticker && yarn start)",
-    "deploy": "yarn rebuild && dfx deploy",
     "azle": "cd azle && npx azle",
-    "rebuild": "dfx canister create --all && dfx build && dfx generate && cp -r src/declarations react/src/ && cp -r src/declarations react-ticker/src/",
-    "generate": "dfx generate heartbeat && dfx generate ticker2 && cp -r src/declarations react/src/ && cp -r src/declarations react-ticker/src/",
-    "postinstall": "(cd react && yarn) && (cd azle && yarn)"
+    "rebuild": "dfx canister create --all && dfx build && yarn generate",
+    "generate": "dfx generate heartbeat && dfx generate ticker2 && ts-node generate_config.ts",
+    "postinstall": "(cd react && yarn) && (cd azle && yarn)",
+    "deploy:local": "ts-node set_mode.ts local && yarn rebuild && dfx deploy",
+    "deploy:production": "ts-node set_mode.ts production && yarn rebuild && dfx deploy --network ic"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@types/node": "^18.0.0",
+    "ts-node": "^10.8.1",
+    "typescript": "^4.7.4"
+  }
 }
