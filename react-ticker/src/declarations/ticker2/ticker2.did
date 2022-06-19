@@ -3,6 +3,9 @@ service: {
     "count_counter2": () -> (int) query;
     "count_counter3": () -> (int) query;
     "tick2": () -> (int);
+    "reset": () -> ();
     "counter2_tick": () -> (int);
+    "counter2_reset": () -> ();
     "counter3_tick": () -> (int);
+    "counter3_reset": () -> ();
 }
