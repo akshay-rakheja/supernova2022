@@ -193,7 +193,7 @@ export function Messages() {
                       <div className="block hover:bg-gray-50">
                         <div className="px-4 py-4 sm:px-6">
                           <div className="flex items-center justify-between">
-                            <p className="text-sm font-medium text-indigo-600 truncate">
+                            <p className="text-sm font-medium text-indigo-600 dark:text-indigo-100 truncate">
                               {canister.toString()}
                             </p>
                             <div className="ml-2 flex-shrink-0 flex">
@@ -218,7 +218,14 @@ export function Messages() {
                                 })()}
                                 {DateTime.fromMillis(
                                   Number(time / BigInt(ns_to_ms))
-                                ).toLocaleString(DateTime.DATETIME_FULL)}
+                                ).toLocaleString(DateTime.DATETIME_FULL)}{" "}
+                                (
+                                {DateTime.fromMillis(
+                                  Number(time / BigInt(ns_to_ms))
+                                )
+                                  .setZone("GMT")
+                                  .toLocaleString(DateTime.DATETIME_FULL)}
+                                )
                               </p>
 
                               {/* <p className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 sm:ml-6">

@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "build": "node log_env.js && (cd react && yarn && yarn build) && (cd react-ticker && yarn && yarn build)",
+    "build": "(cd react && yarn && yarn build) && (cd react-ticker && yarn && yarn build)",
     "start": "(cd react && yarn start)",
     "start:ticker": "(cd react-ticker && yarn start)",
     "azle": "cd azle && npx azle",
