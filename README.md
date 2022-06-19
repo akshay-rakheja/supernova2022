@@ -11,7 +11,7 @@ At the same time, we were blown away by the work of Jordan Last and his collabor
 There was an opportunity to make a unique IC capability uniquely easy as a service to people making dynamic, decentralized apps. We can imagine use cases across many categories:
 
 - _SocialFi_: DAO governance that acts on the common will after votes by using a time certain for the election. Then the autonomous organization can execute without requiring human intervention.
-- _GameFi_: Multiplayer games that move their common world forward independent of individual player actions
+- _GameFi_: Multiplayer games that move their common world forward independent of individual player actions. For example, a battle royale could keep changing the map on a regular basis to keep the intensity of gameplay.
 - _Metaverse_: Autonmous Metaverse NFTs that "behave" even when the user is not around, perhaps even reacting to special events (birthdays, holidays etc)
 - _Async DeFi_: Time-limited asynchronous market orders that execute or expire a certain period after going in
 - _Public Good_: Dead-man-switches that activate certain actions when a user does not otherwise specify "stop" beforehand, releasing information or executing actions to protect protesters. (Messages are cancellable).
