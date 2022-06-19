@@ -21,7 +21,7 @@ There was an opportunity to make a unique IC capability uniquely easy as a servi
 
 DeTi makes Internet Computers autonomous. DeTi is a decentralized cron scheduling service that will fire off a message to a designated canister on a specific function endpoint on a schedule or at a time designated by the user. We wrangled the date work so you would not have to: run your function every day at 5pm. Or every Tuesday at 9:23pm. Maybe just once next Saturday at 11. No matter your scheduling needs, you can compose them using DeTi.
 
-With DeTi, unstoppable canisters become unstoppable robots. We are imagining applia
+With DeTi, unstoppable canisters become unstoppable robots. Come try it out. We are offering free DeTi tokens during Supernova. You can check out DeTi out here: <https://fl5mh-daaaa-aaaap-qalja-cai.ic0.app/> and its reference implementation here: <https://d7hzd-wiaaa-aaaap-qamba-cai.ic0.app/>
 
 ## How we built it
 
@@ -56,7 +56,7 @@ We would love to continue to work on this project, which we think would be helpf
 - Putting on SNS when it is available
 - Passing custom arguments to the scheduled messages
 - Allow agents - make a canister able to self-schedule using another's pulse account, all from code
-- Add DETI to a DEX for easier liquity
+- Add DETI to a DEX for easier liquidity
 - Support identification and wallet software beyond Plug (as cool as it is!)
 - Add payment-based DETI minting
 - Increase the robustness of DETI to handle scale and be more unstoppable by moving across subnets.
