@@ -50,18 +50,18 @@ export default function Main() {
   const path = useResolvedPath(window.location);
   const navigation = [
     {
-      name: "Schedules",
+      name: "Recurring Schedules",
       href: "/schedules",
       current: path.pathname.startsWith("/schedules"),
     },
     {
-      name: "Messages",
+      name: "One-Time Messages",
       href: "/messages",
       current: path.pathname.startsWith("/messages"),
     },
     {
       name:
-        "DETI Tokens (" +
+        "Get DETI Tokens (" +
         (Number(pulses) / 10_000_000).toFixed(7) +
         ")" +
         (pulses && pulses < BigInt(10_000_000) ? " - Running Low!" : ""),

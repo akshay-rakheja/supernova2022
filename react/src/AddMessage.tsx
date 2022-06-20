@@ -135,14 +135,17 @@ export const AddMessage: FC<{
                     </div>
                     <p className="text-xs font-medium dark:text-white">
                       {DateTime.fromMillis(values.time)
-                        //   .setZone("GMT")
-                        .toLocaleString(DateTime.DATETIME_FULL)}
-                    </p>
-                    <p className="text-xs font-medium dark:text-white">
-                      {DateTime.fromMillis(values.time)
                         .setZone("GMT")
                         .toLocaleString(DateTime.DATETIME_FULL)}
                     </p>
+                    {/* <p className="text-xs font-medium dark:text-white">
+                      (
+                      {DateTime.fromMillis(values.time)
+                        //   .setZone("GMT")
+                        .toLocaleString(DateTime.DATETIME_FULL)}
+                      )
+                    </p> */}
+
                     <Field
                       name="time"
                       type="number"

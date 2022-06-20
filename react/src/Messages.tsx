@@ -218,13 +218,13 @@ export function Messages() {
                                 })()}
                                 {DateTime.fromMillis(
                                   Number(time / BigInt(ns_to_ms))
-                                ).toLocaleString(DateTime.DATETIME_FULL)}{" "}
+                                )
+                                  .setZone("GMT")
+                                  .toLocaleString(DateTime.DATETIME_FULL)}{" "}
                                 (
                                 {DateTime.fromMillis(
                                   Number(time / BigInt(ns_to_ms))
-                                )
-                                  .setZone("GMT")
-                                  .toLocaleString(DateTime.DATETIME_FULL)}
+                                ).toLocaleString(DateTime.DATETIME_FULL)}
                                 )
                               </p>
 
